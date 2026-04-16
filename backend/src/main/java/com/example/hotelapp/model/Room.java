@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "pokoje")
@@ -46,8 +47,14 @@ public class Room {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private RoomStatus status = RoomStatus.AVAILABLE;
+    private RoomStatus status = RoomStatus.DOSTEPNY;
 
     @Column(name = "utworzono", updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    @ManyToMany
+    @JoinTable(name = "pokoj_udogodnienia",
+            joinColumns = @JoinColumn(name = "pokoj_id"),
+            inverseJoinColumns = @JoinColumn(name = "udogodnienie_id"))
+    private List<Amenity> amenities;
 }
