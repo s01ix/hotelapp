@@ -1,9 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router';
-import { Calendar, Users, DollarSign, ArrowLeft } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { Button } from '../components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { Badge } from '../components/ui/badge';
 import {
   Table,
   TableBody,
@@ -20,210 +18,158 @@ export const UserDashboard: React.FC = () => {
 
   if (!isLoggedIn) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center p-8 bg-white rounded-xl shadow-sm">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
-            Zaloguj sie, aby wyswietlic swoje rezerwacje
-          </h2>
-          <Button onClick={() => navigate('/')} className="bg-[#1e3a8a]">
-            Powrot do strony glownej
-          </Button>
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="text-center p-12 border border-gray-100 max-w-md">
+          <h2 className="text-3xl font-serif mb-4">Zaloguj się</h2>
+          <p className="text-gray-500 mb-8 uppercase tracking-widest text-xs">
+            Aby zarządzać swoimi pobytami
+          </p>
+          <button 
+            onClick={() => navigate('/')} 
+            className="bg-primary text-white py-3 px-8 text-sm uppercase tracking-widest hover:bg-accent transition-colors"
+          >
+            Powrót
+          </button>
         </div>
       </div>
     );
   }
 
-  // Filtrowanie rezerwacji zalogowanego uzytkownika
   const userBookings = bookings.filter((b) => b.userId === user?.id);
-  
-  const upcomingBookings = userBookings.filter(
-    (b) => new Date(b.checkIn) >= new Date()
-  );
-  
-  const pastBookings = userBookings.filter(
-    (b) => new Date(b.checkIn) < new Date()
-  );
+  const upcomingBookings = userBookings.filter((b) => new Date(b.checkIn) >= new Date());
+  const pastBookings = userBookings.filter((b) => new Date(b.checkIn) < new Date());
 
-  const getStatusBadge = (status: string) => {
+  const getStatusStyle = (status: string) => {
     switch (status) {
-      case 'paid':
-        return <Badge className="bg-green-500">Opłacone</Badge>;
-      case 'pending':
-        return <Badge className="bg-amber-500">Oczekuje na zatwierdzenie</Badge>;
-      case 'confirmed':
-        return <Badge className="bg-blue-500">Potwierdzone</Badge>;
-      default:
-        return <Badge variant="secondary">{status}</Badge>;
+      case 'paid': return 'text-green-600';
+      case 'confirmed': return 'text-blue-600';
+      case 'pending': return 'text-accent';
+      default: return 'text-gray-400';
+    }
+  };
+
+  const getStatusName = (status: string) => {
+    switch (status) {
+      case 'paid': return 'Opłacone';
+      case 'confirmed': return 'Potwierdzone';
+      case 'pending': return 'Oczekuje';
+      default: return status;
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-[#fdfdfd] py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="mb-8">
+        
+        {}
+        <div className="mb-16">
           <Button
             onClick={() => navigate('/')}
             variant="ghost"
-            className="mb-4 hover:bg-gray-100"
+            className="mb-6 hover:text-accent p-0"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Wroc do strony glownej
+            <span className="text-xs uppercase tracking-widest">Wróć do strony głównej</span>
           </Button>
-          <h1 className="text-3xl font-bold text-gray-900">Moje Rezerwacje</h1>
-          <p className="text-gray-600 mt-2">
-            Witaj  {user?.name}
+          <h1 className="text-5xl font-serif mb-2">Witaj, {user?.name}</h1>
+          <p className="text-gray-400 uppercase tracking-[0.2em] text-[10px]">
+            Twoja historia i planowane pobyty w Hotelu Luks
           </p>
         </div>
 
-        {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600 mb-1">Wszystkie rezerwacje</p>
-                  <p className="text-3xl font-bold text-[#1e3a8a]">
-                    {userBookings.length}
-                  </p>
-                </div>
-                <Calendar className="h-10 w-10 text-blue-200" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600 mb-1">Nadchodzace pobyty</p>
-                  <p className="text-3xl font-bold text-amber-600">
-                    {upcomingBookings.length}
-                  </p>
-                </div>
-                <Users className="h-10 w-10 text-amber-200" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600 mb-1">Suma wydatkow</p>
-                  <p className="text-3xl font-bold text-green-600">
-                    {userBookings.reduce((sum, b) => sum + b.totalPrice, 0)} zl
-                  </p>
-                </div>
-                <DollarSign className="h-10 w-10 text-green-200" />
-              </div>
-            </CardContent>
-          </Card>
+        {}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
+          <div className="border-l border-gray-200 pl-6 py-2">
+            <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-2">Wszystkie rezerwacje</p>
+            <p className="text-3xl font-serif text-primary">{userBookings.length}</p>
+          </div>
+          <div className="border-l border-gray-200 pl-6 py-2">
+            <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-2">Nadchodzące pobyty</p>
+            <p className="text-3xl font-serif text-accent">{upcomingBookings.length}</p>
+          </div>
+          <div className="border-l border-gray-200 pl-6 py-2">
+            <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-2">Suma wydatków</p>
+            <p className="text-3xl font-serif text-primary">
+              {userBookings.reduce((sum, b) => sum + b.totalPrice, 0)} zł
+            </p>
+          </div>
         </div>
 
-        {/* Upcoming Bookings */}
-        {upcomingBookings.length > 0 && (
-          <Card className="mb-8 overflow-hidden">
-            <CardHeader className="bg-[#1e3a8a] text-white">
-              <CardTitle className="text-lg">Nadchodzace rezerwacje</CardTitle>
-            </CardHeader>
-            <CardContent className="p-0">
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>ID</TableHead>
-                      <TableHead>Pokoj</TableHead>
-                      <TableHead>Przyjazd</TableHead>
-                      <TableHead>Wyjazd</TableHead>
-                      <TableHead>Goscie</TableHead>
-                      <TableHead>Cena</TableHead>
-                      <TableHead>Platnosc</TableHead>
-                      <TableHead>Status</TableHead>
+        {}
+        <div className="mb-24">
+          <h2 className="text-2xl font-serif mb-8 border-b border-gray-100 pb-4">Nadchodzące pobyty</h2>
+          {upcomingBookings.length > 0 ? (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="hover:bg-transparent border-b border-gray-100">
+                    <TableHead className="text-[10px] uppercase tracking-widest font-bold text-gray-400">ID</TableHead>
+                    <TableHead className="text-[10px] uppercase tracking-widest font-bold text-gray-400">Apartament</TableHead>
+                    <TableHead className="text-[10px] uppercase tracking-widest font-bold text-gray-400">Termin</TableHead>
+                    <TableHead className="text-[10px] uppercase tracking-widest font-bold text-gray-400">Kwota</TableHead>
+                    <TableHead className="text-[10px] uppercase tracking-widest font-bold text-gray-400 text-right">Status</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {upcomingBookings.map((booking) => (
+                    <TableRow key={booking.id} className="border-b border-gray-50 hover:bg-gray-50/30">
+                      <TableCell className="text-[10px] font-mono text-gray-400">#{booking.id.slice(-6)}</TableCell>
+                      <TableCell className="font-medium">{booking.roomName}</TableCell>
+                      <TableCell className="text-gray-500 text-sm">{booking.checkIn} — {booking.checkOut}</TableCell>
+                      <TableCell className="font-serif font-bold text-primary">{booking.totalPrice} zł</TableCell>
+                      <TableCell className="text-right">
+                        <span className={`text-[10px] uppercase tracking-widest font-bold ${getStatusStyle(booking.status)}`}>
+                          {getStatusName(booking.status)}
+                        </span>
+                      </TableCell>
                     </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {upcomingBookings.map((booking) => (
-                      <TableRow key={booking.id}>
-                        <TableCell className="font-medium text-xs">#{booking.id.slice(0,8)}</TableCell>
-                        <TableCell>{booking.roomName}</TableCell>
-                        <TableCell>{booking.checkIn}</TableCell>
-                        <TableCell>{booking.checkOut}</TableCell>
-                        <TableCell>{booking.guests}</TableCell>
-                        <TableCell className="font-semibold">
-                          {booking.totalPrice} zl
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="outline">
-                            {booking.paymentMethod === 'online' ? 'Online' : 'Przelew'}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>{getStatusBadge(booking.status)}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          ) : (
+            <div className="py-12 border border-dashed border-gray-200 text-center">
+              <p className="font-serif italic text-gray-400">Brak zaplanowanych pobytów</p>
+            </div>
+          )}
+        </div>
 
-        {/* Past Bookings */}
+        {}
         {pastBookings.length > 0 && (
-          <Card className="overflow-hidden">
-            <CardHeader className="bg-gray-100">
-              <CardTitle className="text-lg text-gray-700">Historia pobytow</CardTitle>
-            </CardHeader>
-            <CardContent className="p-0">
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>ID</TableHead>
-                      <TableHead>Pokoj</TableHead>
-                      <TableHead>Przyjazd</TableHead>
-                      <TableHead>Wyjazd</TableHead>
-                      <TableHead>Cena</TableHead>
-                      <TableHead>Status</TableHead>
+          <div>
+            <h2 className="text-2xl font-serif mb-8 border-b border-gray-100 pb-4 text-gray-400">Historia pobytów</h2>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableBody>
+                  {pastBookings.map((booking) => (
+                    <TableRow key={booking.id} className="border-b border-gray-50 opacity-60">
+                      <TableCell className="py-4 text-gray-500">{booking.roomName}</TableCell>
+                      <TableCell className="text-gray-400 text-sm">{booking.checkIn} — {booking.checkOut}</TableCell>
+                      <TableCell className="text-gray-500 font-serif">{booking.totalPrice} zł</TableCell>
+                      <TableCell className="text-right">
+                        <span className="text-[10px] uppercase tracking-widest font-bold text-gray-400">
+                          Zakończono
+                        </span>
+                      </TableCell>
                     </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {pastBookings.map((booking) => (
-                      <TableRow key={booking.id} className="opacity-70">
-                        <TableCell className="text-xs">#{booking.id.slice(0,8)}</TableCell>
-                        <TableCell>{booking.roomName}</TableCell>
-                        <TableCell>{booking.checkIn}</TableCell>
-                        <TableCell>{booking.checkOut}</TableCell>
-                        <TableCell>{booking.totalPrice} zl</TableCell>
-                        <TableCell>{getStatusBadge(booking.status)}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            </CardContent>
-          </Card>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </div>
         )}
 
         {/* No Bookings Case */}
         {userBookings.length === 0 && (
-          <Card>
-            <CardContent className="py-16 text-center">
-              <Calendar className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                Brak rezerwacji
-              </h3>
-              <p className="text-gray-600 mb-6">
-                Nie masz jeszcze zadnych rezerwacji. Znajdz idealny pokoj dla siebie!
-              </p>
-              <Button
-                onClick={() => navigate('/')}
-                className="bg-amber-500 hover:bg-amber-600 text-white"
-              >
-                Przegladaj pokoje
-              </Button>
-            </CardContent>
-          </Card>
+          <div className="py-32 text-center">
+            <h3 className="text-3xl font-serif mb-6">Nie masz jeszcze żadnych rezerwacji</h3>
+            <Button
+              onClick={() => navigate('/')}
+              className="bg-primary text-white rounded-none px-10 py-6 text-sm uppercase tracking-widest hover:bg-accent"
+            >
+              Przeglądaj Apartamenty
+            </Button>
+          </div>
         )}
       </div>
     </div>
