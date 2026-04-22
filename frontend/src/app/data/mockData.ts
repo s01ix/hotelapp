@@ -76,7 +76,7 @@ export const rooms: Room[] = [
   },
   {
     id: '6',
-    name: 'Pokoj Standardowy Dwuosobowy',
+    name: 'Pokoj Standardowy ',
     description: 'Komfortowy pokoj z dwoma lozkami pojedynczymi, idealny dla osob dbajacych o budzet.',
     pricePerNight: 149,
     image: 'https://images.unsplash.com/photo-1731336478850-6bce7235e320?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBob3RlbCUyMHJvb20lMjBiZWR8ZW58MXx8fHwxNzc0MjcwMjY5fDA&ixlib=rb-4.1.0&q=80&w=1080',

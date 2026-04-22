@@ -22,11 +22,13 @@ export const Checkout: React.FC = () => {
 
   if (!room || !searchParams) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center p-8 bg-white rounded-xl shadow-lg">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Sesja wygasła</h2>
-          <p className="text-gray-600 mb-6">Nie znaleziono szczegółów rezerwacji.</p>
-          <Button onClick={() => navigate('/')} className="bg-[#1e3a8a]">Wróć do strony głównej</Button>
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="text-center p-12 border border-gray-100 max-w-md">
+          <h2 className="text-3xl font-serif mb-4">Sesja wygasła</h2>
+          <p className="text-gray-500 mb-8 uppercase tracking-widest text-xs">Nie znaleziono szczegółów rezerwacji</p>
+          <Button onClick={() => navigate('/')} className="bg-primary text-white rounded-none px-8">
+            Wróć do strony głównej
+          </Button>
         </div>
       </div>
     );
@@ -51,7 +53,6 @@ export const Checkout: React.FC = () => {
       checkOut: searchParams.checkOut,
       guests: searchParams.guests,
       totalPrice,
-      // Logika statusu: online -> opłacone, offline -> oczekujące
       status: paymentMethod === 'online' ? ('paid' as const) : ('pending' as const),
       paymentMethod,
       userName: fullName,
@@ -60,215 +61,185 @@ export const Checkout: React.FC = () => {
     addBooking(newBooking);
     
     if (paymentMethod === 'online') {
-      alert('Płatność zakończona sukcesem! Rezerwacja została potwierdzona.');
+      alert('Płatność zakończona sukcesem!');
     } else {
-      alert('Rezerwacja złożona! Prosimy o dokonanie przelewu. Rezerwacja zostanie zatwierdzona przez administratora po zaksięgowaniu wpłaty.');
+      alert('Rezerwacja złożona! Prosimy o dokonanie przelewu.');
     }
     
     navigate('/dashboard');
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#fdfdfd] py-16">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <Button
             onClick={() => navigate(-1)}
             variant="ghost"
-            className="mb-4 hover:bg-gray-200"
+            className="mb-8 hover:text-accent p-0"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Powrót
+            <span className="text-xs uppercase tracking-widest text-gray-500">Powrót</span>
         </Button>
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Podsumowanie i Płatność</h1>
+        
+        <h1 className="text-5xl font-serif mb-12">Rezerwacja</h1>
 
         <form onSubmit={handleConfirmBooking}>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Lewa kolumna: Dane i Płatność */}
-            <div className="lg:col-span-2 space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            <div className="lg:col-span-2 space-y-12">
               
-              {/* Szczegóły pokoju */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Wybrany Pokój</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex gap-4">
-                    <img
-                      src={room.image}
-                      alt={room.name}
-                      className="w-24 h-24 rounded-lg object-cover"
-                    />
-                    <div>
-                      <h3 className="font-semibold text-lg">{room.name}</h3>
-                      <p className="text-sm text-gray-600 line-clamp-2">{room.description}</p>
+              <section>
+                <h2 className="text-xl font-serif mb-6 border-b border-gray-100 pb-2">Wybrany apartament</h2>
+                <div className="flex gap-8 items-start">
+                  <img
+                    src={room.image}
+                    alt={room.name}
+                    className="w-40 h-40 object-cover"
+                  />
+                  <div>
+                    <h3 className="text-2xl font-serif mb-2">{room.name}</h3>
+                    <p className="text-sm text-gray-500 leading-relaxed max-w-md">{room.description}</p>
+                    <div className="mt-4 flex gap-4 text-[10px] uppercase tracking-widest text-gray-400">
+                      <span>Max. {room.maxGuests} osób</span>
+                      <span>{room.size}</span>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </section>
 
-              {/* Dane gościa */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Dane Gościa</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="fullName">Imię i Nazwisko *</Label>
-                      <Input
-                        id="fullName"
-                        value={fullName}
-                        onChange={(e) => setFullName(e.target.value)}
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Adres E-mail *</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                      />
-                    </div>
-                  </div>
+              <section>
+                <h2 className="text-xl font-serif mb-6 border-b border-gray-100 pb-2">Dane gościa</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label htmlFor="phone">Numer Telefonu *</Label>
+                    <Label className="text-xs uppercase tracking-widest text-gray-500">Imię i Nazwisko</Label>
                     <Input
-                      id="phone"
-                      type="tel"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      placeholder="+48 000 000 000"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      className="rounded-none border-gray-300 focus-visible:ring-accent"
                       required
                     />
                   </div>
-                </CardContent>
-              </Card>
+                  <div className="space-y-2">
+                    <Label className="text-xs uppercase tracking-widest text-gray-500">Adres E-mail</Label>
+                    <Input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="rounded-none border-gray-300 focus-visible:ring-accent"
+                      required
+                    />
+                  </div>
+                </div>
+                <div className="mt-6 space-y-2">
+                  <Label className="text-xs uppercase tracking-widest text-gray-500">Numer telefonu</Label>
+                  <Input
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="+48 000 000 000"
+                    className="rounded-none border-gray-300 focus-visible:ring-accent"
+                    required
+                  />
+                </div>
+              </section>
 
-              {/* Wybór płatności */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Metoda Płatności</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <RadioGroup
-                    value={paymentMethod}
-                    onValueChange={(value) => setPaymentMethod(value as 'online' | 'offline')}
-                    className="space-y-4"
+              <section>
+                <h2 className="text-xl font-serif mb-6 border-b border-gray-100 pb-2">Metoda płatności</h2>
+                <RadioGroup
+                  value={paymentMethod}
+                  onValueChange={(value) => setPaymentMethod(value as 'online' | 'offline')}
+                  className="grid grid-cols-1 md:grid-cols-2 gap-4"
+                >
+                  <div
+                    className={`p-6 border cursor-pointer transition-all ${
+                      paymentMethod === 'online'
+                        ? 'border-primary bg-gray-50'
+                        : 'border-gray-100 hover:border-gray-200 bg-white'
+                    }`}
+                    onClick={() => setPaymentMethod('online')}
                   >
-                    {/* Płatność Online */}
-                    <div
-                      className={`flex items-start space-x-3 border-2 rounded-lg p-4 cursor-pointer transition-all ${
-                        paymentMethod === 'online'
-                          ? 'border-[#1e3a8a] bg-blue-50'
-                          : 'border-gray-200 hover:border-gray-300'
-                      }`}
-                      onClick={() => setPaymentMethod('online')}
-                    >
-                      <RadioGroupItem value="online" id="online" className="mt-1" />
-                      <label htmlFor="online" className="flex-1 cursor-pointer">
-                        <div className="flex items-center gap-2 mb-2">
-                          <CreditCard className="h-5 w-5 text-[#1e3a8a]" />
-                          <span className="font-semibold text-gray-900">
-                            Płatność Online (Karta / BLIK)
-                          </span>
-                        </div>
-                        <p className="text-sm text-gray-600">
-                          Natychmiastowe potwierdzenie rezerwacji przez system szybkich płatności.
-                        </p>
-                      </label>
+                    <div className="flex items-center gap-3 mb-4">
+                      <RadioGroupItem value="online" id="online" />
+                      <CreditCard className="h-4 w-4 text-primary" />
+                      <Label htmlFor="online" className="font-serif text-lg cursor-pointer">Online</Label>
                     </div>
+                    <p className="text-xs text-gray-400 leading-relaxed uppercase tracking-wider">
+                      Natychmiastowe potwierdzenie rezerwacji (Karta / BLIK)
+                    </p>
+                  </div>
 
-                    {/* Przelew Tradycyjny */}
-                    <div
-                      className={`flex items-start space-x-3 border-2 rounded-lg p-4 cursor-pointer transition-all ${
-                        paymentMethod === 'offline'
-                          ? 'border-[#1e3a8a] bg-blue-50'
-                          : 'border-gray-200 hover:border-gray-300'
-                      }`}
-                      onClick={() => setPaymentMethod('offline')}
-                    >
-                      <RadioGroupItem value="offline" id="offline" className="mt-1" />
-                      <label htmlFor="offline" className="flex-1 cursor-pointer">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Building2 className="h-5 w-5 text-[#1e3a8a]" />
-                          <span className="font-semibold text-gray-900">
-                            Przelew Tradycyjny
-                          </span>
-                        </div>
-                        <p className="text-sm text-gray-600">
-                          Zarezerwuj teraz, zapłać przelewem w ciągu 24h. Rezerwacja zostanie zatwierdzona przez obsługę hotelu.
-                        </p>
-                        {paymentMethod === 'offline' && (
-                          <div className="mt-4 bg-amber-50 rounded-md p-3 border border-amber-200">
-                            <p className="text-sm font-medium text-amber-900 mb-1">Dane do przelewu:</p>
-                            <p className="text-xs text-gray-700 leading-relaxed">
-                              Nr konta: 88 1020 4444 0000 1234 5678 9000<br />
-                              Odbiorca: Hotel React Resort Sp. z o.o.<br />
-                              Tytuł: Rezerwacja {room.name} - {fullName}
-                            </p>
-                          </div>
-                        )}
-                      </label>
+                  <div
+                    className={`p-6 border cursor-pointer transition-all ${
+                      paymentMethod === 'offline'
+                        ? 'border-primary bg-gray-50'
+                        : 'border-gray-100 hover:border-gray-200 bg-white'
+                    }`}
+                    onClick={() => setPaymentMethod('offline')}
+                  >
+                    <div className="flex items-center gap-3 mb-4">
+                      <RadioGroupItem value="offline" id="offline" />
+                      <Building2 className="h-4 w-4 text-primary" />
+                      <Label htmlFor="offline" className="font-serif text-lg cursor-pointer">Przelew</Label>
                     </div>
-                  </RadioGroup>
-                </CardContent>
-              </Card>
+                    <p className="text-xs text-gray-400 leading-relaxed uppercase tracking-wider">
+                      Wymaga weryfikacji przez obsługę hotelu
+                    </p>
+                  </div>
+                </RadioGroup>
+
+                {paymentMethod === 'offline' && (
+                  <div className="mt-6 p-6 border border-gray-100 bg-white">
+                    <p className="text-[10px] uppercase tracking-widest text-accent mb-4 font-bold">Dane do przelewu</p>
+                    <div className="space-y-1 text-sm text-gray-600 font-mono">
+                      <p>Nr: 88 1020 4444 0000 1234 5678 9000</p>
+                      <p>Hotel Luks & Spa Sp. z o.o.</p>
+                      <p>Tytuł: Rezerwacja {room.name.slice(0, 10)} - {fullName}</p>
+                    </div>
+                  </div>
+                )}
+              </section>
             </div>
 
-            {/* Prawa kolumna: Podsumowanie kosztów */}
-            <div className="lg:col-span-1">
-              <Card className="sticky top-8">
-                <CardHeader className="bg-[#1e3a8a] text-white rounded-t-lg">
-                  <CardTitle>Podsumowanie kosztów</CardTitle>
-                </CardHeader>
-                <CardContent className="pt-6 space-y-4">
-                  <div className="space-y-3">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Przyjazd:</span>
-                      <span className="font-medium">{searchParams.checkIn}</span>
+            <aside className="lg:col-span-1">
+              <div className="border border-gray-200 p-8 sticky top-24 bg-white">
+                <h3 className="text-xl font-serif mb-8 border-b border-gray-100 pb-4">Podsumowanie</h3>
+                
+                <div className="space-y-6">
+                  <div className="flex justify-between">
+                    <span className="text-[10px] uppercase tracking-widest text-gray-400">Pobyt</span>
+                    <span className="text-sm font-medium">{nights} {nights === 1 ? 'noc' : 'noce'}</span>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-xs">
+                      <span className="text-gray-400">Zameldowanie</span>
+                      <span>{searchParams.checkIn}</span>
                     </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Wyjazd:</span>
-                      <span className="font-medium">{searchParams.checkOut}</span>
+                    <div className="flex justify-between text-xs">
+                      <span className="text-gray-400">Wymeldowanie</span>
+                      <span>{searchParams.checkOut}</span>
                     </div>
-                    <hr />
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">
-                        {room.pricePerNight} zł × {nights} noce
-                      </span>
-                      <span className="font-medium">{totalPrice} zł</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Opłata serwisowa</span>
-                      <span className="font-medium">0 zł</span>
-                    </div>
-                    <div className="border-t border-gray-200 pt-3">
-                      <div className="flex justify-between">
-                        <span className="font-bold text-lg">Suma:</span>
-                        <span className="font-bold text-2xl text-[#1e3a8a]">
-                          {totalPrice} zł
-                        </span>
-                      </div>
+                  </div>
+
+                  <div className="border-t border-gray-100 pt-6">
+                    <div className="flex justify-between items-end mb-8">
+                      <span className="text-[10px] uppercase tracking-widest text-gray-400">Suma brutto</span>
+                      <span className="text-3xl font-serif text-primary">{totalPrice} zł</span>
                     </div>
                   </div>
 
                   <Button
                     type="submit"
-                    className="w-full bg-amber-500 hover:bg-amber-600 text-white text-lg py-6"
+                    className="w-full bg-primary hover:bg-accent text-white rounded-none py-8 text-sm uppercase tracking-widest transition-colors"
                   >
-                    <CheckCircle className="h-5 w-5 mr-2" />
                     Potwierdzam rezerwację
                   </Button>
 
-                  <p className="text-xs text-gray-500 text-center leading-relaxed">
-                    Klikając przycisk, akceptujesz regulamin hotelu oraz politykę prywatności.
+                  <p className="text-[9px] text-gray-400 text-center uppercase tracking-tighter leading-relaxed">
+                    Dokonując rezerwacji akceptujesz regulamin świadczenia usług Hotelu Luks & Spa
                   </p>
-                </CardContent>
-              </Card>
-            </div>
+                </div>
+              </div>
+            </aside>
           </div>
         </form>
       </div>
