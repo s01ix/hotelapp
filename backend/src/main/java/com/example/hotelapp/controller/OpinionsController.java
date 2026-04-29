@@ -1,7 +1,8 @@
 package com.example.hotelapp.controller;
 
-import com.example.hotelapp.model.Opinions;
-import com.example.hotelapp.repository.OpinionsRepository;
+import com.example.hotelapp.dto.OpinionsDTO;
+import com.example.hotelapp.service.OpinionsService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,40 +12,26 @@ import java.util.List;
 @RequestMapping("api/opinions")
 @RequiredArgsConstructor
 public class OpinionsController {
-    private final OpinionsRepository opinionsRepository;
+
+    private final OpinionsService opinionsService;
 
     @GetMapping
-    public List<Opinions> getAll(){
-        return opinionsRepository.findAll();
+    public List<OpinionsDTO> getAll() {
+        return opinionsService.getAll();
     }
 
     @PostMapping
-    public Opinions create(@RequestBody Opinions opinions){
-        opinions.setId(null);
-        return opinionsRepository.save(opinions);
+    public OpinionsDTO create(@Valid @RequestBody OpinionsDTO opinionsDTO) {
+        return opinionsService.create(opinionsDTO);
     }
 
     @PutMapping("/{id}")
-    public Opinions update(@RequestBody Opinions opinions, @PathVariable Long id){
-        return opinionsRepository.findById(id)
-                .map(existingOpinions ->{
-                    if(opinions.getRate() != null){
-                        existingOpinions.setRate(opinions.getRate());
-                    }
-                    if(opinions.getComment() != null){
-                        existingOpinions.setComment(opinions.getComment());
-                    }
-
-                    return opinionsRepository.save(existingOpinions);
-                }).orElseThrow(()-> new RuntimeException("Nie znaleziono opini o podanym ID"));
+    public OpinionsDTO update(@PathVariable Long id, @RequestBody OpinionsDTO opinionsDTO) {
+        return opinionsService.update(id, opinionsDTO);
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id){
-        if(opinionsRepository.existsById(id)){
-            opinionsRepository.deleteById(id);
-        }else {
-            throw new RuntimeException("Nie znaleziono opini o podanym ID");
-        }
+    public void delete(@PathVariable Long id) {
+        opinionsService.delete(id);
     }
 }

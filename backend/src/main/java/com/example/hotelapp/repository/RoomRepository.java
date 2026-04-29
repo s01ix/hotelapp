@@ -8,8 +8,4 @@ import java.util.List;
 
 @Repository
 public interface RoomRepository extends JpaRepository<Room, Long> {
-    List<Room> findByHotelId(Long hotelId);
-    //odpowiednik SQL: SELECT * FROM pokoje WHERE status = 'AVAILABLE'
-    List<Room> findByStatus(RoomStatus status);
-
 }

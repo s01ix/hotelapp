@@ -38,7 +38,7 @@ public class Opinions {
     @Min(1)
     @Max(5)
     @Column(name = "ocena")
-    private String rate;
+    private Integer rate;
 
     @Column(name = "komentarz", length = 1000)
     private String comment;

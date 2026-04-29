@@ -1,7 +1,9 @@
 package com.example.hotelapp.controller;
 
+import com.example.hotelapp.dto.HotelDTO;
 import com.example.hotelapp.model.Hotel;
 import com.example.hotelapp.repository.HotelRepository;
+import com.example.hotelapp.service.HotelService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -13,53 +15,26 @@ import java.util.List;
 @RequiredArgsConstructor
 
 public class HotelController {
-    private final HotelRepository hotelRepository;
+    private final HotelService hotelService;
 
     @GetMapping // operacja READ
-    public List<Hotel> getAll(){
-        return hotelRepository.findAll();
+    public List<HotelDTO> getAll(){
+        return hotelService.getAll();
     }
 
     @PostMapping // operacja CREATE
-    public Hotel create(@Valid @RequestBody Hotel hotel){   //@Valid sprawdza czy dane są poprawne
-        hotel.setId(null);  // dajemy null żeby id było puste żeby nikt nie nadpisał istniejącego rekordu
-        return hotelRepository.save(hotel);
+    public HotelDTO create(@Valid @RequestBody HotelDTO hotelDTO){   //@Valid sprawdza czy dane są poprawne
+        return hotelService.create(hotelDTO);
     }
 
     @PutMapping("/{id}") // operacja UPDATE
-    public Hotel update(@PathVariable Long id, @RequestBody Hotel hotel){
-        return hotelRepository.findById(id)
-                .map(existingHotel -> {
-                    if(hotel.getName() != null){
-                        existingHotel.setName(hotel.getName());
-                    }
-                    if(hotel.getDescription() != null){
-                        existingHotel.setDescription(hotel.getDescription());
-                    }
-                    if(hotel.getStars() != null){
-                        existingHotel.setStars(hotel.getStars());
-                    }
-                    if(hotel.getPhone() != null){
-                        existingHotel.setPhone(hotel.getPhone());
-                    }
-                    if(hotel.getEmail() != null){
-                        existingHotel.setEmail(hotel.getEmail());
-                    }
-                    if(hotel.getLocation() != null){
-                        existingHotel.setLocation(hotel.getLocation());
-                    }
-
-                    return hotelRepository.save(existingHotel);
-                }).orElseThrow(() -> new RuntimeException("Nie znaleziono hotelu o podanym ID"));
+    public HotelDTO update(@PathVariable Long id, @RequestBody HotelDTO hotelDTO){
+        return hotelService.update(id, hotelDTO);
     }
 
     @DeleteMapping("/{id}") // operacja DELETE
     public void delete(@PathVariable Long id){
-        if(hotelRepository.existsById(id)){
-            hotelRepository.deleteById(id);
-        }else {
-            throw new RuntimeException("Nie można usunąć: brak hotelu o podanym ID");
-        }
+        hotelService.delete(id);
     }
 
 }
