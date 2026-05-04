@@ -35,6 +35,21 @@ public class BookingService {
     }
 
     public BookingDTO create(BookingDTO bookingDTO) {
+        //sprawdzenie dostępnosci pokoi
+        if (!bookingDTO.getCheckOutDate().isAfter(bookingDTO.getCheckInDate())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Data wymeldowania musi być późniejsza niż data zameldowania!");
+        }
+        boolean isOccupied = bookingRepository.existsOverlappingBooking(
+                bookingDTO.getRoomId(),
+                bookingDTO.getCheckInDate(),
+                bookingDTO.getCheckOutDate(),
+                BookingStatus.ANULOWANA
+        );
+        if (isOccupied) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Przepraszamy, ten pokój jest już zajęty w wybranym terminie!");
+        }
+
+
         User user = userRepository.findById(bookingDTO.getUserId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nie znaleziono użytkownika o ID"));
         Room room = roomRepository.findById(bookingDTO.getRoomId())
@@ -49,6 +64,21 @@ public class BookingService {
     }
 
     public BookingDTO update(Long id, BookingDTO bookingDTO) {
+        //sprawdzenie dostępności pokoi
+        if (!bookingDTO.getCheckOutDate().isAfter(bookingDTO.getCheckInDate())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Data wymeldowania musi być późniejsza niż data zameldowania!");
+        }
+        boolean isOccupied = bookingRepository.existsOverlappingBookingForUpdate(
+                bookingDTO.getRoomId(),
+                bookingDTO.getCheckInDate(),
+                bookingDTO.getCheckOutDate(),
+                id,
+                BookingStatus.ANULOWANA
+        );
+        if (isOccupied) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Nie można zmienić terminu! Pokój jest zajęty w nowym czasie przez inną rezerwację.");
+        }
+
         Booking existingBooking = bookingRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nie znaleziono rezerwacji o ID: " + id));
 

@@ -150,7 +150,7 @@ CREATE TABLE opinie (
                         rezerwacja_id       NUMBER NOT NULL,
                         uzytkownik_id       NUMBER NOT NULL,
                         pokoj_id            NUMBER NOT NULL,
-                        ocena               NUMBER(1) NOT NULL,
+                        ocena               NUMBER(10,0) NOT NULL,
                         komentarz           VARCHAR2(4000 CHAR),
                         utworzono           TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
 
