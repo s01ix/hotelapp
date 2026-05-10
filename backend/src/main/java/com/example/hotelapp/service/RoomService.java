@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +29,19 @@ public class RoomService {
         List<RoomDTO> dtoList = new ArrayList<>();
 
         for (Room room : roomsFromDb) {
+            dtoList.add(mapToDto(room));
+        }
+        return dtoList;
+    }
+
+    //Filtracja dostępnych pokoi po dacie i liczbie gosci
+    public List<RoomDTO> searchAvailableRooms(LocalDate checkIn, LocalDate checkOut, Integer guests) {
+        Integer guestsCount = (guests != null) ? guests : 1;
+
+        List<Room> rooms = roomRepository.findAvailableRooms(checkIn, checkOut, guests);
+
+        List<RoomDTO> dtoList = new ArrayList<>();
+        for (Room room : rooms) {
             dtoList.add(mapToDto(room));
         }
         return dtoList;

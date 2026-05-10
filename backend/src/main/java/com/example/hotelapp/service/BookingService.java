@@ -1,11 +1,9 @@
 package com.example.hotelapp.service;
 
 import com.example.hotelapp.dto.BookingDTO;
-import com.example.hotelapp.model.Booking;
-import com.example.hotelapp.model.BookingStatus;
-import com.example.hotelapp.model.Room;
-import com.example.hotelapp.model.User;
+import com.example.hotelapp.model.*;
 import com.example.hotelapp.repository.BookingRepository;
+import com.example.hotelapp.repository.RoomPriceRepository;
 import com.example.hotelapp.repository.RoomRepository;
 import com.example.hotelapp.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +11,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +24,7 @@ public class BookingService {
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
     private final RoomRepository roomRepository;
+    private final RoomPriceRepository roomPriceRepository;
 
     public List<BookingDTO> getAll() {
         List<Booking> bookingsFromDb = bookingRepository.findAll();
@@ -49,7 +51,6 @@ public class BookingService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Przepraszamy, ten pokój jest już zajęty w wybranym terminie!");
         }
 
-
         User user = userRepository.findById(bookingDTO.getUserId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nie znaleziono użytkownika o ID"));
         Room room = roomRepository.findById(bookingDTO.getRoomId())
@@ -58,6 +59,22 @@ public class BookingService {
         Booking bookingToSave = mapToEntity(bookingDTO);
         bookingToSave.setUser(user);
         bookingToSave.setRoom(room);
+
+        //Kalkulator ceny
+        BigDecimal totalPrice = BigDecimal.ZERO;
+        LocalDate startDate = bookingDTO.getCheckInDate();
+        LocalDate endDate = bookingDTO.getCheckOutDate();
+
+        for(LocalDate date = startDate; date.isBefore(endDate); date = date.plusDays(1)){
+            BigDecimal dailyPrice = roomPriceRepository.
+                    findByRoomIdAndStartDateLessThanEqualAndEndDateGreaterThanEqual(room.getId(), date, date).
+                    map(RoomPrice::getPrice). // jesli jest to bierzemy cene sezonowa
+                    orElse(room.getBasePrice()); // jesli nie ma to sama bazowa
+
+            totalPrice = totalPrice.add(dailyPrice);
+        }
+
+        bookingToSave.setTotalAmount(totalPrice);
 
         Booking savedBooking = bookingRepository.save(bookingToSave);
         return mapToDto(savedBooking);
@@ -92,16 +109,25 @@ public class BookingService {
         existingBooking.setCheckOutDate(bookingDTO.getCheckOutDate());
         existingBooking.setAdults(bookingDTO.getAdults());
         existingBooking.setChildren(bookingDTO.getChildren());
-        existingBooking.setTotalAmount(bookingDTO.getTotalAmount());
         existingBooking.setNotes(bookingDTO.getNotes());
 
         existingBooking.setUser(user);
         existingBooking.setRoom(room);
 
-        existingBooking.setStatus(bookingDTO.getStatus());
-        if (bookingDTO.getStatus() == BookingStatus.ANULOWANA) {
-            existingBooking.setCancelledAt(LocalDateTime.now());
+        //Kalkulator ceny
+        BigDecimal totalPrice = BigDecimal.ZERO;
+        LocalDate startDate = bookingDTO.getCheckInDate();
+        LocalDate endDate = bookingDTO.getCheckOutDate();
+
+        for(LocalDate date = startDate; date.isBefore(endDate); date = date.plusDays(1)){
+            BigDecimal dailyPrice = roomPriceRepository.
+                    findByRoomIdAndStartDateLessThanEqualAndEndDateGreaterThanEqual(room.getId(), date, date).
+                    map(RoomPrice::getPrice). // jesli jest to bierzemy cene sezonowa
+                            orElse(room.getBasePrice()); // jesli nie ma to sama bazowa
+
+            totalPrice = totalPrice.add(dailyPrice);
         }
+        existingBooking.setTotalAmount(totalPrice);
 
         Booking savedBooking = bookingRepository.save(existingBooking);
         return mapToDto(savedBooking);

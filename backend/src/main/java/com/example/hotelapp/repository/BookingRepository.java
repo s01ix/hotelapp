@@ -2,11 +2,13 @@ package com.example.hotelapp.repository;
 
 import com.example.hotelapp.model.Booking;
 import com.example.hotelapp.model.BookingStatus;
+import com.example.hotelapp.model.RoomPrice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
@@ -33,4 +35,5 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
                                               @Param("checkOutDate") LocalDate checkOutDate,
                                               @Param("bookingId") Long bookingId,
                                               @Param("status") BookingStatus status);
+
 }

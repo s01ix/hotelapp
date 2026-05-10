@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -21,6 +23,11 @@ public class RoomController {
     @GetMapping
     public List<RoomDTO> getAll(){
         return roomService.getAll();
+    }
+    //filtrowanie dostępnych pokoi po dacie i liczbie gosci
+    @GetMapping("/available")
+    public List<RoomDTO> getAvailableRooms(@RequestParam LocalDate checkIn, @RequestParam LocalDate checkOut, @RequestParam(required = false) Integer maxGuests) {
+        return roomService.searchAvailableRooms(checkIn, checkOut, maxGuests);
     }
 
     @PostMapping
