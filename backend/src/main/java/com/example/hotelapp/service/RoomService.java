@@ -47,6 +47,12 @@ public class RoomService {
         return dtoList;
     }
 
+    public RoomDTO getRoomById(Long id){
+        Room room = roomRepository.findById(id).
+                orElseThrow(() -> new RuntimeException("Nie znaleziono pokoju o podanym ID"));
+        return mapToDto(room);
+    }
+
     public RoomDTO create(RoomDTO roomDTO) {
 
         Hotel hotel = hotelRepository.findById(roomDTO.getHotelId())
@@ -121,10 +127,13 @@ public class RoomService {
         // Zabezpieczenie udogodnień: zamieniamy obiekty na prostą listę numerów ID
         if (room.getAmenities() != null) {
             List<Long> amenityIds = new ArrayList<>();
+            List<String> amenities = new ArrayList<>();
             for (Amenity amenity : room.getAmenities()) {
                 amenityIds.add(amenity.getId());
+                amenities.add(amenity.getName());
             }
             dto.setAmenityIds(amenityIds);
+            dto.setAmenities(amenities);
         }
 
         return dto;

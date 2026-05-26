@@ -9,5 +9,5 @@ public class HotelappApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(HotelappApplication.class, args);
 	}
-
+	//haslo do logowania dla użytkowników co już są w bazie: password
 }

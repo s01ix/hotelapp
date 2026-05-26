@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Optional;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,6 +18,42 @@ import java.util.List;
 public class UserService {
     private final UserRepository userRepository;
 
+    //do logowania oauth2
+    public UserDTO getOrCreateUserFromGoogle(String email, String fullName) {
+        Optional<User> existingUser = userRepository.findByEmail(email);
+
+        if (existingUser.isPresent()) {
+            return mapToDto(existingUser.get());
+        } else {
+            User newUser = new User();
+            newUser.setEmail(email);
+
+            String firstName = fullName;
+            String lastName = "GoogleUser";
+
+            if (fullName != null && fullName.trim().contains(" ")) {
+                String[] parts = fullName.trim().split("\\s+", 2);
+                firstName = parts[0];
+                lastName = parts[1];
+            }
+
+            newUser.setName(firstName);
+            newUser.setLastName(lastName);
+
+            newUser.setPhone("000000000");
+            newUser.setPasswordHash("OAUTH2_ACCOUNT_" + java.util.UUID.randomUUID().toString());
+            newUser.setRole(UserRole.USER);
+
+            User savedUser = userRepository.save(newUser);
+            return mapToDto(savedUser);
+        }
+    }
+
+    public UserDTO getUserByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nie znaleziono użytkownika"));
+        return mapToDto(user);
+    }
     public List<UserDTO> getAll() {
         List<User> usersFromDb = userRepository.findAll();
         List<UserDTO> dtoList = new ArrayList<>();
@@ -26,6 +63,7 @@ public class UserService {
         }
         return dtoList;
     }
+
     public UserDTO create(UserDTO userDTO) {
         User userToSave = mapToEntity(userDTO);
 

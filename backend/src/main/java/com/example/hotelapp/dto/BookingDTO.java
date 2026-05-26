@@ -12,8 +12,10 @@ public class BookingDTO {
     private Long id;
 
     private Long userId;
+    private String userEmail;
     private Long roomId;
 
+    private String roomName;
     private LocalDate checkInDate;
     private LocalDate checkOutDate;
     private Integer adults;

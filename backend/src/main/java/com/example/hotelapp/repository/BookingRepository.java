@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
@@ -35,5 +36,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
                                               @Param("checkOutDate") LocalDate checkOutDate,
                                               @Param("bookingId") Long bookingId,
                                               @Param("status") BookingStatus status);
-
+    //znajdowanie rezerwacji danegu użytkownika
+    List<Booking> findByUserEmail(String email);
 }

@@ -12,11 +12,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +24,14 @@ public class BookingService {
     private final UserRepository userRepository;
     private final RoomRepository roomRepository;
     private final RoomPriceRepository roomPriceRepository;
+
+    public List<BookingDTO> getBookingsForUser(String email) {
+        List<Booking> bookings = bookingRepository.findByUserEmail(email);
+
+        return bookings.stream()
+                .map(this::mapToDto)
+                .collect(Collectors.toList());
+    }
 
     public List<BookingDTO> getAll() {
         List<Booking> bookingsFromDb = bookingRepository.findAll();
@@ -113,7 +120,7 @@ public class BookingService {
 
         existingBooking.setUser(user);
         existingBooking.setRoom(room);
-
+        //TODO: zrobić z ten kalkulator jako osobny endpoint
         //Kalkulator ceny
         BigDecimal totalPrice = BigDecimal.ZERO;
         LocalDate startDate = bookingDTO.getCheckInDate();
@@ -131,6 +138,15 @@ public class BookingService {
 
         Booking savedBooking = bookingRepository.save(existingBooking);
         return mapToDto(savedBooking);
+    }
+
+    public void updateStatus(Long id, String newStatus) {
+        Booking booking = bookingRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Nie znaleziono rezerwacji o ID: " + id));
+
+        booking.setStatus(BookingStatus.valueOf(newStatus.toUpperCase()));
+
+        bookingRepository.save(booking);
     }
 
     public void delete(Long id) {
@@ -152,11 +168,14 @@ public class BookingService {
         dto.setNotes(booking.getNotes());
         dto.setCancelledAt(booking.getCancelledAt());
 
+        dto.setUserEmail(booking.getUser().getEmail());
+
         if (booking.getUser() != null) {
             dto.setUserId(booking.getUser().getId());
         }
         if (booking.getRoom() != null) {
             dto.setRoomId(booking.getRoom().getId());
+            dto.setRoomName(booking.getRoom().getName());
         }
 
         return dto;
