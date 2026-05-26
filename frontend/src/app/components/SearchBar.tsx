@@ -9,18 +9,16 @@ interface SearchBarProps {
 }
 
 export const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
-  const { setSearchParams } = useApp();
+  const { searchRooms, isLoading } = useApp();
   const [checkIn, setCheckIn] = useState('');
   const [checkOut, setCheckOut] = useState('');
   const [guests, setGuests] = useState(1);
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
     if (checkIn && checkOut) {
-      setSearchParams({
-        checkIn,
-        checkOut,
-        guests,
-      });
+      
+      await searchRooms(checkIn, checkOut, guests);
+
       if (onSearch) {
         onSearch();
       }
@@ -82,10 +80,17 @@ export const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
         <div className="flex items-end">
           <Button
             onClick={handleSearch}
+            disabled={isLoading}
             className="w-full bg-primary hover:bg-accent text-white h-10 font-medium rounded-none transition-colors"
           >
-            <Search className="h-4 w-4 mr-2" />
-            Szukaj
+            {isLoading ? (
+              'Szukam...'
+            ) : (
+              <>
+                <Search className="h-4 w-4 mr-2" />
+                Szukaj
+              </>
+            )}
           </Button>
         </div>
       </div>

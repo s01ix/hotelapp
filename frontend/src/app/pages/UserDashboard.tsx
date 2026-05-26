@@ -24,35 +24,45 @@ export const UserDashboard: React.FC = () => {
           <p className="text-gray-500 mb-8 uppercase tracking-widest text-xs">
             Aby zarządzać swoimi pobytami
           </p>
-          <button 
-            onClick={() => navigate('/')} 
-            className="bg-primary text-white py-3 px-8 text-sm uppercase tracking-widest hover:bg-accent transition-colors"
-          >
-            Powrót
-          </button>
+          <div className="flex flex-col gap-4">
+            <button 
+              onClick={() => window.location.href = 'http://localhost:8080/oauth2/authorization/google'} 
+              className="bg-primary text-white py-4 px-8 text-sm uppercase tracking-widest hover:bg-accent transition-colors w-full shadow-md"
+            >
+              Zaloguj przez Google
+            </button>
+            
+            {/* Opcja powrotu na stronę główną, gdyby ktoś się rozmyślił */}
+            <button 
+              onClick={() => navigate('/')} 
+              className="text-gray-400 mt-2 text-xs uppercase tracking-widest hover:text-primary transition-colors"
+            >
+              Wróć do strony głównej
+            </button>s
+          </div>
         </div>
       </div>
     );
   }
 
-  const userBookings = bookings.filter((b) => b.userId === user?.id);
-  const upcomingBookings = userBookings.filter((b) => new Date(b.checkIn) >= new Date());
-  const pastBookings = userBookings.filter((b) => new Date(b.checkIn) < new Date());
+  const today = new Date().toISOString().split('T')[0];
+  const upcomingBookings = bookings.filter((b) => b.checkInDate >= today);
+  const pastBookings = bookings.filter((b) => b.checkInDate < today);
 
-  const getStatusStyle = (status: string) => {
+const getStatusStyle = (status: string) => {
     switch (status) {
-      case 'paid': return 'text-green-600';
-      case 'confirmed': return 'text-blue-600';
-      case 'pending': return 'text-accent';
+      case 'POTWIERDZONA': return 'text-green-600';
+      case 'OCZEKUJACA': return 'text-blue-600';
+      case 'ANULOWANA': return 'text-red-600';
       default: return 'text-gray-400';
     }
   };
 
   const getStatusName = (status: string) => {
     switch (status) {
-      case 'paid': return 'Opłacone';
-      case 'confirmed': return 'Potwierdzone';
-      case 'pending': return 'Oczekuje';
+      case 'POTWIERDZONA': return 'Potwierdzone';
+      case 'OCZEKUJACA': return 'Oczekuje';
+      case 'ANULOWANA': return 'Anulowane';
       default: return status;
     }
   };
@@ -81,7 +91,7 @@ export const UserDashboard: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
           <div className="border-l border-gray-200 pl-6 py-2">
             <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-2">Wszystkie rezerwacje</p>
-            <p className="text-3xl font-serif text-primary">{userBookings.length}</p>
+            <p className="text-3xl font-serif text-primary">{bookings.length}</p>
           </div>
           <div className="border-l border-gray-200 pl-6 py-2">
             <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-2">Nadchodzące pobyty</p>
@@ -90,7 +100,7 @@ export const UserDashboard: React.FC = () => {
           <div className="border-l border-gray-200 pl-6 py-2">
             <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-2">Suma wydatków</p>
             <p className="text-3xl font-serif text-primary">
-              {userBookings.reduce((sum, b) => sum + b.totalPrice, 0)} zł
+              {bookings.reduce((sum, b) => sum + b.totalAmount, 0)} zł
             </p>
           </div>
         </div>
@@ -113,10 +123,10 @@ export const UserDashboard: React.FC = () => {
                 <TableBody>
                   {upcomingBookings.map((booking) => (
                     <TableRow key={booking.id} className="border-b border-gray-50 hover:bg-gray-50/30">
-                      <TableCell className="text-[10px] font-mono text-gray-400">#{booking.id.slice(-6)}</TableCell>
+                      <TableCell className="text-[10px] font-mono text-gray-400">#{booking.id}</TableCell>
                       <TableCell className="font-medium">{booking.roomName}</TableCell>
-                      <TableCell className="text-gray-500 text-sm">{booking.checkIn} — {booking.checkOut}</TableCell>
-                      <TableCell className="font-serif font-bold text-primary">{booking.totalPrice} zł</TableCell>
+                      <TableCell className="text-gray-500 text-sm">{booking.checkInDate} — {booking.checkOutDate}</TableCell>
+                      <TableCell className="font-serif font-bold text-primary">{booking.totalAmount} zł</TableCell>
                       <TableCell className="text-right">
                         <span className={`text-[10px] uppercase tracking-widest font-bold ${getStatusStyle(booking.status)}`}>
                           {getStatusName(booking.status)}
@@ -144,8 +154,8 @@ export const UserDashboard: React.FC = () => {
                   {pastBookings.map((booking) => (
                     <TableRow key={booking.id} className="border-b border-gray-50 opacity-60">
                       <TableCell className="py-4 text-gray-500">{booking.roomName}</TableCell>
-                      <TableCell className="text-gray-400 text-sm">{booking.checkIn} — {booking.checkOut}</TableCell>
-                      <TableCell className="text-gray-500 font-serif">{booking.totalPrice} zł</TableCell>
+                      <TableCell className="text-gray-400 text-sm">{booking.checkInDate} — {booking.checkOutDate}</TableCell>
+                      <TableCell className="text-gray-500 font-serif">{booking.totalAmount} zł</TableCell>
                       <TableCell className="text-right">
                         <span className="text-[10px] uppercase tracking-widest font-bold text-gray-400">
                           Zakończono
@@ -160,7 +170,7 @@ export const UserDashboard: React.FC = () => {
         )}
 
         {/* No Bookings Case */}
-        {userBookings.length === 0 && (
+        {bookings.length === 0 && (
           <div className="py-32 text-center">
             <h3 className="text-3xl font-serif mb-6">Nie masz jeszcze żadnych rezerwacji</h3>
             <Button

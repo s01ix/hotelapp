@@ -1,12 +1,11 @@
 import React from 'react';
 import { SearchBar } from '../components/SearchBar';
 import { RoomCard } from '../components/RoomCard';
-import { rooms } from '../data/mockData';
 import { useApp } from '../context/AppContext';
 
 export const Homepage: React.FC = () => {
   
-  const { searchParams } = useApp();
+  const { searchParams, rooms, isLoading, error } = useApp();
 
   const scrollToRooms = () => {
     const roomsSection = document.getElementById('rooms-section');
@@ -15,9 +14,7 @@ export const Homepage: React.FC = () => {
     }
   };
 
-  const requiredGuests = searchParams?.guests || 1;
-  
-  const filteredRooms = rooms.filter(room => room.maxGuests >= requiredGuests);
+  const requiredGuests = searchParams?.guests || 1; 
 
   return (
     <div className="min-h-screen bg-white">
@@ -56,17 +53,42 @@ export const Homepage: React.FC = () => {
           </p>
         </div>
 
-        {}
-        {filteredRooms.length > 0 ? (
+        {/* 1. Stan ładowania danych */}
+        {isLoading && (
+          <div className="text-center py-20">
+            <p className="text-xl text-gray-500 animate-pulse">Ładowanie dostępnych pokoi z serwera...</p>
+          </div>
+        )}
+
+        {/* 2. Stan błędu (np. nieodpalony Spring Boot) */}
+        {error && (
+          <div className="text-center py-20">
+            <p className="text-xl text-red-500">Błąd połączenia z serwerem: {error}</p>
+          </div>
+        )}
+
+        {/* 3. Wyświetlanie wyników z bazy */}
+        {!isLoading && !error && searchParams && rooms.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
-            {filteredRooms.map((room) => (
+            {rooms.map((room) => (
               <RoomCard key={room.id} room={room} />
             ))}
           </div>
-        ) : (
+        )}
+
+        {/* 4. Brak wyników w wybranym terminie */}
+        {!isLoading && !error && searchParams && rooms.length === 0 && (
           <div className="text-center py-20 border border-dashed border-gray-200">
             <p className="font-serif text-2xl mb-2 text-primary">Brak apartamentów spełniających kryteria</p>
-            <p className="text-gray-500">Niestety nie posiadamy pokoi dla {requiredGuests} osób. Zmniejsz liczbę gości, aby zobaczyć dostępne opcje.</p>
+            <p className="text-gray-500">Niestety nie posiadamy wolnych pokoi dla {requiredGuests} osób w tym terminie. Zmień daty wyszukiwania.</p>
+          </div>
+        )}
+
+        {/* 5. Stan początkowy (przed kliknięciem "Szukaj") */}
+        {!isLoading && !error && !searchParams && (
+          <div className="text-center py-20 border border-dashed border-gray-200">
+            <p className="font-serif text-2xl mb-2 text-gray-400">Oczekujemy na Twoje zapytanie</p>
+            <p className="text-gray-500">Skorzystaj z wyszukiwarki na górze strony.</p>
           </div>
         )}
       </div>

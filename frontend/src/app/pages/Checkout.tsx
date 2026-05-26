@@ -5,15 +5,19 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { RadioGroup, RadioGroupItem } from '../components/ui/radio-group';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { useApp } from '../context/AppContext';
-import { Room } from '../data/mockData';
+import { BookingDTO, createBooking, RoomDTO } from '../components/service/api';
+
 
 export const Checkout: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { searchParams, user, addBooking } = useApp();
-  const room = location.state?.room as Room | undefined;
+  const { searchParams, user, isLoggedIn } = useApp();
+
+  const room = location.state?.room as RoomDTO | undefined;
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const [paymentMethod, setPaymentMethod] = useState<'online' | 'offline'>('online');
   const [fullName, setFullName] = useState(user?.name || '');
@@ -39,34 +43,46 @@ export const Checkout: React.FC = () => {
      new Date(searchParams.checkIn).getTime()) / 
     (1000 * 60 * 60 * 24)
   );
-  const totalPrice = room.pricePerNight * nights;
+  const totalPrice = room.basePrice * nights;
 
-  const handleConfirmBooking = (e: React.FormEvent) => {
+  const placeholderImage = "https://images.unsplash.com/photo-1611892440504-42a792e24d32?q=80&w=1080";
+
+  const handleConfirmBooking = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    const newBooking = {
-      id: `BK${Date.now()}`,
-      userId: user?.id || 'guest',
-      roomId: room.id,
-      roomName: room.name,
-      checkIn: searchParams.checkIn,
-      checkOut: searchParams.checkOut,
-      guests: searchParams.guests,
-      totalPrice,
-      status: paymentMethod === 'online' ? ('paid' as const) : ('pending' as const),
-      paymentMethod,
-      userName: fullName,
-    };
-
-    addBooking(newBooking);
-    
-    if (paymentMethod === 'online') {
-      alert('Płatność zakończona sukcesem!');
-    } else {
-      alert('Rezerwacja złożona! Prosimy o dokonanie przelewu.');
+    if (!user || !user.id) {
+      setError('Musisz być zalogowany, aby dokonać rezerwacji.');
+      return;
     }
+
+    try {
+      setLoading(true);
+      setError(null);
+
+    const bookingData: BookingDTO = {
+        roomId: room.id,
+        userId: user.id,
+        checkInDate: searchParams.checkIn,
+        checkOutDate: searchParams.checkOut,
+        adults: searchParams.guests,
+        children: 0,
+        notes: `Telefon: ${phone}. Metoda płatności: ${paymentMethod}`,
+      };
+
+      await createBooking(bookingData);
     
-    navigate('/dashboard');
+      if (paymentMethod === 'online') {
+        alert('Płatność zakończona sukcesem!');
+      } else {
+        alert('Rezerwacja złożona! Prosimy o dokonanie przelewu.');
+      }
+    
+      navigate('/dashboard');
+    } catch (err) {
+      setError('Wystąpił błąd podczas zapisu rezerwacji.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -91,7 +107,7 @@ export const Checkout: React.FC = () => {
                 <h2 className="text-xl font-serif mb-6 border-b border-gray-100 pb-2">Wybrany apartament</h2>
                 <div className="flex gap-8 items-start">
                   <img
-                    src={room.image}
+                    src={placeholderImage}
                     alt={room.name}
                     className="w-40 h-40 object-cover"
                   />
@@ -100,7 +116,7 @@ export const Checkout: React.FC = () => {
                     <p className="text-sm text-gray-500 leading-relaxed max-w-md">{room.description}</p>
                     <div className="mt-4 flex gap-4 text-[10px] uppercase tracking-widest text-gray-400">
                       <span>Max. {room.maxGuests} osób</span>
-                      <span>{room.size}</span>
+                      <span>{room.bedCount} łóżka</span>
                     </div>
                   </div>
                 </div>
@@ -226,6 +242,12 @@ export const Checkout: React.FC = () => {
                       <span className="text-3xl font-serif text-primary">{totalPrice} zł</span>
                     </div>
                   </div>
+
+                  {error && (
+                    <div className="bg-red-50 text-red-600 p-3 rounded-md mb-4 border border-red-200 text-sm">
+                      <strong>Błąd: </strong> {error}
+                    </div>
+                  )}
 
                   <Button
                     type="submit"

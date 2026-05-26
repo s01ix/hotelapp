@@ -19,7 +19,7 @@ export const AdminPanel: React.FC = () => {
   const navigate = useNavigate();
 
   
-  if (!isLoggedIn || user?.role !== 'admin') {
+  if (!isLoggedIn || user?.role !== 'admin' && user?.role !== 'ADMIN') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="text-center p-12 border border-gray-100 max-w-md">
@@ -38,12 +38,38 @@ export const AdminPanel: React.FC = () => {
     );
   }
 
-  const pendingPayments = bookings.filter((b) => b.status === 'pending');
-  const paidBookings = bookings.filter((b) => b.status === 'paid' || b.status === 'confirmed');
-  const totalRevenue = paidBookings.reduce((sum, b) => sum + b.totalPrice, 0);
+  const pendingPayments = bookings.filter((b) => b.status === 'OCZEKUJACA');
 
-  const handleApprovePayment = (bookingId: string) => {
-    updateBookingStatus(bookingId, 'confirmed');
+  const paidBookings = bookings.filter((b) => b.status === 'POTWIERDZONA' || b.status === 'ZAKONCZONA');
+  
+  const totalRevenue = paidBookings.reduce((sum, b) => sum + b.totalAmount, 0);
+
+  const getStatusStyle = (status: string) => {
+    switch (status) {
+      case 'POTWIERDZONA': return 'text-green-600';
+      case 'ZAKONCZONA': return 'text-gray-500';
+      case 'ANULOWANA': return 'text-red-600';
+      case 'OCZEKUJACA': return 'text-accent';
+      default: return 'text-gray-400';
+    }
+  };
+
+  const getStatusName = (status: string) => {
+    switch (status) {
+      case 'POTWIERDZONA': return 'Potwierdzona';
+      case 'ZAKONCZONA': return 'Zakończona';
+      case 'ANULOWANA': return 'Anulowana';
+      case 'OCZEKUJACA': return 'Oczekuje';
+      default: return status; 
+    }
+  };
+
+  const handleApprovePayment = (bookingId: number) => {
+    updateBookingStatus(bookingId, 'POTWIERDZONA');
+  };
+
+  const handleCancelPayment = (bookingId: number) => {
+    updateBookingStatus(bookingId, 'ANULOWANA');
   };
 
   return (
@@ -106,11 +132,11 @@ export const AdminPanel: React.FC = () => {
                 <TableBody>
                   {pendingPayments.map((booking) => (
                     <TableRow key={booking.id} className="hover:bg-gray-50/50 border-b border-gray-50">
-                      <TableCell className="text-[10px] font-mono text-gray-400">#{booking.id.slice(-6)}</TableCell>
-                      <TableCell className="font-medium">{booking.userName}</TableCell>
+                      <TableCell className="text-[10px] font-mono text-gray-400">#{booking.id}</TableCell>
+                      <TableCell className="font-medium text-sm text-gray-700">{booking.userEmail || 'Brak danych'}</TableCell>
                       <TableCell className="text-gray-500 text-sm">{booking.roomName}</TableCell>
-                      <TableCell className="text-gray-500 text-sm">{booking.checkIn} — {booking.checkOut}</TableCell>
-                      <TableCell className="text-right font-serif font-bold">{booking.totalPrice} zł</TableCell>
+                      <TableCell className="text-gray-500 text-sm">{booking.checkInDate} — {booking.checkOutDate}</TableCell>
+                      <TableCell className="text-right font-serif font-bold">{booking.totalAmount} zł</TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-3">
                           <button 
@@ -121,7 +147,8 @@ export const AdminPanel: React.FC = () => {
                             <Check className="h-5 w-5" />
                           </button>
                           <button 
-                            className="p-2 hover:text-destructive transition-colors"
+                            onClick={() => handleCancelPayment(booking.id)}
+                            className="p-2 hover:text-red-500 transition-colors"
                             title="Odrzuć"
                           >
                             <X className="h-5 w-5" />
@@ -154,18 +181,14 @@ export const AdminPanel: React.FC = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {bookings.map((booking) => (
+                {paidBookings.map((booking) => (
                   <TableRow key={booking.id} className="border-b border-gray-50">
-                    <TableCell className="py-4 font-medium">{booking.userName}</TableCell>
+                    <TableCell className="font-medium text-sm text-gray-700">{booking.userEmail || 'Brak danych'}</TableCell>
                     <TableCell className="text-gray-500 text-sm">{booking.roomName}</TableCell>
-                    <TableCell className="font-serif">{booking.totalPrice} zł</TableCell>
+                    <TableCell className="font-serif">{booking.totalAmount} zł</TableCell>
                     <TableCell className="text-right">
-                      <span className={`text-[10px] uppercase tracking-widest font-bold ${
-                        booking.status === 'paid' || booking.status === 'confirmed' 
-                        ? 'text-green-600' 
-                        : 'text-accent'
-                      }`}>
-                        {booking.status === 'paid' ? 'Opłacono' : booking.status === 'confirmed' ? 'Potwierdzono' : 'Oczekuje'}
+                      <span className={`text-[10px] uppercase tracking-widest font-bold ${getStatusStyle(booking.status)}`}>
+                        {getStatusName(booking.status)}
                       </span>
                     </TableCell>
                   </TableRow>
