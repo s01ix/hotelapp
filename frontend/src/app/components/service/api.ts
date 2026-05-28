@@ -83,7 +83,25 @@ export const createBooking = async (booking: BookingDTO) => {
     if(!response.ok) {
         throw new Error("Błąd podczas tworzenia rezerwacji");
     }
+    return response.json();
 }
+
+//funkcja do tworzenia platnosci
+export const createPayment = async (paymentData: any) => {
+    const response = await fetch(`${API_BASE_URL}/payments`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        credentials: 'include',
+        body: JSON.stringify(paymentData)
+    });
+
+    if(!response.ok) {
+        throw new Error("Błąd podczas tworzenia płatności");
+    }
+    return response.json();
+}
+
+
 
 export const fetchAvailableRooms = async (checkIn: string, checkOut: string, maxGuests: number): Promise<RoomDTO[]> => {
     const url = new URL(`${API_BASE_URL}/rooms/available`);

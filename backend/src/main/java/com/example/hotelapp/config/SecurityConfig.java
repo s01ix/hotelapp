@@ -42,6 +42,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/api/users/me").permitAll()
+                        .requestMatchers("/paypal/**", "/paypal.html").permitAll()
 
                         .anyRequest().authenticated()
                 )

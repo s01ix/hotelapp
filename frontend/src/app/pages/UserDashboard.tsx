@@ -1,5 +1,5 @@
-import React from 'react';
-import { useNavigate } from 'react-router';
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router'
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import {
@@ -15,6 +15,20 @@ import { useApp } from '../context/AppContext';
 export const UserDashboard: React.FC = () => {
   const { user, bookings, isLoggedIn } = useApp();
   const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+  const [paymentMessage, setPaymentMessage] = useState<{type: 'success'|'error'|'warning', text: string} | null>(null);
+
+  useEffect(() => {
+    const status = searchParams.get('status');
+    const error = searchParams.get('error');
+    if (status === 'success') {
+      setPaymentMessage({ type: 'success', text: 'Płatność PayPal zakończona pomyślnie!' });
+    } else if (status === 'canceled') {
+      setPaymentMessage({ type: 'warning', text: 'Płatność PayPal została anulowana.' });
+    } else if (status === 'error' || error) {
+      setPaymentMessage({ type: 'error', text: 'Wystąpił błąd podczas płatności PayPal.' });
+    }
+  }, [searchParams]);
 
   if (!isLoggedIn) {
     return (
@@ -51,7 +65,7 @@ export const UserDashboard: React.FC = () => {
 
 const getStatusStyle = (status: string) => {
     switch (status) {
-      case 'POTWIERDZONA': return 'text-green-600';
+      case 'OPLACONA': return 'text-green-600';
       case 'OCZEKUJACA': return 'text-blue-600';
       case 'ANULOWANA': return 'text-red-600';
       default: return 'text-gray-400';
@@ -60,7 +74,7 @@ const getStatusStyle = (status: string) => {
 
   const getStatusName = (status: string) => {
     switch (status) {
-      case 'POTWIERDZONA': return 'Potwierdzone';
+      case 'OPLACONA': return 'Potwierdzone';
       case 'OCZEKUJACA': return 'Oczekuje';
       case 'ANULOWANA': return 'Anulowane';
       default: return status;
@@ -86,6 +100,13 @@ const getStatusStyle = (status: string) => {
             Twoja historia i planowane pobyty
           </p>
         </div>
+
+
+                {paymentMessage && (
+          <div className={`mb-8 p-4 border ${paymentMessage.type === 'success' ? 'bg-green-50 border-green-200 text-green-700' : paymentMessage.type === 'warning' ? 'bg-yellow-50 border-yellow-200 text-yellow-700' : 'bg-red-50 border-red-200 text-red-700'}`}>
+            {paymentMessage.text}
+          </div>
+        )}
 
         {}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
