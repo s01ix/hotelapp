@@ -6,7 +6,7 @@ import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { RadioGroup, RadioGroupItem } from '../components/ui/radio-group';
 import { useApp } from '../context/AppContext';
-import { BookingDTO, createBooking, RoomDTO } from '../components/service/api';
+import { BookingDTO, createBooking, createPayment, RoomDTO } from '../components/service/api';
 
 
 export const Checkout: React.FC = () => {
@@ -69,15 +69,23 @@ export const Checkout: React.FC = () => {
         notes: `Telefon: ${phone}. Metoda płatności: ${paymentMethod}`,
       };
 
-      await createBooking(bookingData);
+      const createdBooking = await createBooking(bookingData);
     
       if (paymentMethod === 'online') {
-        alert('Płatność zakończona sukcesem!');
+        const paymentData = {
+          bookingId: createdBooking.id,
+          amount: createdBooking.totalAmount || totalPrice,
+          currency: 'PLN',
+          method: 'paypal',
+          status: 'OCZEKUJACA'
+        };
+        const payment = await createPayment(paymentData);
+        window.location.href = `http://localhost:8080/paypal/pay?paymentId=${payment.id}`;
+        return; // Zatrzymaj nawigacje, przejście do PayPala
       } else {
         alert('Rezerwacja złożona! Prosimy o dokonanie przelewu.');
+        navigate('/dashboard');
       }
-    
-      navigate('/dashboard');
     } catch (err) {
       setError('Wystąpił błąd podczas zapisu rezerwacji.');
     } finally {
