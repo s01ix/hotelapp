@@ -49,10 +49,17 @@ export interface BookingDTO {
     notes?: string;
 }
 
+export interface HotelDTO {
+    id: number;
+    nazwa: string;
+    opis: string;
+    gwiazdki: number;
+    email: string;
+    telefon: string;
+}
 
 const API_BASE_URL = 'http://localhost:8080/api';
 
-//funkcja do sprawdzania aktualnie zalogowanego użytkownika
 export const checkCurrentUser = async () => {
     const response = await fetch(`${API_BASE_URL}/users/me`, {
         method: 'GET',
@@ -64,8 +71,8 @@ export const checkCurrentUser = async () => {
     }
     return response.json();
 };
-//funkcja do tworzenia rezerwacji
-export const createBooking = async (booking: BookingDTO): Promise<Booking> => {
+
+export const createBooking = async (booking: BookingDTO) => {
     const response = await fetch(`${API_BASE_URL}/bookings`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
@@ -76,25 +83,8 @@ export const createBooking = async (booking: BookingDTO): Promise<Booking> => {
     if(!response.ok) {
         throw new Error("Błąd podczas tworzenia rezerwacji");
     }
-    return response.json();
 }
 
-//funkcja do tworzenia platnosci
-export const createPayment = async (paymentData: any) => {
-    const response = await fetch(`${API_BASE_URL}/payments`, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        credentials: 'include',
-        body: JSON.stringify(paymentData)
-    });
-
-    if(!response.ok) {
-        throw new Error("Błąd podczas tworzenia płatności");
-    }
-    return response.json();
-}
-
-//funkcja do pobierania dostępnych pokoi
 export const fetchAvailableRooms = async (checkIn: string, checkOut: string, maxGuests: number): Promise<RoomDTO[]> => {
     const url = new URL(`${API_BASE_URL}/rooms/available`);
     url.searchParams.append('checkIn', checkIn);
@@ -109,7 +99,7 @@ export const fetchAvailableRooms = async (checkIn: string, checkOut: string, max
 
     return response.json();
 }
-//funkcja do pobierania szczegółów pokoju
+
 export const fetchRoomById = async (id : number): Promise<RoomDTO> => {
     const response = await fetch(`${API_BASE_URL}/rooms/${id}`);
 
@@ -119,7 +109,7 @@ export const fetchRoomById = async (id : number): Promise<RoomDTO> => {
 
     return response.json();
 }
-// funkcja do pobierania rezerwacji zalogowanego użytkownika
+
 export const fetchMyBookings = async () => {
     const response = await fetch(`${API_BASE_URL}/bookings/my`, {
         method: 'GET',
@@ -131,7 +121,7 @@ export const fetchMyBookings = async () => {
     }
     return response.json();
 };
-//funkcja do pobierania wszystkich rezerwacji (dla admina)
+
 export const fetchAllBookings = async () => {
     const response = await fetch(`${API_BASE_URL}/bookings`, {  
         method: 'GET',
@@ -143,7 +133,7 @@ export const fetchAllBookings = async () => {
     }
     return response.json();    
 };
-// funkcja do aktualizacji statusu rezerwacji (dla admina)
+
 export const updateBookingStatusInBackend = async (bookingId: number, status: string) => {
     const response = await fetch(`${API_BASE_URL}/bookings/${bookingId}/status`, {
         method: 'PUT',
@@ -158,3 +148,11 @@ export const updateBookingStatusInBackend = async (bookingId: number, status: st
 
     return response.text();
 };
+
+export const fetchAllHotels = async (): Promise<HotelDTO[]> => {
+    const response = await fetch(`${API_BASE_URL}/hotels`); 
+    if(!response.ok) {
+        throw new Error("Błąd podczas pobierania hoteli");
+    }
+    return response.json();
+}

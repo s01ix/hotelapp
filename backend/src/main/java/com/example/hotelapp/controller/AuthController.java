@@ -49,6 +49,7 @@ public class AuthController {
             authService.register(request.get("name"), request.get("lastName"), request.get("email"), request.get("password"), request.get("phone"));
             return ResponseEntity.ok(Map.of("message", "Zarejestrowano pomyslnie"));
         }catch (Exception e){
+            e.printStackTrace(); 
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }

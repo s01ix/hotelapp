@@ -70,7 +70,7 @@ const { user, isLoggedIn, loginWithGoogle, loginWithEmail, registerWithEmail, lo
           <div className="flex justify-between items-center h-16">
             <Link to="/" className="flex flex-col items-start leading-none group">
               <span className="text-2xl font-serif font-bold tracking-tighter uppercase">Luks</span>
-              <span className="text-[10px] tracking-[0.3em] uppercase opacity-60">Hotel & Spa</span>
+              <span className="text-[10px] tracking-[0.3em] uppercase opacity-60">Search</span>
             </Link>
 
             <div className="flex items-center gap-6">

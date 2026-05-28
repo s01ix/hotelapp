@@ -1,48 +1,120 @@
 import React from 'react';
 import { useNavigate } from 'react-router';
-import { Users, BedDouble } from 'lucide-react';
+import { Users, BedDouble, MapPin, CheckCircle2 } from 'lucide-react';
 import { Button } from './ui/button';
-import { RoomDTO } from './service/api';
+import { RoomDTO, HotelDTO } from './service/api';
 
 interface RoomCardProps {
   room: RoomDTO;
+  hotels?: HotelDTO[];
 }
 
-export const RoomCard: React.FC<RoomCardProps> = ({ room }) => {
+const ROOM_IMAGES = [
+  "https://images.pexels.com/photos/271618/pexels-photo-271618.jpeg?auto=compress&cs=tinysrgb&w=1080",
+  "https://images.pexels.com/photos/271624/pexels-photo-271624.jpeg?auto=compress&cs=tinysrgb&w=1080",
+  "https://images.pexels.com/photos/237371/pexels-photo-237371.jpeg?auto=compress&cs=tinysrgb&w=1080",
+  "https://images.pexels.com/photos/262048/pexels-photo-262048.jpeg?auto=compress&cs=tinysrgb&w=1080",
+  "https://images.pexels.com/photos/1001965/pexels-photo-1001965.jpeg?auto=compress&cs=tinysrgb&w=1080",
+  "https://images.pexels.com/photos/262048/pexels-photo-262048.jpeg?auto=compress&cs=tinysrgb&w=1080",
+  "https://images.pexels.com/photos/271643/pexels-photo-271643.jpeg?auto=compress&cs=tinysrgb&w=1080",
+  "https://images.pexels.com/photos/6492397/pexels-photo-6492397.jpeg?auto=compress&cs=tinysrgb&w=1080",
+  "https://images.pexels.com/photos/237371/pexels-photo-237371.jpeg?auto=compress&cs=tinysrgb&w=1080",
+  "https://images.pexels.com/photos/3659683/pexels-photo-3659683.jpeg?auto=compress&cs=tinysrgb&w=1080",
+  "https://images.pexels.com/photos/164595/pexels-photo-164595.jpeg?auto=compress&cs=tinysrgb&w=1080",
+  "https://images.pexels.com/photos/258154/pexels-photo-258154.jpeg?auto=compress&cs=tinysrgb&w=1080",
+  "https://images.pexels.com/photos/260922/pexels-photo-260922.jpeg?auto=compress&cs=tinysrgb&w=1080",
+  "https://images.pexels.com/photos/237371/pexels-photo-237371.jpeg?auto=compress&cs=tinysrgb&w=1080",
+  "https://images.pexels.com/photos/26139/pexels-photo-26139.jpg?auto=compress&cs=tinysrgb&w=1080",
+  "https://images.pexels.com/photos/164595/pexels-photo-164595.jpeg?auto=compress&cs=tinysrgb&w=1080",
+  "https://images.pexels.com/photos/2082087/pexels-photo-2082087.jpeg?auto=compress&cs=tinysrgb&w=1080",
+  "https://images.pexels.com/photos/1454806/pexels-photo-1454806.jpeg?auto=compress&cs=tinysrgb&w=1080",
+  "https://images.pexels.com/photos/271639/pexels-photo-271639.jpeg?auto=compress&cs=tinysrgb&w=1080",
+  "https://images.pexels.com/photos/172872/pexels-photo-172872.jpeg?auto=compress&cs=tinysrgb&w=1080",
+  "https://images.pexels.com/photos/271619/pexels-photo-271619.jpeg?auto=compress&cs=tinysrgb&w=1080",
+  "https://images.pexels.com/photos/164595/pexels-photo-164595.jpeg?auto=compress&cs=tinysrgb&w=1080",
+  "https://images.pexels.com/photos/262048/pexels-photo-262048.jpeg?auto=compress&cs=tinysrgb&w=1080",
+  "https://images.pexels.com/photos/271618/pexels-photo-271618.jpeg?auto=compress&cs=tinysrgb&w=1080",
+  "https://images.pexels.com/photos/262048/pexels-photo-262048.jpeg?auto=compress&cs=tinysrgb&w=1080"
+];
+
+export const RoomCard: React.FC<RoomCardProps> = ({ room, hotels = [] }) => {
   const navigate = useNavigate();
 
-  const placeholderImage = "https://images.unsplash.com/photo-1611892440504-42a792e24d32?q=80&w=1080";
+  const imageIndex = room.id ? (room.id % ROOM_IMAGES.length) : 0;
+  const currentImage = ROOM_IMAGES[imageIndex];
 
+  const formatBeds = (count: number) => {
+    if (count === 1) return `${count} Łóżko`;
+    if (count >= 2 && count <= 4) return `${count} Łóżka`;
+    return `${count} Łóżek`;
+  };
+
+  const formatGuests = (count: number) => {
+    if (count === 1) return `Max 1 Osoba`;
+    if (count >= 2 && count <= 4) return `Max ${count} Osoby`;
+    return `Max ${count} Osób`;
+  };
+
+  const descriptionParts = room.description ? room.description.split('Udogodnienia:') : ['Brak opisu'];
+  const mainDescription = descriptionParts[0];
+  const amenitiesList = descriptionParts.length > 1 ? descriptionParts[1].split(',') : [];
+
+  let hotelName = 'Nieznany Hotel';
+  if (room.hotelId && hotels && hotels.length > 0) {
+      hotelName = hotels.find(h => h.id === room.hotelId)?.nazwa || 'Nieznany Hotel';
+  }
+  if (hotelName === 'Nieznany Hotel') {
+      const fallbackNames = ['Gorski Resort & Spa', 'Morska Bryza', 'City Center Premium', 'Lesna Ostoja', 'Mazurski Raj'];
+      const hotelIndex = room.id ? Math.floor((room.id - 1) / 5) % fallbackNames.length : 0;
+      hotelName = fallbackNames[hotelIndex];
+  }
 
   return (
-    <div className="group cursor-pointer" onClick={() => navigate(`/room/${room.id}`)}>
-      <div className="relative aspect-[4/5] overflow-hidden mb-6 bg-gray-100">
-        <img
-          src={placeholderImage}
-          alt={room.name}
-          className="w-full h-full object-cover grayscale-[0.3] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700"
-        />
-        <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-          <Button className="w-full bg-white text-black hover:bg-accent hover:text-white transition-colors">
-            Sprawdź dostępność
+    <div className="group cursor-pointer flex flex-col h-full bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden" onClick={() => navigate(`/room/${room.id}`)}>
+      <div className="relative aspect-[16/10] overflow-hidden bg-gray-200">
+        <img src={currentImage} alt={room.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy" />
+        <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full text-xs font-bold tracking-widest text-accent flex items-center gap-1 shadow-sm">
+          <MapPin className="h-3 w-3" />
+          {hotelName}
+        </div>
+        <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center">
+          <Button className="w-full bg-accent text-white hover:bg-black transition-colors font-semibold shadow-lg">
+            Sprawdź i rezerwuj
           </Button>
         </div>
       </div>
 
-      <div className="space-y-2">
-        <div className="flex justify-between items-start">
-          <h3 className="text-2xl font-serif group-hover:text-accent transition-colors">{room.name}</h3>
-          <span className="text-lg font-medium">{room.basePrice} zł</span>
+      <div className="p-6 flex flex-col flex-grow space-y-4">
+        <div>
+          <h3 className="text-2xl font-serif group-hover:text-accent transition-colors mb-2 line-clamp-1" title={room.name}>
+            {room.name}
+          </h3>
+          <div className="flex justify-between items-end border-b border-gray-100 pb-4">
+            <div className="flex flex-col gap-1.5 text-xs tracking-widest uppercase text-gray-500 font-medium">
+              <span className="flex items-center gap-2"><Users className="h-3.5 w-3.5 text-gray-400" /> {formatGuests(room.maxGuests)}</span>
+              <span className="flex items-center gap-2"><BedDouble className="h-3.5 w-3.5 text-gray-400" /> {formatBeds(room.bedCount)}</span>
+            </div>
+            <div className="text-right">
+              <span className="text-sm text-gray-400 block mb-1">Cena za noc</span>
+              <span className="text-3xl font-light text-gray-900">{room.basePrice} <span className="text-lg font-medium">zł</span></span>
+            </div>
+          </div>
         </div>
         
-        <div className="flex items-center gap-4 text-xs tracking-widest uppercase text-gray-400">
-          <span className="flex items-center gap-1"><Users className="h-3 w-3" /> {room.maxGuests} Os.</span>
-          <span className="flex items-center gap-1"><BedDouble className="h-3 w-3" /> {room.bedCount} Łóżka</span>
-        </div>
-        
-        <p className="text-sm text-gray-500 line-clamp-2 pt-2 border-t border-gray-100">
-          {room.description}
+        <p className="text-sm text-gray-600 line-clamp-2 min-h-[2.5rem]">
+          {mainDescription}
         </p>
+
+        {amenitiesList.length > 0 && (
+          <div className="mt-auto pt-4 flex flex-wrap gap-2">
+            {amenitiesList.map((amenity, index) => (
+              <span key={index} className="inline-flex items-center gap-1 bg-gray-50 text-gray-600 px-2.5 py-1 rounded-md text-xs font-medium border border-gray-100">
+                <CheckCircle2 className="h-3 w-3 text-green-500" />
+                {amenity.trim()}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

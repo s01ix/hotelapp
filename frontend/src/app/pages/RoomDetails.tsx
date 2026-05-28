@@ -122,7 +122,7 @@ export const RoomDetails: React.FC = () => {
 
             {/* Amenities */}
             <div>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">Udogodnienia</h2>
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4"></h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {room.amenities && room.amenities.length > 0 ? (
                   room.amenities.map((amenityName, index) => (
@@ -134,7 +134,7 @@ export const RoomDetails: React.FC = () => {
                     </div>
                   ))
                 ) : (
-                  <p className="text-gray-500 italic">Brak przypisanych udogodnień</p>
+                  <p className="text-gray-500 italic"></p>
                 )}
               </div>
             </div>

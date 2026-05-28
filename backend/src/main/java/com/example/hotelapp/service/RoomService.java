@@ -119,12 +119,10 @@ public class RoomService {
         dto.setCurrency(room.getCurrency());
         dto.setStatus(room.getStatus());
 
-        // Zabezpieczenie hotelu
         if (room.getHotel() != null) {
             dto.setHotelId(room.getHotel().getId());
         }
 
-        // Zabezpieczenie udogodnień: zamieniamy obiekty na prostą listę numerów ID
         if (room.getAmenities() != null) {
             List<Long> amenityIds = new ArrayList<>();
             List<String> amenities = new ArrayList<>();

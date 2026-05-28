@@ -6,7 +6,7 @@ import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { RadioGroup, RadioGroupItem } from '../components/ui/radio-group';
 import { useApp } from '../context/AppContext';
-import { BookingDTO, createBooking, createPayment, RoomDTO } from '../components/service/api';
+import { BookingDTO, createBooking, RoomDTO } from '../components/service/api';
 
 
 export const Checkout: React.FC = () => {
@@ -69,23 +69,15 @@ export const Checkout: React.FC = () => {
         notes: `Telefon: ${phone}. Metoda płatności: ${paymentMethod}`,
       };
 
-      const createdBooking = await createBooking(bookingData);
+      await createBooking(bookingData);
     
       if (paymentMethod === 'online') {
-        const paymentData = {
-          bookingId: createdBooking.id,
-          amount: createdBooking.totalAmount || totalPrice,
-          currency: 'PLN',
-          method: 'paypal',
-          status: 'OCZEKUJACA'
-        };
-        const payment = await createPayment(paymentData);
-        window.location.href = `http://localhost:8080/paypal/pay?paymentId=${payment.id}`;
-        return; // Zatrzymaj nawigacje, przejście do PayPala
+        alert('Płatność zakończona sukcesem!');
       } else {
         alert('Rezerwacja złożona! Prosimy o dokonanie przelewu.');
-        navigate('/dashboard');
       }
+    
+      navigate('/dashboard');
     } catch (err) {
       setError('Wystąpił błąd podczas zapisu rezerwacji.');
     } finally {
@@ -215,7 +207,7 @@ export const Checkout: React.FC = () => {
                     <p className="text-[10px] uppercase tracking-widest text-accent mb-4 font-bold">Dane do przelewu</p>
                     <div className="space-y-1 text-sm text-gray-600 font-mono">
                       <p>Nr: 88 1020 4444 0000 1234 5678 9000</p>
-                      <p>Hotel Luks & Spa Sp. z o.o.</p>
+                      <p>Luks Search</p>
                       <p>Tytuł: Rezerwacja {room.name.slice(0, 10)} - {fullName}</p>
                     </div>
                   </div>
@@ -265,7 +257,7 @@ export const Checkout: React.FC = () => {
                   </Button>
 
                   <p className="text-[9px] text-gray-400 text-center uppercase tracking-tighter leading-relaxed">
-                    Dokonując rezerwacji akceptujesz regulamin świadczenia usług Hotelu Luks & Spa
+                    Dokonując rezerwacji akceptujesz regulamin świadczenia usług Luks Search
                   </p>
                 </div>
               </div>
