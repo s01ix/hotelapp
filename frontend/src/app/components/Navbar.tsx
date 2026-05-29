@@ -86,6 +86,11 @@ const { user, isLoggedIn, loginWithGoogle, loginWithEmail, registerWithEmail, lo
                       <ShieldCheck className="h-4 w-4 mr-2" />
                       Panel Admina
                   </Button>
+                  ) : user?.role === 'receptionist' || user?.role === 'RECEPTIONIST' ? (
+                  <Button onClick={() => navigate('/receptionist')} variant="ghost" className="hover:text-accent">
+                      <ShieldCheck className="h-4 w-4 mr-2" />
+                      Panel Recepcjonisty
+                  </Button>
                     ) : (
                   <Button onClick={() => navigate('/dashboard')} variant="ghost" className="hover:text-accent">
                       <LayoutDashboard className="h-4 w-4 mr-2" />

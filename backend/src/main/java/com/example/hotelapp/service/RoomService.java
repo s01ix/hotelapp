@@ -1,11 +1,14 @@
 package com.example.hotelapp.service;
 
 import com.example.hotelapp.dto.RoomDTO;
+import com.example.hotelapp.dto.RoomPhotoDTO;
 import com.example.hotelapp.model.Amenity;
 import com.example.hotelapp.model.Hotel;
 import com.example.hotelapp.model.Room;
+import com.example.hotelapp.model.RoomPhoto;
 import com.example.hotelapp.repository.AmenityRepository;
 import com.example.hotelapp.repository.HotelRepository;
+import com.example.hotelapp.repository.RoomPhotoRepository;
 import com.example.hotelapp.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,6 +26,7 @@ public class RoomService {
     private final RoomRepository roomRepository;
     private final HotelRepository hotelRepository;
     private final AmenityRepository amenityRepository;
+    private final RoomPhotoRepository roomPhotoRepository;
 
     public List<RoomDTO> getAll() {
         List<Room> roomsFromDb = roomRepository.findAll();
@@ -132,6 +136,20 @@ public class RoomService {
             }
             dto.setAmenityIds(amenityIds);
             dto.setAmenities(amenities);
+        }
+
+        if (room.getId() != null) {
+            List<RoomPhoto> photos = roomPhotoRepository.findByRoomId(room.getId());
+            List<RoomPhotoDTO> photoDtos = new ArrayList<>();
+            for (RoomPhoto p : photos) {
+                RoomPhotoDTO pDto = new RoomPhotoDTO();
+                pDto.setId(p.getId());
+                pDto.setRoomId(p.getRoom().getId());
+                pDto.setUrl(p.getUrl());
+                pDto.setIsPrimary(p.getIsPrimary());
+                photoDtos.add(pDto);
+            }
+            dto.setPhotos(photoDtos);
         }
 
         return dto;

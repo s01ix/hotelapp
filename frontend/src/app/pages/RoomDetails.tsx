@@ -14,7 +14,9 @@ export const RoomDetails: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const placeholderImage = "https://images.unsplash.com/photo-1611892440504-42a792e24d32?q=80&w=1080";
+  const fallbackImage = "https://images.unsplash.com/photo-1611892440504-42a792e24d32?q=80&w=1080";
+  const primaryPhoto = room?.photos?.find(p => p.isPrimary);
+  const currentImage = primaryPhoto?.url || (room?.photos && room.photos.length > 0 ? room.photos[0].url : fallbackImage);
 
   useEffect(()=>{
     const loadRoom = async () => {
@@ -91,7 +93,7 @@ export const RoomDetails: React.FC = () => {
         {/* Room Image */}
         <div className="relative h-96 rounded-xl overflow-hidden mb-8">
           <img
-            src={placeholderImage}
+            src={currentImage}
             alt={room.name}
             className="w-full h-full object-cover"
           />

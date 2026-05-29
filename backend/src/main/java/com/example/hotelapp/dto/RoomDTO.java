@@ -22,5 +22,6 @@ public class RoomDTO {
     private RoomStatus status;
 
     private List<Long> amenityIds;
-    private List<String> amenities ;
+    private List<String> amenities;
+    private List<RoomPhotoDTO> photos;
 }

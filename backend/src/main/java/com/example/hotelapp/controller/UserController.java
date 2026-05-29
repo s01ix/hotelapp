@@ -68,6 +68,12 @@ public class UserController {
         return userService.update(id, userDTO);
     }
 
+    @PutMapping("/{id}/role")
+    public org.springframework.http.ResponseEntity<String> updateUserRole(@PathVariable Long id, @RequestParam String role) {
+        userService.updateUserRole(id, role);
+        return org.springframework.http.ResponseEntity.ok().body("Rola została pomyślnie zmieniona.");
+    }
+
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
         userService.delete(id);

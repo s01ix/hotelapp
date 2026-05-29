@@ -6,6 +6,8 @@ import { Checkout } from './pages/Checkout';
 import { UserDashboard } from './pages/UserDashboard';
 import { AdminPanel } from './pages/AdminPanel';
 import { NotFound } from './pages/NotFound';
+import { ReceptionistPanel } from './pages/ReceptionistPanel';
+import { AdminUserPanel } from './pages/AdminUserPanel';
 
 export const router = createBrowserRouter([
   {
@@ -18,6 +20,8 @@ export const router = createBrowserRouter([
       { path: 'dashboard', Component: UserDashboard },
       { path: 'admin', Component: AdminPanel },
       { path: '*', Component: NotFound },
+      { path: 'receptionist', Component: ReceptionistPanel },
+      { path: 'admin/users', Component: AdminUserPanel },
     ],
   },
 ]);

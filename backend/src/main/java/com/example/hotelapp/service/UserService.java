@@ -86,6 +86,14 @@ public class UserService {
         return mapToDto(savedUser);
     }
 
+    public void updateUserRole(Long id, String role) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Nie znaleziono użytkownika"));
+
+        user.setRole(UserRole.valueOf(role.toUpperCase()));
+        userRepository.save(user);
+    }
+
     public void delete(Long id) {
         if (userRepository.existsById(id)) {
             userRepository.deleteById(id);

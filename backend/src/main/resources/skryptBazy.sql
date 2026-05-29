@@ -45,4 +45,48 @@ INSERT INTO pokoje (hotel_id, nazwa, numer_pokoju, opis, max_osob, liczba_lozek,
 INSERT INTO pokoje (hotel_id, nazwa, numer_pokoju, opis, max_osob, liczba_lozek, cena_bazowa, waluta, status, utworzono) VALUES (5, 'Pokoj Dwuosobowy Standard', '504', 'Klasyczny. Udogodnienia: Prysznic, Zestaw kosmetykow, Wi-Fi.', 2, 1, 350.00, 'PLN', 'DOSTEPNY', CURRENT_TIMESTAMP);
 INSERT INTO pokoje (hotel_id, nazwa, numer_pokoju, opis, max_osob, liczba_lozek, cena_bazowa, waluta, status, utworzono) VALUES (5, 'Pokoj Jednoosobowy', '505', 'Kompaktowy. Udogodnienia: TV, Czajnik, Sejf.', 1, 1, 200.00, 'PLN', 'DOSTEPNY', CURRENT_TIMESTAMP);
 
+--Zdjecia pokoi
+SET DEFINE OFF;
+
+INSERT INTO ZDJECIA_POKOI (URL_ZDJECIA, UTWORZONO, POKOJ_ID, CZY_GLOWNE)
+SELECT
+    CASE MOD(level - 1, 25)
+        WHEN 0 THEN 'https://images.pexels.com/photos/271618/pexels-photo-271618.jpeg?auto=compress&cs=tinysrgb&w=1080'
+        WHEN 1 THEN 'https://images.pexels.com/photos/271624/pexels-photo-271624.jpeg?auto=compress&cs=tinysrgb&w=1080'
+        WHEN 2 THEN 'https://images.pexels.com/photos/237371/pexels-photo-237371.jpeg?auto=compress&cs=tinysrgb&w=1080'
+        WHEN 3 THEN 'https://images.pexels.com/photos/262048/pexels-photo-262048.jpeg?auto=compress&cs=tinysrgb&w=1080'
+        WHEN 4 THEN 'https://images.pexels.com/photos/1001965/pexels-photo-1001965.jpeg?auto=compress&cs=tinysrgb&w=1080'
+        WHEN 5 THEN 'https://images.pexels.com/photos/262048/pexels-photo-262048.jpeg?auto=compress&cs=tinysrgb&w=1080'
+        WHEN 6 THEN 'https://images.pexels.com/photos/271643/pexels-photo-271643.jpeg?auto=compress&cs=tinysrgb&w=1080'
+        WHEN 7 THEN 'https://images.pexels.com/photos/6492397/pexels-photo-6492397.jpeg?auto=compress&cs=tinysrgb&w=1080'
+        WHEN 8 THEN 'https://images.pexels.com/photos/237371/pexels-photo-237371.jpeg?auto=compress&cs=tinysrgb&w=1080'
+        WHEN 9 THEN 'https://images.pexels.com/photos/3659683/pexels-photo-3659683.jpeg?auto=compress&cs=tinysrgb&w=1080'
+        WHEN 10 THEN 'https://images.pexels.com/photos/164595/pexels-photo-164595.jpeg?auto=compress&cs=tinysrgb&w=1080'
+        WHEN 11 THEN 'https://images.pexels.com/photos/258154/pexels-photo-258154.jpeg?auto=compress&cs=tinysrgb&w=1080'
+        WHEN 12 THEN 'https://images.pexels.com/photos/260922/pexels-photo-260922.jpeg?auto=compress&cs=tinysrgb&w=1080'
+        WHEN 13 THEN 'https://images.pexels.com/photos/237371/pexels-photo-237371.jpeg?auto=compress&cs=tinysrgb&w=1080'
+        WHEN 14 THEN 'https://images.pexels.com/photos/26139/pexels-photo-26139.jpg?auto=compress&cs=tinysrgb&w=1080'
+        WHEN 15 THEN 'https://images.pexels.com/photos/164595/pexels-photo-164595.jpeg?auto=compress&cs=tinysrgb&w=1080'
+        WHEN 16 THEN 'https://images.pexels.com/photos/2082087/pexels-photo-2082087.jpeg?auto=compress&cs=tinysrgb&w=1080'
+        WHEN 17 THEN 'https://images.pexels.com/photos/1454806/pexels-photo-1454806.jpeg?auto=compress&cs=tinysrgb&w=1080'
+        WHEN 18 THEN 'https://images.pexels.com/photos/271639/pexels-photo-271639.jpeg?auto=compress&cs=tinysrgb&w=1080'
+        WHEN 19 THEN 'https://images.pexels.com/photos/172872/pexels-photo-172872.jpeg?auto=compress&cs=tinysrgb&w=1080'
+        WHEN 20 THEN 'https://images.pexels.com/photos/271619/pexels-photo-271619.jpeg?auto=compress&cs=tinysrgb&w=1080'
+        WHEN 21 THEN 'https://images.pexels.com/photos/164595/pexels-photo-164595.jpeg?auto=compress&cs=tinysrgb&w=1080'
+        WHEN 22 THEN 'https://images.pexels.com/photos/262048/pexels-photo-262048.jpeg?auto=compress&cs=tinysrgb&w=1080'
+        WHEN 23 THEN 'https://images.pexels.com/photos/271618/pexels-photo-271618.jpeg?auto=compress&cs=tinysrgb&w=1080'
+        WHEN 24 THEN 'https://images.pexels.com/photos/262048/pexels-photo-262048.jpeg?auto=compress&cs=tinysrgb&w=1080'
+        END AS URL_ZDJECIA,
+    SYSTIMESTAMP AS UTWORZONO,
+    level AS POKOJ_ID,
+    CASE
+        WHEN MOD(level, 5) = 0 THEN 1
+        ELSE 0
+        END AS CZY_GLOWNE
+FROM dual
+    CONNECT BY level <= 99;
+
+COMMIT;
+SET DEFINE ON;
+
 COMMIT;

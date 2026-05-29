@@ -2,7 +2,7 @@ export interface User {
   id: number;
   name: string;
   email: string;
-  role: 'user' | 'admin'| 'USER' | 'ADMIN';
+  role: 'user' | 'admin'| 'USER' | 'ADMIN' | 'receptionist' | 'RECEPTIONIST';
 }
 
 export interface SearchParams {
@@ -24,6 +24,13 @@ export interface Booking {
   userEmail?: string;
 }
 
+export interface RoomPhotoDTO {
+    id: number;
+    roomId: number;
+    url: string;
+    isPrimary: boolean;
+}
+
 export interface RoomDTO {
     id: number;
     hotelId: number;
@@ -37,6 +44,7 @@ export interface RoomDTO {
     status: string; 
     amenityIds: number[];
     amenities: string[];
+    photos?: RoomPhotoDTO[];
 }
 
 export interface BookingDTO {
@@ -100,8 +108,6 @@ export const createPayment = async (paymentData: any) => {
     }
     return response.json();
 }
-
-
 
 export const fetchAvailableRooms = async (checkIn: string, checkOut: string, maxGuests: number): Promise<RoomDTO[]> => {
     const url = new URL(`${API_BASE_URL}/rooms/available`);
@@ -173,4 +179,27 @@ export const fetchAllHotels = async (): Promise<HotelDTO[]> => {
         throw new Error("Błąd podczas pobierania hoteli");
     }
     return response.json();
+}
+// Funkcja do pobierania wszystkich użytkowników
+export const fetchAllUsers = async () => {
+    const response = await fetch(`${API_BASE_URL}/users`, {
+        method: 'GET',
+        credentials: 'include',
+    });
+
+    if(!response.ok) {
+        throw new Error("Błąd podczas pobierania użytkowników");
+    }
+    return response.json();
+}
+// Funkcja do aktualizacji roli użytkownika
+export const updateUserRole = async (userId: number, newRole: string): Promise<string> => {
+    const response = await fetch(`${API_BASE_URL}/users/${userId}/role?role=${newRole}`, {
+    method: 'PUT',
+    credentials: 'include',
+});
+if(!response.ok) {
+    throw new Error("Błąd podczas aktualizacji roli użytkownika");
+}
+return response.text();
 }
