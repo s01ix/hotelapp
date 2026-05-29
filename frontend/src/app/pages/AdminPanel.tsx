@@ -1,25 +1,15 @@
 import React from 'react';
 import { useNavigate } from 'react-router';
-import { ArrowLeft, Check, X, CreditCard } from 'lucide-react';
+import { ArrowLeft, Users, Building, MapPin, DollarSign } from 'lucide-react';
 import { Button } from '../components/ui/button';
-import { Card, CardContent } from '../components/ui/card';
-import { Badge } from '../components/ui/badge';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '../components/ui/table';
 import { useApp } from '../context/AppContext';
 
 export const AdminPanel: React.FC = () => {
-  const { user, bookings, updateBookingStatus, isLoggedIn } = useApp();
+  const { user, isLoggedIn } = useApp();
   const navigate = useNavigate();
 
   
-  if (!isLoggedIn || user?.role !== 'admin' && user?.role !== 'ADMIN') {
+if (!isLoggedIn || (user?.role !== 'ADMIN' && user?.role !== 'admin')) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="text-center p-12 border border-gray-100 max-w-md">
@@ -38,45 +28,38 @@ export const AdminPanel: React.FC = () => {
     );
   }
 
-  const pendingPayments = bookings.filter((b) => b.status === 'OCZEKUJACA');
-
-  const paidBookings = bookings.filter((b) => b.status === 'POTWIERDZONA' || b.status === 'ZAKONCZONA');
-  
-  const totalRevenue = paidBookings.reduce((sum, b) => sum + b.totalAmount, 0);
-
-  const getStatusStyle = (status: string) => {
-    switch (status) {
-      case 'POTWIERDZONA': return 'text-green-600';
-      case 'ZAKONCZONA': return 'text-gray-500';
-      case 'ANULOWANA': return 'text-red-600';
-      case 'OCZEKUJACA': return 'text-accent';
-      default: return 'text-gray-400';
+  const adminModules = [
+    {
+      title: 'Zarządzanie Użytkownikami',
+      description: 'Zmieniaj role użytkowników (np. na Recepcjonistę).',
+      icon: <Users className="h-8 w-8 text-primary mb-4" />,
+      path: '/admin/users' 
+    },
+    {
+      title: 'Zarządzanie Pokojami',
+      description: 'Dodawaj nowe pokoje, edytuj zdjęcia, pojemność i opisy.',
+      icon: <Building className="h-8 w-8 text-primary mb-4" />,
+      path: '/admin/rooms'
+    },
+    {
+      title: 'Ceny i Udogodnienia',
+      description: 'Konfiguruj cenniki, dodawaj WiFi, TV, śniadania itp.',
+      icon: <DollarSign className="h-8 w-8 text-primary mb-4" />,
+      path: '/admin/amenities'
+    },
+    {
+      title: 'Lokalizacje',
+      description: 'Zarządzaj budynkami i adresami Twoich obiektów.',
+      icon: <MapPin className="h-8 w-8 text-primary mb-4" />,
+      path: '/admin/locations'
     }
-  };
-
-  const getStatusName = (status: string) => {
-    switch (status) {
-      case 'POTWIERDZONA': return 'Potwierdzona';
-      case 'ZAKONCZONA': return 'Zakończona';
-      case 'ANULOWANA': return 'Anulowana';
-      case 'OCZEKUJACA': return 'Oczekuje';
-      default: return status; 
-    }
-  };
-
-  const handleApprovePayment = (bookingId: number) => {
-    updateBookingStatus(bookingId, 'POTWIERDZONA');
-  };
-
-  const handleCancelPayment = (bookingId: number) => {
-    updateBookingStatus(bookingId, 'ANULOWANA');
-  };
+  ];
 
   return (
     <div className="min-h-screen bg-[#fdfdfd] py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {}
+        {/* NAGŁÓWEK */}
         <div className="mb-16">
           <Button
             onClick={() => navigate('/')}
@@ -86,117 +69,29 @@ export const AdminPanel: React.FC = () => {
             <ArrowLeft className="h-4 w-4 mr-2" />
             <span className="text-xs uppercase tracking-widest">Wróć do serwisu</span>
           </Button>
-          <h1 className="text-5xl font-serif mb-2">Zarządzanie Hotelem</h1>
+          <h1 className="text-5xl font-serif mb-2">Panel Administratora</h1>
           <p className="text-gray-400 uppercase tracking-[0.2em] text-[10px]">
-            Panel administracyjny systemu Luks
+            Konfiguracja główna systemu Luks
           </p>
         </div>
 
-        {}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-20">
-          {[
-            { label: 'Rezerwacje', value: bookings.length },
-            { label: 'Oczekujące', value: pendingPayments.length, color: 'text-accent' },
-            { label: 'Zatwierdzone', value: paidBookings.length },
-            { label: 'Przychód', value: `${totalRevenue} zł`, color: 'text-accent' }
-          ].map((stat, i) => (
-            <div key={i} className="border-l border-gray-200 pl-6 py-2">
-              <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-2">{stat.label}</p>
-              <p className={`text-3xl font-serif ${stat.color || 'text-primary'}`}>{stat.value}</p>
+        {/* KAFELKI MODUŁÓW */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {adminModules.map((mod, i) => (
+            <div 
+              key={i} 
+              onClick={() => navigate(mod.path)}
+              className="border border-gray-100 p-8 hover:border-accent hover:shadow-sm transition-all cursor-pointer bg-white group"
+            >
+              <div className="group-hover:scale-105 transition-transform origin-left">
+                {mod.icon}
+              </div>
+              <h3 className="text-xl font-serif mb-2">{mod.title}</h3>
+              <p className="text-gray-500 text-sm">{mod.description}</p>
             </div>
           ))}
         </div>
 
-        {}
-        <div className="mb-24">
-          <div className="flex justify-between items-end mb-8 border-b border-gray-100 pb-4">
-            <h2 className="text-2xl font-serif">Oczekujące płatności</h2>
-            <span className="text-[10px] uppercase tracking-widest text-accent">
-              Wymagają weryfikacji manualnej
-            </span>
-          </div>
-
-          {pendingPayments.length > 0 ? (
-            <div className="bg-white border border-gray-100">
-              <Table>
-                <TableHeader>
-                  <TableRow className="hover:bg-transparent border-b border-gray-100">
-                    <TableHead className="text-[10px] uppercase tracking-widest font-bold text-gray-400">ID</TableHead>
-                    <TableHead className="text-[10px] uppercase tracking-widest font-bold text-gray-400">Gość</TableHead>
-                    <TableHead className="text-[10px] uppercase tracking-widest font-bold text-gray-400">Pokój</TableHead>
-                    <TableHead className="text-[10px] uppercase tracking-widest font-bold text-gray-400">Termin</TableHead>
-                    <TableHead className="text-[10px] uppercase tracking-widest font-bold text-gray-400 text-right">Kwota</TableHead>
-                    <TableHead className="text-[10px] uppercase tracking-widest font-bold text-gray-400 text-right">Akcje</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {pendingPayments.map((booking) => (
-                    <TableRow key={booking.id} className="hover:bg-gray-50/50 border-b border-gray-50">
-                      <TableCell className="text-[10px] font-mono text-gray-400">#{booking.id}</TableCell>
-                      <TableCell className="font-medium text-sm text-gray-700">{booking.userEmail || 'Brak danych'}</TableCell>
-                      <TableCell className="text-gray-500 text-sm">{booking.roomName}</TableCell>
-                      <TableCell className="text-gray-500 text-sm">{booking.checkInDate} — {booking.checkOutDate}</TableCell>
-                      <TableCell className="text-right font-serif font-bold">{booking.totalAmount} zł</TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-3">
-                          <button 
-                            onClick={() => handleApprovePayment(booking.id)}
-                            className="p-2 hover:text-accent transition-colors"
-                            title="Zatwierdź"
-                          >
-                            <Check className="h-5 w-5" />
-                          </button>
-                          <button 
-                            onClick={() => handleCancelPayment(booking.id)}
-                            className="p-2 hover:text-red-500 transition-colors"
-                            title="Odrzuć"
-                          >
-                            <X className="h-5 w-5" />
-                          </button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          ) : (
-            <div className="py-20 text-center border border-dashed border-gray-200">
-              <p className="font-serif italic text-gray-400">Brak oczekujących operacji</p>
-            </div>
-          )}
-        </div>
-
-        {}
-        <div>
-          <h2 className="text-2xl font-serif mb-8 border-b border-gray-100 pb-4">Historia rezerwacji</h2>
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow className="hover:bg-transparent">
-                  <TableHead className="text-[10px] uppercase tracking-widest font-bold text-gray-400">Gość</TableHead>
-                  <TableHead className="text-[10px] uppercase tracking-widest font-bold text-gray-400">Pokój</TableHead>
-                  <TableHead className="text-[10px] uppercase tracking-widest font-bold text-gray-400">Kwota</TableHead>
-                  <TableHead className="text-[10px] uppercase tracking-widest font-bold text-gray-400 text-right">Status</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {paidBookings.map((booking) => (
-                  <TableRow key={booking.id} className="border-b border-gray-50">
-                    <TableCell className="font-medium text-sm text-gray-700">{booking.userEmail || 'Brak danych'}</TableCell>
-                    <TableCell className="text-gray-500 text-sm">{booking.roomName}</TableCell>
-                    <TableCell className="font-serif">{booking.totalAmount} zł</TableCell>
-                    <TableCell className="text-right">
-                      <span className={`text-[10px] uppercase tracking-widest font-bold ${getStatusStyle(booking.status)}`}>
-                        {getStatusName(booking.status)}
-                      </span>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        </div>
       </div>
     </div>
   );

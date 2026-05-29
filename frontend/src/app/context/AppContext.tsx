@@ -52,11 +52,9 @@ const fetchMyBookingsContext = async () => {
         
         try {
           let data;
-          if (userData.role === 'ADMIN' || userData.role === 'admin' || userData.role === 'ROLE_ADMIN') {
-            // Jeśli to szef -> pobierz z bazy absolutnie wszystko
+          if (userData.role === 'ADMIN' || userData.role === 'admin' || userData.role === 'RECEPTIONIST' || userData.role === 'receptionist') {
             data = await fetchAllBookings();
           } else {
-            // Jeśli to zwykły gość -> pobierz tylko jego rezerwacje
             data = await fetchMyBookings();
           }
           setBookings(data);
