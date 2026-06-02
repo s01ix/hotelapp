@@ -343,7 +343,7 @@ export const AdminRoomsPanel: React.FC = () => {
                   className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <option value="DOSTEPNY">DOSTĘPNY</option>
-                  <option value="SERWIS">W BAZIE / UTRZYMANIE</option>
+                  <option value="SERWIS">SERWIS</option>
                   <option value="NIEDOSTEPNY">NIEDOSTĘPNY</option>
                 </select>
               </div>

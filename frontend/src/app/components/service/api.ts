@@ -67,6 +67,15 @@ export interface HotelDTO {
     locationId?: number;
 }
 
+export interface LocationDTO{
+    id: number;
+    street: string;
+    buildingNumber: string;
+    city: string;
+    postalCode: string;
+    country: string;
+}
+
 const API_BASE_URL = 'http://localhost:8080/api';
 
 export const checkCurrentUser = async () => {
@@ -134,11 +143,53 @@ export const fetchAllRooms = async (): Promise<RoomDTO[]> => {
 }
 
 export const fetchAllHotels = async (): Promise<HotelDTO[]> => {
-    const response = await fetch(`${API_BASE_URL}/hotels`);
+    const response = await fetch(`${API_BASE_URL}/hotels`, {
+        method: 'GET',
+        credentials: 'include', 
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
     if(!response.ok) {
         throw new Error("Błąd podczas pobierania hoteli");
     }
     return response.json();
+}
+
+export const createHotel = async (hotelData: Partial<HotelDTO>): Promise<HotelDTO> => {
+    const response = await fetch(`${API_BASE_URL}/hotels`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(hotelData)
+    });
+    if(!response.ok) {
+        throw new Error("Błąd podczas tworzenia hotelu");
+    }
+    return response.json();
+}
+
+export const updateHotel = async (id: number, hotelData: Partial<HotelDTO>): Promise<HotelDTO> => {
+    const response = await fetch(`${API_BASE_URL}/hotels/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(hotelData)
+    });
+    if(!response.ok) {
+        throw new Error("Błąd podczas aktualizacji hotelu");
+    }
+    return response.json();
+}
+
+export const deleteHotel = async (id: number): Promise<void> => {
+    const response = await fetch(`${API_BASE_URL}/hotels/${id}`, {
+        method: 'DELETE',
+        credentials: 'include'
+    });
+    if(!response.ok) {
+        throw new Error("Błąd podczas usuwania hotelu");
+    }
 }
 
 export const createRoomPhoto = async (photoData: Partial<RoomPhotoDTO>): Promise<RoomPhotoDTO> => {
@@ -271,4 +322,54 @@ if(!response.ok) {
     throw new Error("Błąd podczas aktualizacji roli użytkownika");
 }
 return response.text();
+}
+
+export const fetchAllLocations = async (): Promise<LocationDTO[]> => {
+    const response = await fetch(`${API_BASE_URL}/locations`, {
+        method: 'GET',
+        credentials: 'include', // <-- BRAKOWAŁO TEGO
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+    if(!response.ok) {
+        throw new Error("Błąd podczas pobierania lokalizacji");
+    }
+    return response.json();
+}
+
+export const createLocation = async (locationData: Partial<LocationDTO>): Promise<LocationDTO> => {
+    const response = await fetch(`${API_BASE_URL}/locations`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(locationData)
+    });
+    if(!response.ok) {
+        throw new Error("Błąd podczas tworzenia lokalizacji");
+    }
+    return response.json();
+}
+
+export const updateLocation = async (id: number, locationData: Partial<LocationDTO>): Promise<LocationDTO> => {
+    const response = await fetch(`${API_BASE_URL}/locations/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(locationData)
+    });
+    if(!response.ok) {
+        throw new Error("Błąd podczas aktualizacji lokalizacji");
+    }
+    return response.json();
+}
+
+export const deleteLocation = async (id: number): Promise<void> => {
+    const response = await fetch(`${API_BASE_URL}/locations/${id}`, {
+        method: 'DELETE',
+        credentials: 'include'
+    });
+    if(!response.ok) {
+        throw new Error("Błąd podczas usuwania lokalizacji");
+    }
 }

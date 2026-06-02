@@ -9,6 +9,7 @@ import { AdminRoomsPanel } from './pages/AdminRoomsPanel';
 import { NotFound } from './pages/NotFound';
 import { ReceptionistPanel } from './pages/ReceptionistPanel';
 import { AdminUserPanel } from './pages/AdminUserPanel';
+import { AdminLocationsPanel } from './pages/AdminLocationsPanel'
 
 export const router = createBrowserRouter([
   {
@@ -21,6 +22,7 @@ export const router = createBrowserRouter([
       { path: 'dashboard', Component: UserDashboard },
       { path: 'admin', Component: AdminPanel },
       { path: 'admin/rooms', Component: AdminRoomsPanel },
+      { path: 'admin/locations', Component: AdminLocationsPanel },
       { path: '*', Component: NotFound },
       { path: 'receptionist', Component: ReceptionistPanel },
       { path: 'admin/users', Component: AdminUserPanel },
