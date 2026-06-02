@@ -59,11 +59,12 @@ export interface BookingDTO {
 
 export interface HotelDTO {
     id: number;
-    nazwa: string;
-    opis: string;
-    gwiazdki: number;
+    name: string;
+    description: string;
+    stars: number;
     email: string;
-    telefon: string;
+    phone: string;
+    locationId?: number;
 }
 
 const API_BASE_URL = 'http://localhost:8080/api';
@@ -124,6 +125,81 @@ export const fetchAvailableRooms = async (checkIn: string, checkOut: string, max
     return response.json();
 }
 
+export const fetchAllRooms = async (): Promise<RoomDTO[]> => {
+    const response = await fetch(`${API_BASE_URL}/rooms`);
+    if(!response.ok) {
+        throw new Error("Błąd podczas pobierania pokoi");
+    }
+    return response.json();
+}
+
+export const fetchAllHotels = async (): Promise<HotelDTO[]> => {
+    const response = await fetch(`${API_BASE_URL}/hotels`);
+    if(!response.ok) {
+        throw new Error("Błąd podczas pobierania hoteli");
+    }
+    return response.json();
+}
+
+export const createRoomPhoto = async (photoData: Partial<RoomPhotoDTO>): Promise<RoomPhotoDTO> => {
+    const response = await fetch(`${API_BASE_URL}/room_photos`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(photoData)
+    });
+    if(!response.ok) {
+        throw new Error("Błąd podczas dodawania zdjęcia");
+    }
+    return response.json();
+}
+
+export const deleteRoomPhoto = async (id: number): Promise<void> => {
+    const response = await fetch(`${API_BASE_URL}/room_photos/${id}`, {
+        method: 'DELETE',
+        credentials: 'include'
+    });
+    if(!response.ok) {
+        throw new Error("Błąd podczas usuwania zdjęcia");
+    }
+}
+
+export const createRoom = async (roomData: RoomDTO): Promise<RoomDTO> => {
+    const response = await fetch(`${API_BASE_URL}/rooms`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(roomData)
+    });
+    if(!response.ok) {
+        throw new Error("Błąd podczas tworzenia pokoju");
+    }
+    return response.json();
+}
+
+export const updateRoom = async (id: number, roomData: RoomDTO): Promise<RoomDTO> => {
+    const response = await fetch(`${API_BASE_URL}/rooms/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(roomData)
+    });
+    if(!response.ok) {
+        throw new Error("Błąd podczas aktualizacji pokoju");
+    }
+    return response.json();
+}
+
+export const deleteRoom = async (id: number): Promise<void> => {
+    const response = await fetch(`${API_BASE_URL}/rooms/${id}`, {
+        method: 'DELETE',
+        credentials: 'include'
+    });
+    if(!response.ok) {
+        throw new Error("Błąd podczas usuwania pokoju");
+    }
+}
+
 export const fetchRoomById = async (id : number): Promise<RoomDTO> => {
     const response = await fetch(`${API_BASE_URL}/rooms/${id}`);
 
@@ -173,13 +249,6 @@ export const updateBookingStatusInBackend = async (bookingId: number, status: st
     return response.text();
 };
 
-export const fetchAllHotels = async (): Promise<HotelDTO[]> => {
-    const response = await fetch(`${API_BASE_URL}/hotels`); 
-    if(!response.ok) {
-        throw new Error("Błąd podczas pobierania hoteli");
-    }
-    return response.json();
-}
 // Funkcja do pobierania wszystkich użytkowników
 export const fetchAllUsers = async () => {
     const response = await fetch(`${API_BASE_URL}/users`, {
