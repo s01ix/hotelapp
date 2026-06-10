@@ -4,9 +4,11 @@ import com.example.hotelapp.dto.OpinionsDTO;
 import com.example.hotelapp.service.OpinionsService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("api/opinions")
@@ -18,6 +20,24 @@ public class OpinionsController {
     @GetMapping
     public List<OpinionsDTO> getAll() {
         return opinionsService.getAll();
+    }
+
+    @GetMapping("/user/{userId}")
+    public List<OpinionsDTO> getUserOpinions(@PathVariable Long userId) {
+        return opinionsService.getUserOpinions(userId);
+    }
+
+    @GetMapping("/room/{roomId}")
+    public List<OpinionsDTO> getRoomOpinions(@PathVariable Long roomId) {
+        return opinionsService.getRoomOpinions(roomId);
+    }
+
+    @GetMapping("/can-review/{bookingId}/user/{userId}")
+    public ResponseEntity<Map<String, Boolean>> canReview(
+            @PathVariable Long bookingId,
+            @PathVariable Long userId) {
+        boolean canReview = opinionsService.canReviewBooking(bookingId, userId);
+        return ResponseEntity.ok(Map.of("canReview", canReview));
     }
 
     @PostMapping

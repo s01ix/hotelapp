@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,16 +35,57 @@ public class OpinionsService {
         }
         return dtoList;
     }
+    public List<OpinionsDTO> getUserOpinions(Long userId) {
+        List<Opinions> opinions = opinionsRepository.findByUserId(userId);
+        List<OpinionsDTO> dtoList = new ArrayList<>();
+        for (Opinions opinion : opinions) {
+            dtoList.add(mapToDto(opinion));
+        }
+        return dtoList;
+    }
+
+    public List<OpinionsDTO> getRoomOpinions(Long roomId) {
+        List<Opinions> opinions = opinionsRepository.findByRoomId(roomId);
+        List<OpinionsDTO> dtoList = new ArrayList<>();
+        for (Opinions opinion : opinions) {
+            dtoList.add(mapToDto(opinion));
+        }
+        return dtoList;
+    }
+
+    public boolean canReviewBooking(Long bookingId, Long userId) {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nie znaleziono rezerwacji"));
+
+        if (!booking.getUser().getId().equals(userId)) {
+            return false;
+        }
+
+        if (booking.getCheckOutDate().isAfter(LocalDate.now())) {
+            return false;
+        }
+
+        return !opinionsRepository.existsByBookingId(bookingId);
+    }
+
 
     public OpinionsDTO create(OpinionsDTO dto) {
+        if (!canReviewBooking(dto.getBookingId(), dto.getUserId())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Nie możesz wystawić opinii dla tej rezerwacji");
+        }
+
         User user = userRepository.findById(dto.getUserId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nie znaleziono użytkownika o ID"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "Nie znaleziono użytkownika o ID"));
 
         Room room = roomRepository.findById(dto.getRoomId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nie znaleziono pokoju o ID"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "Nie znaleziono pokoju o ID"));
 
         Booking booking = bookingRepository.findById(dto.getBookingId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nie znaleziono rezerwacji o ID"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "Nie znaleziono rezerwacji o ID"));
 
         Opinions opinionToSave = mapToEntity(dto);
         opinionToSave.setUser(user);
@@ -56,24 +98,21 @@ public class OpinionsService {
 
     public OpinionsDTO update(Long id, OpinionsDTO dto) {
         Opinions existingOpinion = opinionsRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nie znaleziono opinii o ID"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Nie znaleziono opinii o ID"));
 
-        User user = userRepository.findById(dto.getUserId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nie znaleziono użytkownika o ID"));
-        Room room = roomRepository.findById(dto.getRoomId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nie znaleziono pokoju o ID"));
-        Booking booking = bookingRepository.findById(dto.getBookingId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nie znaleziono rezerwacji o ID"));
+        if (!existingOpinion.getUser().getId().equals(dto.getUserId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "Nie możesz edytować cudzej opinii");
+        }
 
         existingOpinion.setRate(dto.getRate());
         existingOpinion.setComment(dto.getComment());
-        existingOpinion.setUser(user);
-        existingOpinion.setRoom(room);
-        existingOpinion.setBooking(booking);
 
         Opinions savedOpinion = opinionsRepository.save(existingOpinion);
         return mapToDto(savedOpinion);
     }
+
 
     public void delete(Long id) {
         if (opinionsRepository.existsById(id)) {

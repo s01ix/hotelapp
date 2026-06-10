@@ -13,6 +13,7 @@ export interface SearchParams {
 
 export interface Booking {
   id: number;
+  roomId?: number;
   checkInDate: string;
   checkOutDate: string;
   status: string;
@@ -75,6 +76,26 @@ export interface LocationDTO{
     postalCode: string;
     country: string;
 }
+
+export interface Opinion {
+  id?: number;
+  bookingId: number;
+  userId: number;
+  roomId: number;
+  rate: number;
+  comment: string;
+  createdAt?: string;
+  roomName?: string;
+  userName?: string;
+}
+
+export interface OpinionFormData {
+  bookingId: number;
+  roomId: number;
+  rate: number;
+  comment: string;
+}
+
 
 const API_BASE_URL = 'http://localhost:8080/api';
 
@@ -373,3 +394,106 @@ export const deleteLocation = async (id: number): Promise<void> => {
         throw new Error("Błąd podczas usuwania lokalizacji");
     }
 }
+
+export const fetchAllOpinions = async (): Promise<Opinion[]> => {
+    const response = await fetch(`${API_BASE_URL}/opinions`, {
+        method: 'GET',
+        credentials: 'include',
+    });
+    if (!response.ok) {
+        throw new Error('Błąd podczas pobierania opinii');
+    }
+    return response.json();
+};
+
+export const fetchUserOpinions = async (userId: number): Promise<Opinion[]> => {
+    const response = await fetch(`${API_BASE_URL}/opinions/user/${userId}`, {
+        method: 'GET',
+        credentials: 'include',
+    });
+    if (!response.ok) {
+        throw new Error('Błąd podczas pobierania opinii użytkownika');
+    }
+    return response.json();
+};
+
+export const fetchRoomOpinions = async (roomId: number): Promise<Opinion[]> => {
+    const response = await fetch(`${API_BASE_URL}/opinions/room/${roomId}`, {
+        method: 'GET',
+        credentials: 'include',
+    });
+    if (!response.ok) {
+        throw new Error('Błąd podczas pobierania opinii pokoju');
+    }
+    return response.json();
+};
+
+export const canReviewBooking = async (bookingId: number, userId: number): Promise<boolean> => {
+    try {
+        const response = await fetch(
+            `${API_BASE_URL}/opinions/can-review/${bookingId}/user/${userId}`,
+            {
+                method: 'GET',
+                credentials: 'include',
+            }
+        );
+        if (!response.ok) return false;
+        const data = await response.json();
+        return data.canReview;
+    } catch (error) {
+        console.error('Błąd sprawdzania możliwości wystawienia opinii:', error);
+        return false;
+    }
+};
+
+export const createOpinion = async (userId: number, opinion: OpinionFormData): Promise<Opinion> => {
+    const response = await fetch(`${API_BASE_URL}/opinions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+            ...opinion,
+            userId,
+        }),
+    });
+    
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || 'Nie udało się dodać opinii');
+    }
+    
+    return response.json();
+};
+
+export const updateOpinion = async (
+    id: number,
+    userId: number,
+    opinion: Partial<OpinionFormData>
+): Promise<Opinion> => {
+    const response = await fetch(`${API_BASE_URL}/opinions/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+            ...opinion,
+            userId,
+        }),
+    });
+    
+    if (!response.ok) {
+        throw new Error('Nie udało się zaktualizować opinii');
+    }
+    
+    return response.json();
+};
+
+export const deleteOpinion = async (id: number): Promise<void> => {
+    const response = await fetch(`${API_BASE_URL}/opinions/${id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+    });
+    
+    if (!response.ok) {
+        throw new Error('Nie udało się usunąć opinii');
+    }
+};
