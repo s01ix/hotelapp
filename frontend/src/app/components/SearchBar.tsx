@@ -29,12 +29,12 @@ export const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
 
   return (
     <div className="bg-white border border-gray-200 p-6 w-full shadow-sm">
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-4">
         {/* Check-in Date */}
         <div className="space-y-2 flex flex-col">
           <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
             <Calendar className="h-4 w-4 text-primary" />
-            Data przyjazd
+            Data przyjazdu
           </label>
           <Input
             type="date"

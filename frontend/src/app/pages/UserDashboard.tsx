@@ -21,7 +21,7 @@ import {
 } from '../components/service/api';
 
 export const UserDashboard: React.FC = () => {
-  const { user, bookings, isLoggedIn } = useApp();
+  const { user, bookings, loginWithGoogle} = useApp();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   
@@ -166,34 +166,7 @@ export const UserDashboard: React.FC = () => {
         return status;
     }
   };
-
-  if (!isLoggedIn) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="text-center p-12 border border-gray-100 max-w-md">
-          <h2 className="text-3xl font-serif mb-4">Zaloguj się</h2>
-          <p className="text-gray-500 mb-8 uppercase tracking-widest text-xs">
-            Aby zarządzać swoimi pobytami
-          </p>
-          <div className="flex flex-col gap-4">
-            <button
-              onClick={() => (window.location.href = 'http://localhost:8080/oauth2/authorization/google')}
-              className="bg-primary text-white py-4 px-8 text-sm uppercase tracking-widest hover:bg-accent transition-colors w-full shadow-md"
-            >
-              Zaloguj przez Google
-            </button>
-            <button
-              onClick={() => navigate('/')}
-              className="text-gray-400 mt-2 text-xs uppercase tracking-widest hover:text-primary transition-colors"
-            >
-              Wróć do strony głównej
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
+  
   const today = new Date().toISOString().split('T')[0];
   const upcomingBookings = bookings.filter((b) => b.checkInDate >= today);
   const pastBookings = bookings.filter((b) => b.checkOutDate < today);

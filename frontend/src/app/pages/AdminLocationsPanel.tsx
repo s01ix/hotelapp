@@ -28,7 +28,7 @@ import {
 } from '../components/service/api';
 
 export const AdminLocationsPanel: React.FC = () => {
-  const { user, isLoggedIn } = useApp();
+  const { user} = useApp();
   const navigate = useNavigate();
   
   const [hotelsList, setHotelsList] = useState<HotelDTO[]>([]);
@@ -64,16 +64,9 @@ export const AdminLocationsPanel: React.FC = () => {
   };
 
   useEffect(() => {
-    if (isLoggedIn && (user?.role === 'ADMIN' || user?.role === 'admin')) {
-      loadData();
-    } else {
-      setIsLoading(false);
-    }
-  }, [isLoggedIn, user]);
+    loadData();
+  }, []);
 
-  if (!isLoggedIn || (user?.role !== 'ADMIN' && user?.role !== 'admin')) {
-    return <div className="text-center p-12">Brak dostępu.</div>;
-  }
 
   const handleOpenDialog = (hotel?: HotelDTO) => {
     if (hotel) {

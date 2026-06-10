@@ -1,32 +1,10 @@
 import React from 'react';
 import { useNavigate } from 'react-router';
-import { ArrowLeft, Users, Building, MapPin, DollarSign } from 'lucide-react';
+import { ArrowLeft, Users, Building, Hotel } from 'lucide-react';
 import { Button } from '../components/ui/button';
-import { useApp } from '../context/AppContext';
 
 export const AdminPanel: React.FC = () => {
-  const { user, isLoggedIn } = useApp();
   const navigate = useNavigate();
-
-  
-if (!isLoggedIn || (user?.role !== 'ADMIN' && user?.role !== 'admin')) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="text-center p-12 border border-gray-100 max-w-md">
-          <h2 className="text-3xl font-serif mb-4">Brak dostępu</h2>
-          <p className="text-gray-500 mb-8 uppercase tracking-widest text-xs">
-            Wymagane uprawnienia administratora
-          </p>
-          <Button 
-            onClick={() => navigate('/')} 
-            className="bg-primary text-white rounded-none px-8"
-          >
-            Powrót
-          </Button>
-        </div>
-      </div>
-    );
-  }
 
   const adminModules = [
     {
@@ -41,17 +19,12 @@ if (!isLoggedIn || (user?.role !== 'ADMIN' && user?.role !== 'admin')) {
       icon: <Building className="h-8 w-8 text-primary mb-4" />,
       path: '/admin/rooms'
     },
+
     {
-      title: 'Ceny i Udogodnienia',
-      description: 'Konfiguruj cenniki, dodawaj WiFi, TV, śniadania itp.',
-      icon: <DollarSign className="h-8 w-8 text-primary mb-4" />,
-      path: '/admin/amenities'
-    },
-    {
-      title: 'Lokalizacje',
-      description: 'Zarządzaj budynkami i adresami Twoich obiektów.',
-      icon: <MapPin className="h-8 w-8 text-primary mb-4" />,
-      path: '/admin/locations'
+  title: 'Zarządzanie Hotelami',
+      description: 'Zarządzaj obiektami hotelowymi, nazwami i głównymi adresami.',
+      icon: <Hotel className="h-8 w-8 text-primary mb-4" />, 
+      path: '/admin/locations' 
     }
   ];
 

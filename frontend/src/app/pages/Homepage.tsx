@@ -120,8 +120,8 @@ export const Homepage: React.FC = () => {
             ) : hotels.length > 0 ? (
                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
                   {hotels.map((hotel) => {
-                    const hotelName = hotel.nazwa || (hotel as any).name || 'Luksusowy Hotel Luks Search';
-                    const hotelStars = hotel.gwiazdki || 4;
+                    const hotelName = hotel.name || (hotel as any).name || 'Luksusowy Hotel Luks Search';
+                    const hotelStars = hotel.stars || 4;
 
                     return (
                       <div key={hotel.id} className="group flex flex-col bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden">

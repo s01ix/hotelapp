@@ -1,10 +1,10 @@
 package com.example.hotelapp.controller;
 
 import com.example.hotelapp.dto.AmenityDTO;
-import com.example.hotelapp.model.Amenity;
 import com.example.hotelapp.service.AmenityService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +19,10 @@ public class AmenityController {
     @GetMapping
     public List<AmenityDTO> getAll(){
         return amenityService.getAll();
+    }
+
+    public ResponseEntity<AmenityDTO> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(new AmenityDTO());
     }
 
     @PostMapping

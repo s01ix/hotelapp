@@ -7,14 +7,11 @@ import { useApp } from '../context/AppContext';
 import { User, fetchAllUsers, updateUserRole } from '../components/service/api';
 
 export const AdminUserPanel: React.FC = () => {
-  const { user, isLoggedIn } = useApp();
+  const { user} = useApp();
   const navigate = useNavigate();
   const [usersList, setUsersList] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  if (!isLoggedIn || (user?.role !== 'ADMIN' && user?.role !== 'admin')) {
-    return <div className="text-center p-12">Brak dostępu.</div>;
-  }
 
   const loadUsers = async () => {
     try {
@@ -115,6 +112,14 @@ export const AdminUserPanel: React.FC = () => {
                               className="text-[10px] h-7 px-2 border-accent text-accent hover:bg-accent hover:text-white"
                             >
                               RECEPCJONISTA
+                            </Button>
+                            <Button 
+                              onClick={() => handleRoleChange(u.id, 'ADMIN')} 
+                              variant="outline" 
+                              disabled={u.role.toUpperCase() === 'ADMIN'}
+                              className="text-[10px] h-7 px-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
+                            >
+                              ADMIN
                             </Button>
                           </>
                         )}

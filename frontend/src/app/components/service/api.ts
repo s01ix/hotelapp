@@ -96,6 +96,12 @@ export interface OpinionFormData {
   comment: string;
 }
 
+export interface AmenityDTO {
+  id: number;
+  name: string;
+  category: string;
+  description: string;
+}
 
 const API_BASE_URL = 'http://localhost:8080/api';
 
@@ -496,4 +502,51 @@ export const deleteOpinion = async (id: number): Promise<void> => {
     if (!response.ok) {
         throw new Error('Nie udało się usunąć opinii');
     }
+};
+
+export const fetchAllAmenities = async (): Promise<AmenityDTO[]> => {
+  const response = await fetch(`${API_BASE_URL}/amenities`, {
+    method: 'GET',
+    credentials: 'include',
+  });
+  if (!response.ok) {
+    throw new Error('Błąd podczas pobierania udogodnień');
+  }
+  return response.json();
+};
+
+export const createAmenity = async (amenity: Partial<AmenityDTO>): Promise<AmenityDTO> => {
+  const response = await fetch(`${API_BASE_URL}/amenities`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify(amenity),
+  });
+  if (!response.ok) {
+    throw new Error('Błąd podczas tworzenia udogodnienia');
+  }
+  return response.json();
+};
+
+export const updateAmenity = async (id: number, amenity: Partial<AmenityDTO>): Promise<AmenityDTO> => {
+  const response = await fetch(`${API_BASE_URL}/amenities/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify(amenity),
+  });
+  if (!response.ok) {
+    throw new Error('Błąd podczas aktualizacji udogodnienia');
+  }
+  return response.json();
+};
+
+export const deleteAmenity = async (id: number): Promise<void> => {
+  const response = await fetch(`${API_BASE_URL}/amenities/${id}`, {
+    method: 'DELETE',
+    credentials: 'include',
+  });
+  if (!response.ok) {
+    throw new Error('Błąd podczas usuwania udogodnienia');
+  }
 };

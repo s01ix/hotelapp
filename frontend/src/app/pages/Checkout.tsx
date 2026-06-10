@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
-import { CreditCard, Building2, CheckCircle, ArrowLeft } from 'lucide-react';
+import { CreditCard, Building2, ArrowLeft } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
@@ -11,7 +11,7 @@ import { BookingDTO, createBooking, createPayment, RoomDTO } from '../components
 export const Checkout: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { searchParams, user, isLoggedIn } = useApp();
+  const { searchParams, user } = useApp();
 
   const room = location.state?.room as RoomDTO | undefined;
 
@@ -48,11 +48,7 @@ export const Checkout: React.FC = () => {
 
   const handleConfirmBooking = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!user || !user.id) {
-      setError('Musisz być zalogowany, aby dokonać rezerwacji.');
-      return;
-    }
+  
 
     try {
       setLoading(true);
@@ -60,7 +56,7 @@ export const Checkout: React.FC = () => {
 
     const bookingData: BookingDTO = {
         roomId: room.id,
-        userId: user.id,
+        userId: user!.id,
         checkInDate: searchParams.checkIn,
         checkOutDate: searchParams.checkOut,
         adults: searchParams.guests,

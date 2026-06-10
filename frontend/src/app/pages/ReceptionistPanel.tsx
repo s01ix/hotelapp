@@ -1,9 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router';
-import { ArrowLeft, Check, X, CreditCard, LogOut } from 'lucide-react';
+import { ArrowLeft, Check, X, LogOut } from 'lucide-react';
 import { Button } from '../components/ui/button';
-import { Card, CardContent } from '../components/ui/card';
-import { Badge } from '../components/ui/badge';
 import {
   Table,
   TableBody,
@@ -15,28 +13,8 @@ import {
 import { useApp } from '../context/AppContext';
 
 export const ReceptionistPanel: React.FC = () => {
-  const { user, bookings, updateBookingStatus, isLoggedIn } = useApp();
+  const { bookings, updateBookingStatus} = useApp();
   const navigate = useNavigate();
-
-  
-  if (!isLoggedIn || (user?.role !== 'RECEPTIONIST' && user?.role !== 'ADMIN' && user?.role !== 'receptionist')) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="text-center p-12 border border-gray-100 max-w-md">
-          <h2 className="text-3xl font-serif mb-4">Brak dostępu</h2>
-          <p className="text-gray-500 mb-8 uppercase tracking-widest text-xs">
-            Wymagane uprawnienia recepcji
-          </p>
-          <Button 
-            onClick={() => navigate('/')} 
-            className="bg-primary text-white rounded-none px-8"
-          >
-            Powrót
-          </Button>
-        </div>
-      </div>
-    );
-  }
 
   const pendingPayments = bookings.filter((b) => b.status === 'OCZEKUJACA');
 
@@ -217,7 +195,7 @@ export const ReceptionistPanel: React.FC = () => {
           )}
         </div>
 
-        {/* TABELA 3: HISTORIA */}
+        {/*Historia rezerwacji*/}
         <div>
           <h2 className="text-2xl font-serif mb-8 border-b border-gray-100 pb-4">Historia rezerwacji</h2>
           <div className="overflow-x-auto">
