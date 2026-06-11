@@ -4,11 +4,12 @@ import { ArrowLeft, Users, BedDouble, Check, Star, MessageSquare } from 'lucide-
 import { Button } from '../components/ui/button';
 import { useApp } from '../context/AppContext';
 import { RoomDTO, fetchRoomById, fetchRoomOpinions, Opinion } from '../components/service/api';
+import { toast } from 'sonner';
 
 export const RoomDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { searchParams } = useApp();
+  const { searchParams, isLoggedIn } = useApp();
   
   const [room, setRoom] = useState<RoomDTO | null>(null); 
   const [loading, setLoading] = useState(true);
@@ -74,17 +75,17 @@ export const RoomDetails: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <p className="text-xl text-gray-500 animate-pulse">Ładowanie szczegółów pokoju...</p>
+      <div className="min-h-screen flex items-center justify-center bg-background text-foreground">
+        <p className="text-xl text-muted-foreground animate-pulse">Ładowanie szczegółów pokoju...</p>
       </div>
     );
   }
 
   if (error || !room) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Nie znaleziono pokoju</h2>
+      <div className="min-h-screen flex items-center justify-center bg-background text-foreground">
+        <div className="text-center bg-card p-8 rounded-3xl shadow-sm">
+          <h2 className="text-2xl font-bold text-foreground mb-4">Nie znaleziono pokoju</h2>
           <p className="text-red-500 mb-6">{error}</p>
           <Button onClick={() => navigate('/')}>Wróć do strony głównej</Button>
         </div>
@@ -92,12 +93,21 @@ export const RoomDetails: React.FC = () => {
     );
   }
 
-  const handleBookNow = () => {
+const handleBookNow = () => {
+    if (!isLoggedIn) {
+      toast.error('Aby zarezerwować pokój, musisz się zalogować');
+
+      navigate('/dashboard');
+
+      return;
+    }
+
     if (!searchParams) {
-      alert('Wybierz daty przyjazdu i wyjazdu na stronie głównej');
+      toast.error('Wybierz daty przyjazdu i wyjazdu');
       navigate('/');
       return;
     }
+
     navigate('/checkout', { state: { room } });
   };
 
@@ -111,13 +121,13 @@ export const RoomDetails: React.FC = () => {
   const nights = getNights();
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background text-foreground">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Back Button */}
         <Button
           onClick={() => navigate('/')}
           variant="ghost"
-          className="mb-6 hover:bg-gray-100"
+          className="mb-6 hover:bg-muted"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Wróć do listy pokoi
@@ -133,7 +143,7 @@ export const RoomDetails: React.FC = () => {
           
           {/* Średnia ocena na zdjęciu */}
           {averageRating && (
-            <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-sm px-4 py-2 rounded-lg shadow-lg flex items-center gap-2">
+            <div className="absolute top-4 right-4 bg-card/95 backdrop-blur-sm px-4 py-2 rounded-lg shadow-lg flex items-center gap-2">
               <Star className="h-5 w-5 fill-amber-400 text-amber-400" />
               <span className="font-bold text-lg">{averageRating}</span>
               <span className="text-sm text-gray-600">({opinions.length})</span>

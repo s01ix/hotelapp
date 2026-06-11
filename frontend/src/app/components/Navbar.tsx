@@ -6,6 +6,8 @@ import { Button } from './ui/button';
 import {Dialog,DialogContent,DialogDescription,DialogHeader,DialogTitle,} from './ui/dialog';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
+import { ThemeToggle } from './ThemeToggle';
+
 
 export const Navbar: React.FC = () => {
 const { user, isLoggedIn, loginWithGoogle, loginWithEmail, registerWithEmail, logout } = useApp();
@@ -65,7 +67,7 @@ const { user, isLoggedIn, loginWithGoogle, loginWithEmail, registerWithEmail, lo
 
   return (
     <>
-      <nav className="bg-white text-primary border-b border-gray-100 sticky top-0 z-50 py-2">
+      <nav className="bg-card text-primary dark:text-white border-b border-border dark:border-gray-800 sticky top-0 z-50 py-2 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link to="/" className="flex flex-col items-start leading-none group">
@@ -74,6 +76,7 @@ const { user, isLoggedIn, loginWithGoogle, loginWithEmail, registerWithEmail, lo
             </Link>
 
             <div className="flex items-center gap-6">
+              <ThemeToggle />
               {isLoggedIn ? (
                 <>
                   <div className="hidden md:flex items-center gap-2 text-sm font-medium">
@@ -194,7 +197,7 @@ const { user, isLoggedIn, loginWithGoogle, loginWithEmail, registerWithEmail, lo
               />
             </div>
             
-            <Button type="submit" className="w-full bg-primary hover:bg-accent text-white rounded-none h-12 transition-colors">
+            <Button type="submit" className="w-full bg-primary hover:bg-accent text-primary-foreground rounded-none h-12 transition-colors">
               {isLoginMode ? 'Zaloguj się' : 'Utwórz konto'}
             </Button>
           </form>

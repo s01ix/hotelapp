@@ -52,9 +52,9 @@ export const OpinionForm: React.FC<OpinionFormProps> = ({
   };
 
   return (
-    <div className="bg-white border border-gray-200 p-8 max-w-2xl">
+    <div className="bg-card border border-border p-8 max-w-2xl">
       <h3 className="text-2xl font-serif mb-2">Oceń swój pobyt</h3>
-      <p className="text-gray-500 text-sm mb-8 uppercase tracking-widest">{roomName}</p>
+      <p className="text-muted-foreground text-sm mb-8 uppercase tracking-widest">{roomName}</p>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Ocena gwiazdkami */}
@@ -101,7 +101,7 @@ export const OpinionForm: React.FC<OpinionFormProps> = ({
           <textarea
             value={comment}
             onChange={(e) => setComment(e.target.value)}
-            className="w-full border border-gray-200 p-4 min-h-[150px] focus:outline-none focus:border-primary resize-none"
+            className="w-full border border-border p-4 min-h-[150px] focus:outline-none focus:border-primary resize-none"
             placeholder="Podziel się swoimi wrażeniami z pobytu..."
             maxLength={4000}
           />
@@ -122,7 +122,7 @@ export const OpinionForm: React.FC<OpinionFormProps> = ({
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="flex-1 bg-primary hover:bg-accent text-white py-4 uppercase tracking-widest text-sm"
+            className="flex-1 bg-primary hover:bg-accent text-primary-foreground py-4 uppercase tracking-widest text-sm"
           >
             {isSubmitting ? 'Wysyłanie...' : 'Wyślij opinię'}
           </Button>

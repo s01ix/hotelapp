@@ -25,11 +25,11 @@ export const Checkout: React.FC = () => {
 
   if (!room || !searchParams) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="text-center p-12 border border-gray-100 max-w-md">
+      <div className="min-h-screen flex items-center justify-center bg-background text-foreground">
+        <div className="text-center p-12 border border-border max-w-md bg-card">
           <h2 className="text-3xl font-serif mb-4">Sesja wygasła</h2>
-          <p className="text-gray-500 mb-8 uppercase tracking-widest text-xs">Nie znaleziono szczegółów rezerwacji</p>
-          <Button onClick={() => navigate('/')} className="bg-primary text-white rounded-none px-8">
+          <p className="text-muted-foreground mb-8 uppercase tracking-widest text-xs">Nie znaleziono szczegółów rezerwacji</p>
+          <Button onClick={() => navigate('/')} className="bg-primary text-primary-foreground rounded-none px-8">
             Wróć do strony głównej
           </Button>
         </div>
@@ -91,7 +91,7 @@ export const Checkout: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#fdfdfd] py-16">
+    <div className="min-h-screen bg-background text-foreground py-16">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <Button
             onClick={() => navigate(-1)}
@@ -114,7 +114,7 @@ export const Checkout: React.FC = () => {
                   <img
                     src={placeholderImage}
                     alt={room.name}
-                    className="w-40 h-40 object-cover"
+                    className="w-40 h-40 object-cover rounded-xl"
                   />
                   <div>
                     <h3 className="text-2xl font-serif mb-2">{room.name}</h3>
@@ -173,8 +173,8 @@ export const Checkout: React.FC = () => {
                   <div
                     className={`p-6 border cursor-pointer transition-all ${
                       paymentMethod === 'online'
-                        ? 'border-primary bg-gray-50'
-                        : 'border-gray-100 hover:border-gray-200 bg-white'
+                        ? 'border-primary bg-secondary'
+                        : 'border-border hover:border-border bg-card'
                     }`}
                     onClick={() => setPaymentMethod('online')}
                   >
@@ -208,7 +208,7 @@ export const Checkout: React.FC = () => {
                 </RadioGroup>
 
                 {paymentMethod === 'offline' && (
-                  <div className="mt-6 p-6 border border-gray-100 bg-white">
+                  <div className="mt-6 p-6 border border-border bg-card">
                     <p className="text-[10px] uppercase tracking-widest text-accent mb-4 font-bold">Dane do przelewu</p>
                     <div className="space-y-1 text-sm text-gray-600 font-mono">
                       <p>Nr: 88 1020 4444 0000 1234 5678 9000</p>
@@ -221,7 +221,7 @@ export const Checkout: React.FC = () => {
             </div>
 
             <aside className="lg:col-span-1">
-              <div className="border border-gray-200 p-8 sticky top-24 bg-white">
+              <div className="border border-border p-8 sticky top-24 bg-card">
                 <h3 className="text-xl font-serif mb-8 border-b border-gray-100 pb-4">Podsumowanie</h3>
                 
                 <div className="space-y-6">
@@ -256,7 +256,7 @@ export const Checkout: React.FC = () => {
 
                   <Button
                     type="submit"
-                    className="w-full bg-primary hover:bg-accent text-white rounded-none py-8 text-sm uppercase tracking-widest transition-colors"
+                    className="w-full bg-primary hover:bg-accent text-primary-foreground rounded-none py-8 text-sm uppercase tracking-widest transition-colors"
                   >
                     Potwierdzam rezerwację
                   </Button>

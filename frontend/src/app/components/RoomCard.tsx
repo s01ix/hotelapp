@@ -34,7 +34,7 @@ export const RoomCard: React.FC<RoomCardProps> = ({ room, hotels = [] }) => {
 
   let hotelName = 'Nieznany Hotel';
   if (room.hotelId && hotels && hotels.length > 0) {
-      hotelName = hotels.find(h => h.id === room.hotelId)?.nazwa || 'Nieznany Hotel';
+      hotelName = hotels.find(h => h.id === room.hotelId)?.name || 'Nieznany Hotel';
   }
   if (hotelName === 'Nieznany Hotel') {
       const fallbackNames = ['Gorski Resort & Spa', 'Morska Bryza', 'City Center Premium', 'Lesna Ostoja', 'Mazurski Raj'];
@@ -43,15 +43,15 @@ export const RoomCard: React.FC<RoomCardProps> = ({ room, hotels = [] }) => {
   }
 
   return (
-    <div className="group cursor-pointer flex flex-col h-full bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden" onClick={() => navigate(`/room/${room.id}`)}>
-      <div className="relative aspect-[16/10] overflow-hidden bg-gray-200">
+    <div className="group cursor-pointer flex flex-col h-full bg-card border border-border rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden" onClick={() => navigate(`/room/${room.id}`)}>
+      <div className="relative aspect-[16/10] overflow-hidden bg-muted">
         <img src={currentImage} alt={room.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy" />
-        <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full text-xs font-bold tracking-widest text-accent flex items-center gap-1 shadow-sm">
+        <div className="absolute top-4 left-4 bg-card/90 backdrop-blur-sm px-3 py-1.5 rounded-full text-xs font-bold tracking-widest text-accent flex items-center gap-1 shadow-sm">
           <MapPin className="h-3 w-3" />
           {hotelName}
         </div>
         <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center">
-          <Button className="w-full bg-accent text-white hover:bg-black transition-colors font-semibold shadow-lg">
+          <Button className="w-full bg-accent text-accent-foreground hover:bg-accent/90 transition-colors font-semibold shadow-lg">
             Sprawdź i rezerwuj
           </Button>
         </div>
@@ -81,7 +81,7 @@ export const RoomCard: React.FC<RoomCardProps> = ({ room, hotels = [] }) => {
         {amenitiesList.length > 0 && (
           <div className="mt-auto pt-4 flex flex-wrap gap-2">
             {amenitiesList.map((amenity, index) => (
-              <span key={index} className="inline-flex items-center gap-1 bg-gray-50 text-gray-600 px-2.5 py-1 rounded-md text-xs font-medium border border-gray-100">
+              <span key={index} className="inline-flex items-center gap-1 bg-secondary text-muted-foreground px-2.5 py-1 rounded-md text-xs font-medium border border-border">
                 <CheckCircle2 className="h-3 w-3 text-green-500" />
                 {amenity.trim()}
               </span>

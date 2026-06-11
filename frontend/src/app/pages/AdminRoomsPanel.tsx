@@ -13,7 +13,6 @@ import {
   DialogTitle,
   DialogFooter,
 } from '../components/ui/dialog';
-import { useApp } from '../context/AppContext';
 import { 
   RoomDTO, 
   HotelDTO, 
@@ -293,7 +292,7 @@ export const AdminRoomsPanel: React.FC = () => {
   }, {} as Record<string, AmenityDTO[]>);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-background text-foreground py-12">
       <div className="container mx-auto px-4 max-w-6xl">
         <Button 
           variant="ghost" 
@@ -308,7 +307,7 @@ export const AdminRoomsPanel: React.FC = () => {
             <h1 className="text-3xl font-serif text-primary">Zarządzanie Pokojami</h1>
             <p className="text-gray-500 mt-2">Dodawaj, edytuj i usuwaj pokoje w systemie</p>
           </div>
-          <Button onClick={() => handleOpenDialog()} className="bg-primary text-white">
+          <Button onClick={() => handleOpenDialog()} className="bg-primary text-primary-foreground">
             <Plus className="mr-2 h-4 w-4" /> Nowy Pokój
           </Button>
         </div>
@@ -622,7 +621,7 @@ export const AdminRoomsPanel: React.FC = () => {
                     />
                     <Label htmlFor="isPrimary" className="text-sm">Główne</Label>
                   </div>
-                  <Button type="button" onClick={handleAddPhoto} className="bg-primary text-white">
+                  <Button type="button" onClick={handleAddPhoto} className="bg-primary text-primary-foreground">
                     Dodaj
                   </Button>
                 </div>
@@ -658,7 +657,7 @@ export const AdminRoomsPanel: React.FC = () => {
           
           <DialogFooter>
             <Button variant="outline" onClick={handleCloseDialog}>Anuluj</Button>
-            <Button onClick={handleSave} className="bg-primary text-white">
+            <Button onClick={handleSave} className="bg-primary text-primary-foreground">
               Zapisz Pokój
             </Button>
           </DialogFooter>
@@ -697,7 +696,7 @@ export const AdminRoomsPanel: React.FC = () => {
           </div>
           
           <DialogFooter>
-            <Button onClick={() => setIsUsageDialogOpen(false)} className="bg-primary text-white">
+            <Button onClick={() => setIsUsageDialogOpen(false)} className="bg-primary text-primary-foreground">
               Rozumiem
             </Button>
           </DialogFooter>

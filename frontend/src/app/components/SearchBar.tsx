@@ -3,6 +3,8 @@ import { Search, Calendar, Users } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { useApp } from '../context/AppContext';
+import { toast } from 'sonner';
+
 
 interface SearchBarProps {
   onSearch?: () => void;
@@ -14,21 +16,32 @@ export const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
   const [checkOut, setCheckOut] = useState('');
   const [guests, setGuests] = useState(1);
 
-  const handleSearch = async () => {
-    if (checkIn && checkOut) {
-      
-      await searchRooms(checkIn, checkOut, guests);
+  const today = new Date().toISOString().split('T')[0];
 
-      if (onSearch) {
-        onSearch();
-      }
-    } else {
-      alert('Proszę wybrać daty przyjazdu i wyjazdu przed rozpoczęciem wyszukiwania.');
+  const handleSearch = async () => {
+    if (!checkIn || !checkOut) {
+      toast.error('Proszę wybrać daty przyjazdu i wyjazdu.');
+      return;
+    }
+
+    if (checkIn < today) {
+      toast.error('Data przyjazdu nie może być wcześniejsza niż dzisiaj.');
+      return;
+    }
+
+    if(checkOut <= checkIn) {
+      toast.error('Data wyjazdu musi być późniejsza niż data przyjazdu.');
+      return;
+    }
+
+    await searchRooms(checkIn, checkOut, guests);
+    if (onSearch) {
+      onSearch();
     }
   };
 
   return (
-    <div className="bg-white border border-gray-200 p-6 w-full shadow-sm">
+    <div className="bg-card border border-border p-6 w-full shadow-sm">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-4">
         {/* Check-in Date */}
         <div className="space-y-2 flex flex-col">
@@ -81,7 +94,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
           <Button
             onClick={handleSearch}
             disabled={isLoading}
-            className="w-full bg-primary hover:bg-accent text-white h-10 font-medium rounded-none transition-colors"
+            className="w-full bg-primary hover:bg-accent text-primary-foreground h-10 font-medium rounded-none transition-colors"
           >
             {isLoading ? (
               'Szukam...'

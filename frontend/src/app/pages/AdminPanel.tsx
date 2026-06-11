@@ -29,7 +29,7 @@ export const AdminPanel: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#fdfdfd] py-16">
+    <div className="min-h-screen bg-background text-foreground py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* NAGŁÓWEK */}
@@ -54,13 +54,13 @@ export const AdminPanel: React.FC = () => {
             <div 
               key={i} 
               onClick={() => navigate(mod.path)}
-              className="border border-gray-100 p-8 hover:border-accent hover:shadow-sm transition-all cursor-pointer bg-white group"
+              className="border border-border p-8 hover:border-accent hover:shadow-sm transition-all cursor-pointer bg-card group"
             >
               <div className="group-hover:scale-105 transition-transform origin-left">
                 {mod.icon}
               </div>
               <h3 className="text-xl font-serif mb-2">{mod.title}</h3>
-              <p className="text-gray-500 text-sm">{mod.description}</p>
+              <p className="text-muted-foreground text-sm">{mod.description}</p>
             </div>
           ))}
         </div>

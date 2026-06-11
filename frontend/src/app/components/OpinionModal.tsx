@@ -31,10 +31,10 @@ export const OpinionModal: React.FC<OpinionModalProps> = ({
       />
       
       {/* Modal Content */}
-      <div className="relative bg-white max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="relative bg-card max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full transition-colors z-10"
+          className="absolute top-4 right-4 p-2 hover:bg-muted rounded-full transition-colors z-10"
         >
           <X className="h-5 w-5" />
         </button>

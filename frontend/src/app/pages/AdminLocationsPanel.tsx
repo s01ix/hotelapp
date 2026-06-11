@@ -163,7 +163,7 @@ export const AdminLocationsPanel: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-background text-foreground py-12">
       <div className="container mx-auto px-4 max-w-6xl">
         <Button variant="ghost" className="mb-6 -ml-4" onClick={() => navigate('/admin')}>
           <ArrowLeft className="mr-2 h-4 w-4" /> Powrót do Panelu
@@ -171,13 +171,13 @@ export const AdminLocationsPanel: React.FC = () => {
 
         <div className="mb-8">
           <h1 className="text-3xl font-serif text-primary">Zarządzanie Hotelami</h1>
-          <p className="text-gray-500 mt-2">Dodawaj i edytuj hotele wraz z ich lokalizacjami.</p>
+          <p className="text-muted-foreground mt-2">Dodawaj i edytuj hotele wraz z ich lokalizacjami.</p>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
-          <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-            <h2 className="font-medium text-gray-700">Lista hoteli</h2>
-            <Button onClick={() => handleOpenDialog()} className="bg-primary text-white h-9">
+        <div className="bg-card rounded-lg shadow-sm border border-border overflow-hidden">
+          <div className="p-4 border-b border-border flex justify-between items-center bg-secondary/50">
+            <h2 className="font-medium text-foreground">Lista hoteli</h2>
+            <Button onClick={() => handleOpenDialog()} className="bg-primary text-primary-foreground h-9">
               <Plus className="mr-2 h-4 w-4" /> Dodaj Hotel
             </Button>
           </div>
@@ -304,7 +304,7 @@ export const AdminLocationsPanel: React.FC = () => {
           
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Anuluj</Button>
-            <Button onClick={handleSave} className="bg-primary text-white">Zapisz</Button>
+            <Button onClick={handleSave} className="bg-primary text-primary-foreground">Zapisz</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

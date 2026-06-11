@@ -172,7 +172,7 @@ export const UserDashboard: React.FC = () => {
   const pastBookings = bookings.filter((b) => b.checkOutDate < today);
 
   return (
-    <div className="min-h-screen bg-[#fdfdfd] py-16">
+    <div className="min-h-screen bg-background text-foreground py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-16">
           <Button
@@ -390,7 +390,7 @@ export const UserDashboard: React.FC = () => {
             <h3 className="text-3xl font-serif mb-6">Nie masz jeszcze żadnych rezerwacji</h3>
             <Button
               onClick={() => navigate('/')}
-              className="bg-primary text-white rounded-none px-10 py-6 text-sm uppercase tracking-widest hover:bg-accent"
+              className="bg-primary text-primary-foreground rounded-none px-10 py-6 text-sm uppercase tracking-widest hover:bg-accent"
             >
               Przeglądaj Apartamenty
             </Button>

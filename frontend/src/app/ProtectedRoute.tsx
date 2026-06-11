@@ -11,8 +11,8 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ allowedRoles }) 
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <p className="text-gray-500 uppercase tracking-widest text-xs animate-pulse">
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <p className="text-muted-foreground uppercase tracking-widest text-xs animate-pulse">
           Weryfikacja uprawnień...
         </p>
       </div>
