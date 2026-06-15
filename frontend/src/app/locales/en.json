@@ -1,0 +1,463 @@
+{
+  "navbar": {
+    "login": "Log in",
+    "register": "Register",
+    "logout": "Log out",
+    "adminPanel": "Admin Panel",
+    "receptionPanel": "Reception Panel",
+    "reservations": "Reservations"
+  },
+  "auth": {
+    "loginTitle": "Log in",
+    "registerTitle": "Sign up",
+    "loginDesc": "Use your email and password or log in with Google.",
+    "registerDesc": "Create a new account by providing the details below.",
+    "firstName": "First Name",
+    "firstNamePlaceholder": "John",
+    "lastName": "Last Name",
+    "lastNamePlaceholder": "Doe",
+    "phone": "Phone",
+    "email": "Email Address",
+    "password": "Password",
+    "loginBtn": "Log in",
+    "registerBtn": "Create account",
+    "noAccount": "Don't have an account? Sign up",
+    "hasAccount": "Already have an account? Log in",
+    "or": "OR",
+    "continueWithGoogle": "Continue with Google"
+  },
+  "opinionForm": {
+    "title": "Rate your stay",
+    "ratingRequired": "Please select a rating",
+    "genericError": "An error occurred",
+    "yourRating": "Your rating",
+    "ratings": {
+      "1": "Very poor",
+      "2": "Poor",
+      "3": "Average",
+      "4": "Good",
+      "5": "Excellent"
+    },
+    "yourOpinion": "Your review (optional)",
+    "opinionPlaceholder": "Share your experience...",
+    "chars": "characters",
+    "submitting": "Submitting...",
+    "submitBtn": "Submit review",
+    "cancelBtn": "Cancel"
+  },
+  "roomCard": {
+    "noDescription": "No description available",
+    "unknownHotel": "Unknown Hotel",
+    "checkAndBook": "Check and Book",
+    "bed_one": "Bed",
+    "bed_few": "Beds",
+    "bed_many": "Beds",
+    "guest_one": "Person",
+    "guest_few": "People",
+    "guest_many": "People",
+    "pricePerNight": "Price per night",
+    "currency": "PLN"
+  },
+  "searchBar": {
+    "errors": {
+      "datesRequired": "Please select check-in and check-out dates.",
+      "checkInPast": "Check-in date cannot be in the past.",
+      "checkOutBeforeCheckIn": "Check-out date must be after check-in date."
+    },
+    "checkIn": "Check-in Date",
+    "checkOut": "Check-out Date",
+    "guests": "Guests",
+    "searching": "Searching...",
+    "search": "Search"
+  },
+  "adminLocations": {
+    "title": "Hotel Management",
+    "subtitle": "Add and edit hotels and their locations.",
+    "backToPanel": "Back to Panel",
+    "listTitle": "Hotels List",
+    "addHotel": "Add Hotel",
+    "loading": "Loading...",
+    "noHotels": "No hotels found.",
+    "noAddress": "No address assigned",
+    "table": {
+      "nameAndAddress": "Name & Address",
+      "contact": "Contact",
+      "stars": "Stars",
+      "actions": "Actions"
+    },
+    "errors": {
+      "save": "An error occurred while saving.",
+      "delete": "Error deleting hotel.",
+      "deleteLocation": "Failed to delete location:"
+    },
+    "prompts": {
+      "deleteHotel": "Are you sure you want to delete the hotel \"{{name}}\"?"
+    },
+    "dialog": {
+      "addTitle": "Add Hotel",
+      "editTitle": "Edit Hotel",
+      "hotelData": "Hotel Details",
+      "hotelName": "Hotel Name",
+      "description": "Description",
+      "email": "Email",
+      "phone": "Phone",
+      "stars": "Stars",
+      "locationData": "Location",
+      "street": "Street",
+      "buildingNumber": "Building No.",
+      "city": "City",
+      "postalCode": "Postal Code",
+      "country": "Country",
+      "cancel": "Cancel",
+      "save": "Save",
+      "placeholders": {
+        "name": "e.g. Grand Hotel",
+        "description": "Short hotel description...",
+        "email": "contact@hotel.com",
+        "phone": "+1 234 567 890",
+        "street": "e.g. Main Street",
+        "buildingNumber": "12A",
+        "city": "New York",
+        "postalCode": "10001",
+        "country": "USA"
+      }
+    }
+  },
+  "adminPanel": {
+    "title": "Administrator Panel",
+    "subtitle": "Main configuration of the Luks system",
+    "backToSite": "Back to Website",
+    "modules": {
+      "users": {
+        "title": "User Management",
+        "description": "Change user roles (e.g., to Receptionist)."
+      },
+      "rooms": {
+        "title": "Room Management",
+        "description": "Add new rooms, edit photos, capacity, and descriptions."
+      },
+      "hotels": {
+        "title": "Hotel Management",
+        "description": "Manage hotel properties, names, and main addresses."
+      }
+    }
+  },
+  "adminUserPanel": {
+    "title": "User Management",
+    "subtitle": "Manage staff permissions",
+    "backToAdminPanel": "Back to Admin Panel",
+    "loading": "Loading users...",
+    "yourAccount": "Your account",
+    "table": {
+      "id": "ID",
+      "email": "Email",
+      "name": "Name",
+      "currentRole": "Current Role",
+      "changeRoleTo": "Change role to:"
+    },
+    "errors": {
+      "changeRole": "An error occurred while changing the role."
+    }
+  },
+  "common": {
+    "back": "Back",
+    "currency": "PLN",
+    "error": "Error",
+    "loading": "Processing...",
+    "loadingData": "Loading data...",
+    "create": "Create",
+    "cancel": "Cancel",
+    "add": "Add",
+    "understand": "I understand"
+
+  },
+  "checkout": {
+    "title": "Checkout",
+    "sessionExpired": "Session expired",
+    "noBookingDetails": "Booking details not found",
+    "backToHome": "Return to homepage",
+    "alerts": {
+      "offlineSuccess": "Booking confirmed! Please proceed with the bank transfer.",
+      "errorSaving": "An error occurred while saving the booking."
+    },
+    "room": {
+      "selected": "Selected apartment",
+      "maxGuests": "Max. {{count}} guests",
+      "beds_one": "{{count}} bed",
+      "beds_other": "{{count}} beds"
+    },
+    "form": {
+      "guestDetails": "Guest details",
+      "fullName": "Full Name",
+      "email": "Email Address",
+      "phone": "Phone number"
+    },
+    "payment": {
+      "title": "Payment method",
+      "method": "Payment method",
+      "onlineTitle": "Online",
+      "onlineDesc": "Instant booking confirmation (Card / BLIK)",
+      "offlineTitle": "Bank Transfer",
+      "offlineDesc": "Requires verification by hotel staff",
+      "transferDetails": "Transfer details",
+      "transferTitle": "Title: Booking {{roomName}} - {{fullName}}"
+    },
+    "summary": {
+      "title": "Summary",
+      "stay": "Stay",
+      "nights_one": "{{count}} night",
+      "nights_other": "{{count}} nights",
+      "checkIn": "Check-in",
+      "checkOut": "Check-out",
+      "total": "Total amount",
+      "confirmBtn": "Confirm booking",
+      "termsAcceptance": "By confirming, you accept the Terms of Service of Luks Search"
+    }
+  },
+  "admin": {
+    "rooms": {
+      "backToPanel": "Back to Panel",
+      "title": "Room Management",
+      "subtitle": "Add, edit, and remove rooms in the system",
+      "newRoomBtn": "New Room",
+      "table": {
+        "numberName": "Number / Name",
+        "places": "Capacity",
+        "pricePerNight": "Price / Night",
+        "status": "Status",
+        "actions": "Actions",
+        "empty": "No rooms in the system.",
+        "roomNumber": "Room {{number}}",
+        "noAmenities": "No amenities",
+        "amenitiesCount_one": "{{count}} amenity",
+        "amenitiesCount_other": "{{count}} amenities"
+      },
+      "status": {
+        "DOSTEPNY": "AVAILABLE",
+        "SERWIS": "MAINTENANCE",
+        "NIEDOSTEPNY": "UNAVAILABLE"
+      },
+      "alerts": {
+        "addPhotoError": "Error adding photo",
+        "deletePhotoConfirm": "Delete this photo?",
+        "deletePhotoError": "Error deleting photo",
+        "amenityNameRequired": "Please enter an amenity name",
+        "createAmenityError": "Error creating amenity",
+        "deleteAmenityConfirm": "Are you sure you want to delete the amenity \"{{amenityName}}\"?",
+        "deleteAmenityError": "Error deleting amenity",
+        "saveRoomError": "An error occurred while saving the room.",
+        "deleteRoomConfirm": "Are you sure you want to delete this room?",
+        "deleteRoomError": "An error occurred while deleting the room."
+      },
+      "dialog": {
+        "editTitle": "Edit Room",
+        "addTitle": "Add New Room",
+        "roomNumber": "Room Number",
+        "name": "Name",
+        "description": "Description",
+        "maxGuests": "Max Guests",
+        "bedCount": "Number of beds",
+        "basePrice": "Price per night",
+        "status": "Status",
+        "hotel": "Hotel / Location",
+        "saveRoom": "Save Room"
+      },
+      "amenities": {
+        "title": "Amenities",
+        "addNew": "Add new",
+        "newAmenityTitle": "New amenity",
+        "namePlaceholder": "Name (e.g. WiFi)",
+        "categoryPlaceholder": "Category (e.g. Internet)",
+        "empty": "No amenities. Add the first one!",
+        "deleteTooltip": "Delete amenity",
+        "categoryOther": "Other",
+        "selectedCount_one": "Selected: 1 amenity",
+        "selectedCount_other": "Selected: {{count}} amenities"
+      },
+      "photos": {
+        "title": "Photos",
+        "urlLabel": "Photo URL",
+        "urlPlaceholder": "https://...",
+        "primary": "Primary",
+        "primaryBadge": "Primary",
+        "empty": "No photos for this room."
+      },
+      "usageDialog": {
+        "title": "Cannot delete amenity",
+        "description": "The amenity \"{{amenityName}}\" is used in the following rooms:",
+        "hint": "To delete this amenity, first remove it from all rooms where it is used."
+      }
+    }
+  },
+  "home": {
+    "hero": {
+      "discover": "Discover",
+      "newDimension": "a new dimension",
+      "rest": "of relaxation",
+      "subtitle": "The best hotels and apartments across Poland. From mountain peaks to Baltic beaches."
+    },
+    "results": {
+      "title": "Our Apartments",
+      "recommendedTitle": "Recommended by Luks Search",
+      "searchSubtitle_one": "Search results for {{count}} person",
+      "searchSubtitle_other": "Search results for {{count}} people",
+      "recommendedSubtitle": "Choose the perfect location for your next trip"
+    },
+    "states": {
+      "loadingRooms": "Searching for perfect rooms...",
+      "error": "Server connection error: {{error}}",
+      "noRoomsTitle": "No apartments match your criteria",
+      "noRoomsDesc": "Unfortunately, we have no available rooms for {{count}} people in this period. Please change your dates.",
+      "loadingHotels": "Loading the best hotels database...",
+      "noHotelsTitle": "No hotels to display",
+      "noHotelsDesc": "Make sure you have added data to the Oracle database."
+    },
+    "hotel": {
+      "defaultName": "Luxury Hotel Luks Search"
+    }
+  },
+  "notFound": {
+    "title": "Page Not Found",
+    "description": "The page you're looking for doesn't exist or has been moved.",
+    "backBtn": "Back to Homepage"
+  },
+  "reception": {
+    "back": "Back to website",
+    "title": "Reception Panel",
+    "subtitle": "Live guest and reservation management",
+    "stats": {
+      "pending": "Pending payments",
+      "active": "Guests in hotel",
+      "total": "Total bookings",
+      "revenue": "Revenue"
+    },
+    "table": {
+      "id": "ID",
+      "guest": "Guest",
+      "room": "Room",
+      "dates": "Dates",
+      "amount": "Amount",
+      "actions": "Actions",
+      "action": "Action",
+      "status": "Status",
+      "noData": "No data"
+    },
+    "pending": {
+      "title": "Pending payments",
+      "subtitle": "Requires manual verification",
+      "empty": "No pending operations",
+      "approve": "Approve payment",
+      "reject": "Reject booking"
+    },
+    "active": {
+      "title": "Guests in hotel",
+      "subtitle": "Payment verified — ready for check-out",
+      "empty": "No guests currently staying in the hotel",
+      "checkout": "Check out guest"
+    },
+    "history": {
+      "title": "Booking history"
+    },
+    "status": {
+      "POTWIERDZONA": "Confirmed",
+      "ZAKONCZONA": "Completed",
+      "ANULOWANA": "Cancelled",
+      "OCZEKUJACA": "Pending"
+    }
+  },
+  "roomDetails": {
+    "errors": {
+      "loadDetails": "Unable to load room details",
+      "loadOpinions": "Error loading reviews:"
+    },
+    "loadingRoom": "Loading room details...",
+    "notFound": {
+      "title": "Room not found"
+    },
+    "toast": {
+      "loginRequired": "You must be logged in to book a room",
+      "datesRequired": "Please select check-in and check-out dates"
+    },
+    "backToList": "Back to room list",
+    "roomNumber": "No. {{number}}",
+    "opinionsCount_one": "{{count}} review",
+    "opinionsCount_other": "{{count}} reviews",
+    "maxGuests": "Up to {{count}} guests",
+    "beds_one": "{{count}} bed",
+    "beds_other": "{{count}} beds",
+    "amenities": {
+      "title": "Amenities",
+      "empty": "No information about amenities"
+    },
+    "info": {
+      "title": "Important information",
+      "checkInOut": "• Check-in: 3:00 PM | Check-out: 11:00 AM",
+      "cancelPolicy": "• Cancellation policy: Free cancellation up to 48h before arrival",
+      "noPets": "• Pets are not allowed",
+      "noSmoking": "• No smoking in all rooms"
+    },
+    "opinions": {
+      "title": "Guest reviews ({{count}})",
+      "loading": "Loading reviews...",
+      "guest": "Guest",
+      "showLess": "Show fewer reviews",
+      "showAll": "Show all reviews ({{count}})",
+      "emptyTitle": "No reviews",
+      "emptyDesc": "This room has no reviews yet. Be the first!"
+    },
+    "booking": {
+      "perNight": "per night",
+      "checkIn": "Check-in:",
+      "checkOut": "Check-out:",
+      "guests": "Guests:",
+      "total": "Total:",
+      "bookNowBtn": "Book now",
+      "selectDatesPrompt": "Select dates on the homepage to see the total price"
+    }
+  },
+  "dashboard": {
+    "payment": {
+      "success": "PayPal payment completed successfully!",
+      "canceled": "PayPal payment was canceled.",
+      "error": "An error occurred during the PayPal payment."
+    },
+    "opinion": {
+      "success": "Thank you for your review!"
+    },
+    "greeting": "Welcome, {{name}}",
+    "subtitle": "Your booking history and upcoming stays",
+    "stats": {
+      "totalBookings": "Total bookings",
+      "upcomingStays": "Upcoming stays",
+      "yourOpinions": "Your reviews",
+      "totalSpent": "Total spent"
+    },
+    "upcoming": {
+      "title": "Upcoming stays",
+      "empty": "No planned stays"
+    },
+    "history": {
+      "title": "Stay history",
+      "leaveOpinionBtn": "Leave a review"
+    },
+    "table": {
+      "id": "ID",
+      "apartment": "Apartment",
+      "dates": "Dates",
+      "amount": "Amount",
+      "status": "Status",
+      "opinion": "Review"
+    },
+    "empty": {
+      "title": "You don't have any bookings yet",
+      "browseBtn": "Browse Apartments"
+    },
+    "status": {
+      "OPLACONA": "Confirmed",
+      "POTWIERDZONA": "Confirmed",
+      "OCZEKUJACA": "Pending",
+      "ANULOWANA": "Canceled",
+      "ZAKONCZONA": "Completed"
+    }
+  }
+}

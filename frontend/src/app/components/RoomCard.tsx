@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router';
 import { Users, BedDouble, MapPin, CheckCircle2 } from 'lucide-react';
 import { Button } from './ui/button';
 import { RoomDTO, HotelDTO } from './service/api';
+import { useTranslation } from 'react-i18next'; 
 
 interface RoomCardProps {
   room: RoomDTO;
@@ -11,32 +12,33 @@ interface RoomCardProps {
 
 export const RoomCard: React.FC<RoomCardProps> = ({ room, hotels = [] }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation(); 
 
   const fallbackImage = "https://images.pexels.com/photos/271618/pexels-photo-271618.jpeg?auto=compress&cs=tinysrgb&w=1080";
   const primaryPhoto = room.photos?.find(p => p.isPrimary);
   const currentImage = primaryPhoto?.url || (room.photos && room.photos.length > 0 ? room.photos[0].url : fallbackImage);
 
   const formatBeds = (count: number) => {
-    if (count === 1) return `${count} Łóżko`;
-    if (count >= 2 && count <= 4) return `${count} Łóżka`;
-    return `${count} Łóżek`;
+    if (count === 1) return `1 ${t('roomCard.bed_one')}`;
+    if (count >= 2 && count <= 4) return `${count} ${t('roomCard.bed_few')}`;
+    return `${count} ${t('roomCard.bed_many')}`;
   };
 
   const formatGuests = (count: number) => {
-    if (count === 1) return `Max 1 Osoba`;
-    if (count >= 2 && count <= 4) return `Max ${count} Osoby`;
-    return `Max ${count} Osób`;
+    if (count === 1) return `Max 1 ${t('roomCard.guest_one')}`;
+    if (count >= 2 && count <= 4) return `Max ${count} ${t('roomCard.guest_few')}`;
+    return `Max ${count} ${t('roomCard.guest_many')}`;
   };
 
-  const descriptionParts = room.description ? room.description.split('Udogodnienia:') : ['Brak opisu'];
+  const descriptionParts = room.description ? room.description.split('Udogodnienia:') : [t('roomCard.noDescription')];
   const mainDescription = descriptionParts[0];
   const amenitiesList = descriptionParts.length > 1 ? descriptionParts[1].split(',') : [];
 
-  let hotelName = 'Nieznany Hotel';
+  let hotelName = t('roomCard.unknownHotel');
   if (room.hotelId && hotels && hotels.length > 0) {
-      hotelName = hotels.find(h => h.id === room.hotelId)?.name || 'Nieznany Hotel';
+      hotelName = hotels.find(h => h.id === room.hotelId)?.name || t('roomCard.unknownHotel');
   }
-  if (hotelName === 'Nieznany Hotel') {
+  if (hotelName === t('roomCard.unknownHotel')) {
       const fallbackNames = ['Gorski Resort & Spa', 'Morska Bryza', 'City Center Premium', 'Lesna Ostoja', 'Mazurski Raj'];
       const hotelIndex = room.id ? Math.floor((room.id - 1) / 5) % fallbackNames.length : 0;
       hotelName = fallbackNames[hotelIndex];
@@ -52,7 +54,7 @@ export const RoomCard: React.FC<RoomCardProps> = ({ room, hotels = [] }) => {
         </div>
         <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center">
           <Button className="w-full bg-accent text-accent-foreground hover:bg-accent/90 transition-colors font-semibold shadow-lg">
-            Sprawdź i rezerwuj
+            {t('roomCard.checkAndBook')}
           </Button>
         </div>
       </div>
@@ -68,8 +70,8 @@ export const RoomCard: React.FC<RoomCardProps> = ({ room, hotels = [] }) => {
               <span className="flex items-center gap-2"><BedDouble className="h-3.5 w-3.5 text-gray-400" /> {formatBeds(room.bedCount)}</span>
             </div>
             <div className="text-right">
-              <span className="text-sm text-gray-400 block mb-1">Cena za noc</span>
-              <span className="text-3xl font-light text-gray-900">{room.basePrice} <span className="text-lg font-medium">zł</span></span>
+              <span className="text-sm text-gray-400 block mb-1">{t('roomCard.pricePerNight')}</span>
+              <span className="text-3xl font-light text-gray-900">{room.basePrice} <span className="text-lg font-medium">{t('roomCard.currency')}</span></span>
             </div>
           </div>
         </div>

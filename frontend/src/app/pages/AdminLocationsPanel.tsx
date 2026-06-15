@@ -26,10 +26,12 @@ import {
   updateLocation,
   deleteLocation
 } from '../components/service/api';
+import { useTranslation } from 'react-i18next';
 
 export const AdminLocationsPanel: React.FC = () => {
-  const { user} = useApp();
+  const { user } = useApp();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   
   const [hotelsList, setHotelsList] = useState<HotelDTO[]>([]);
   const [locationsList, setLocationsList] = useState<LocationDTO[]>([]);
@@ -66,7 +68,6 @@ export const AdminLocationsPanel: React.FC = () => {
   useEffect(() => {
     loadData();
   }, []);
-
 
   const handleOpenDialog = (hotel?: HotelDTO) => {
     if (hotel) {
@@ -114,13 +115,13 @@ export const AdminLocationsPanel: React.FC = () => {
       setIsDialogOpen(false);
       await loadData();
     } catch (err) {
-      alert("Wystąpił błąd podczas zapisywania.");
+      alert(t('adminLocations.errors.save'));
       console.error(err);
     }
   };
 
   const handleDelete = async (hotel: HotelDTO) => {
-    if (window.confirm(`Na pewno usunąć hotel "${hotel.name}"?`)) {
+    if (window.confirm(t('adminLocations.prompts.deleteHotel', { name: hotel.name }))) {
       try {
         await deleteHotel(hotel.id);
         
@@ -133,14 +134,14 @@ export const AdminLocationsPanel: React.FC = () => {
             try {
               await deleteLocation(hotel.locationId);
             } catch (err) {
-              console.error("Nie udało się usunąć lokalizacji:", err);
+              console.error(t('adminLocations.errors.deleteLocation'), err);
             }
           }
         }
         
         await loadData();
       } catch (err) {
-        alert("Błąd podczas usuwania hotelu.");
+        alert(t('adminLocations.errors.delete'));
       }
     }
   };
@@ -158,7 +159,7 @@ export const AdminLocationsPanel: React.FC = () => {
 
   const getLocationString = (locationId?: number) => {
     const loc = locationsList.find(l => l.id === locationId);
-    if (!loc) return "Brak przypisanego adresu";
+    if (!loc) return t('adminLocations.noAddress');
     return `${loc.city}, ul. ${loc.street} ${loc.buildingNumber}`;
   };
 
@@ -166,35 +167,35 @@ export const AdminLocationsPanel: React.FC = () => {
     <div className="min-h-screen bg-background text-foreground py-12">
       <div className="container mx-auto px-4 max-w-6xl">
         <Button variant="ghost" className="mb-6 -ml-4" onClick={() => navigate('/admin')}>
-          <ArrowLeft className="mr-2 h-4 w-4" /> Powrót do Panelu
+          <ArrowLeft className="mr-2 h-4 w-4" /> {t('adminLocations.backToPanel')}
         </Button>
 
         <div className="mb-8">
-          <h1 className="text-3xl font-serif text-primary">Zarządzanie Hotelami</h1>
-          <p className="text-muted-foreground mt-2">Dodawaj i edytuj hotele wraz z ich lokalizacjami.</p>
+          <h1 className="text-3xl font-serif text-primary">{t('adminLocations.title')}</h1>
+          <p className="text-muted-foreground mt-2">{t('adminLocations.subtitle')}</p>
         </div>
 
         <div className="bg-card rounded-lg shadow-sm border border-border overflow-hidden">
           <div className="p-4 border-b border-border flex justify-between items-center bg-secondary/50">
-            <h2 className="font-medium text-foreground">Lista hoteli</h2>
+            <h2 className="font-medium text-foreground">{t('adminLocations.listTitle')}</h2>
             <Button onClick={() => handleOpenDialog()} className="bg-primary text-primary-foreground h-9">
-              <Plus className="mr-2 h-4 w-4" /> Dodaj Hotel
+              <Plus className="mr-2 h-4 w-4" /> {t('adminLocations.addHotel')}
             </Button>
           </div>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Nazwa i Adres</TableHead>
-                <TableHead>Kontakt</TableHead>
-                <TableHead>Gwiazdki</TableHead>
-                <TableHead className="text-right">Akcje</TableHead>
+                <TableHead>{t('adminLocations.table.nameAndAddress')}</TableHead>
+                <TableHead>{t('adminLocations.table.contact')}</TableHead>
+                <TableHead>{t('adminLocations.table.stars')}</TableHead>
+                <TableHead className="text-right">{t('adminLocations.table.actions')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
-                <TableRow><TableCell colSpan={4} className="text-center py-8">Ładowanie...</TableCell></TableRow>
+                <TableRow><TableCell colSpan={4} className="text-center py-8">{t('adminLocations.loading')}</TableCell></TableRow>
               ) : hotelsList.length === 0 ? (
-                <TableRow><TableCell colSpan={4} className="text-center py-8">Brak hoteli.</TableCell></TableRow>
+                <TableRow><TableCell colSpan={4} className="text-center py-8">{t('adminLocations.noHotels')}</TableCell></TableRow>
               ) : (
                 hotelsList.map((hotel) => (
                   <TableRow key={hotel.id}>
@@ -232,36 +233,36 @@ export const AdminLocationsPanel: React.FC = () => {
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{editingHotelId ? 'Edytuj Hotel' : 'Dodaj Hotel'}</DialogTitle>
+            <DialogTitle>{editingHotelId ? t('adminLocations.dialog.editTitle') : t('adminLocations.dialog.addTitle')}</DialogTitle>
           </DialogHeader>
           <div className="grid gap-6 py-4">
             <div className="space-y-4">
               <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 border-b pb-2">
                 <Building className="h-4 w-4" />
-                <span>Dane Hotelu</span>
+                <span>{t('adminLocations.dialog.hotelData')}</span>
               </div>
               
               <div className="space-y-2">
-                <Label>Nazwa hotelu</Label>
-                <Input name="name" value={hotelFormData.name} onChange={handleHotelChange} placeholder="np. Grand Hotel" />
+                <Label>{t('adminLocations.dialog.hotelName')}</Label>
+                <Input name="name" value={hotelFormData.name} onChange={handleHotelChange} placeholder={t('adminLocations.dialog.placeholders.name')} />
               </div>
               
               <div className="space-y-2">
-                <Label>Opis</Label>
-                <Textarea name="description" value={hotelFormData.description} onChange={handleHotelChange} rows={3} placeholder="Krótki opis hotelu..." />
+                <Label>{t('adminLocations.dialog.description')}</Label>
+                <Textarea name="description" value={hotelFormData.description} onChange={handleHotelChange} rows={3} placeholder={t('adminLocations.dialog.placeholders.description')} />
               </div>
               
               <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <Label>Email</Label>
-                  <Input name="email" type="email" value={hotelFormData.email} onChange={handleHotelChange} placeholder="kontakt@hotel.pl" />
+                  <Label>{t('adminLocations.dialog.email')}</Label>
+                  <Input name="email" type="email" value={hotelFormData.email} onChange={handleHotelChange} placeholder={t('adminLocations.dialog.placeholders.email')} />
                 </div>
                 <div className="space-y-2">
-                  <Label>Telefon</Label>
-                  <Input name="phone" value={hotelFormData.phone} onChange={handleHotelChange} placeholder="+48 123 456 789" />
+                  <Label>{t('adminLocations.dialog.phone')}</Label>
+                  <Input name="phone" value={hotelFormData.phone} onChange={handleHotelChange} placeholder={t('adminLocations.dialog.placeholders.phone')} />
                 </div>
                 <div className="space-y-2">
-                  <Label>Gwiazdki</Label>
+                  <Label>{t('adminLocations.dialog.stars')}</Label>
                   <Input name="stars" type="number" min="1" max="5" value={hotelFormData.stars} onChange={handleHotelChange} />
                 </div>
               </div>
@@ -270,41 +271,41 @@ export const AdminLocationsPanel: React.FC = () => {
             <div className="space-y-4">
               <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 border-b pb-2">
                 <MapPin className="h-4 w-4" />
-                <span>Lokalizacja</span>
+                <span>{t('adminLocations.dialog.locationData')}</span>
               </div>
               
               <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2 col-span-2">
-                  <Label>Ulica</Label>
-                  <Input name="street" value={locationFormData.street} onChange={handleLocationChange} placeholder="np. Marszałkowska" />
+                  <Label>{t('adminLocations.dialog.street')}</Label>
+                  <Input name="street" value={locationFormData.street} onChange={handleLocationChange} placeholder={t('adminLocations.dialog.placeholders.street')} />
                 </div>
                 <div className="space-y-2">
-                  <Label>Nr budynku</Label>
-                  <Input name="buildingNumber" value={locationFormData.buildingNumber} onChange={handleLocationChange} placeholder="12A" />
+                  <Label>{t('adminLocations.dialog.buildingNumber')}</Label>
+                  <Input name="buildingNumber" value={locationFormData.buildingNumber} onChange={handleLocationChange} placeholder={t('adminLocations.dialog.placeholders.buildingNumber')} />
                 </div>
               </div>
               
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Miasto</Label>
-                  <Input name="city" value={locationFormData.city} onChange={handleLocationChange} placeholder="Warszawa" />
+                  <Label>{t('adminLocations.dialog.city')}</Label>
+                  <Input name="city" value={locationFormData.city} onChange={handleLocationChange} placeholder={t('adminLocations.dialog.placeholders.city')} />
                 </div>
                 <div className="space-y-2">
-                  <Label>Kod pocztowy</Label>
-                  <Input name="postalCode" value={locationFormData.postalCode} onChange={handleLocationChange} placeholder="00-001" />
+                  <Label>{t('adminLocations.dialog.postalCode')}</Label>
+                  <Input name="postalCode" value={locationFormData.postalCode} onChange={handleLocationChange} placeholder={t('adminLocations.dialog.placeholders.postalCode')} />
                 </div>
               </div>
               
               <div className="space-y-2">
-                <Label>Kraj</Label>
-                <Input name="country" value={locationFormData.country} onChange={handleLocationChange} placeholder="Polska" />
+                <Label>{t('adminLocations.dialog.country')}</Label>
+                <Input name="country" value={locationFormData.country} onChange={handleLocationChange} placeholder={t('adminLocations.dialog.placeholders.country')} />
               </div>
             </div>
           </div>
           
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Anuluj</Button>
-            <Button onClick={handleSave} className="bg-primary text-primary-foreground">Zapisz</Button>
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>{t('adminLocations.dialog.cancel')}</Button>
+            <Button onClick={handleSave} className="bg-primary text-primary-foreground">{t('adminLocations.dialog.save')}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

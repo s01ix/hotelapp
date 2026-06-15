@@ -1,0 +1,475 @@
+{
+  "navbar": {
+    "login": "Logowanie",
+    "register": "Rejestracja",
+    "logout": "Wyloguj",
+    "adminPanel": "Panel Admina",
+    "receptionPanel": "Panel Recepcjonisty",
+    "reservations": "Rezerwacje"
+  },
+  "auth": {
+    "loginTitle": "Zaloguj się",
+    "registerTitle": "Zarejestruj się",
+    "loginDesc": "Użyj e-maila i hasła lub zaloguj się przez konto Google.",
+    "registerDesc": "Utwórz nowe konto, podając poniższe dane.",
+    "firstName": "Imię",
+    "firstNamePlaceholder": "Jan",
+    "lastName": "Nazwisko",
+    "lastNamePlaceholder": "Kowalski",
+    "phone": "Telefon",
+    "email": "Adres Email",
+    "password": "Hasło",
+    "loginBtn": "Zaloguj się",
+    "registerBtn": "Utwórz konto",
+    "noAccount": "Nie masz konta? Zarejestruj się",
+    "hasAccount": "Masz już konto? Zaloguj się",
+    "or": "LUB",
+    "continueWithGoogle": "Kontynuuj z Google"
+  },
+  "opinionForm": {
+    "title": "Oceń swój pobyt",
+    "ratingRequired": "Proszę wybrać ocenę",
+    "genericError": "Wystąpił błąd",
+    "yourRating": "Twoja ocena",
+    "ratings": {
+      "1": "Bardzo słabo",
+      "2": "Słabo",
+      "3": "Średnio",
+      "4": "Dobrze",
+      "5": "Wspaniale"
+    },
+    "yourOpinion": "Twoja opinia (opcjonalnie)",
+    "opinionPlaceholder": "Podziel się swoimi wrażeniami z pobytu...",
+    "chars": "znaków",
+    "submitting": "Wysyłanie...",
+    "submitBtn": "Wyślij opinię",
+    "cancelBtn": "Anuluj"
+  },
+  "roomCard": {
+    "noDescription": "Brak opisu",
+    "unknownHotel": "Nieznany Hotel",
+    "checkAndBook": "Sprawdź i rezerwuj",
+    "bed_one": "Łóżko",
+    "bed_few": "Łóżka",
+    "bed_many": "Łóżek",
+    "guest_one": "Osoba",
+    "guest_few": "Osoby",
+    "guest_many": "Osób",
+    "pricePerNight": "Cena za noc",
+    "currency": "zł"
+  },
+  "searchBar": {
+    "errors": {
+      "datesRequired": "Proszę wybrać daty przyjazdu i wyjazdu.",
+      "checkInPast": "Data przyjazdu nie może być wcześniejsza niż dzisiaj.",
+      "checkOutBeforeCheckIn": "Data wyjazdu musi być późniejsza niż data przyjazdu."
+    },
+    "checkIn": "Data przyjazdu",
+    "checkOut": "Data wyjazdu",
+    "guests": "Liczba gości",
+    "searching": "Szukam...",
+    "search": "Szukaj"
+  },
+  "adminLocations": {
+    "title": "Zarządzanie Hotelami",
+    "subtitle": "Dodawaj i edytuj hotele wraz z ich lokalizacjami.",
+    "backToPanel": "Powrót do Panelu",
+    "listTitle": "Lista hoteli",
+    "addHotel": "Dodaj Hotel",
+    "loading": "Ładowanie...",
+    "noHotels": "Brak hoteli.",
+    "noAddress": "Brak przypisanego adresu",
+    "table": {
+      "nameAndAddress": "Nazwa i Adres",
+      "contact": "Kontakt",
+      "stars": "Gwiazdki",
+      "actions": "Akcje"
+    },
+    "errors": {
+      "save": "Wystąpił błąd podczas zapisywania.",
+      "delete": "Błąd podczas usuwania hotelu.",
+      "deleteLocation": "Nie udało się usunąć lokalizacji:"
+    },
+    "prompts": {
+      "deleteHotel": "Na pewno usunąć hotel \"{{name}}\"?"
+    },
+    "dialog": {
+      "addTitle": "Dodaj Hotel",
+      "editTitle": "Edytuj Hotel",
+      "hotelData": "Dane Hotelu",
+      "hotelName": "Nazwa hotelu",
+      "description": "Opis",
+      "email": "Email",
+      "phone": "Telefon",
+      "stars": "Gwiazdki",
+      "locationData": "Lokalizacja",
+      "street": "Ulica",
+      "buildingNumber": "Nr budynku",
+      "city": "Miasto",
+      "postalCode": "Kod pocztowy",
+      "country": "Kraj",
+      "cancel": "Anuluj",
+      "save": "Zapisz",
+      "placeholders": {
+        "name": "np. Grand Hotel",
+        "description": "Krótki opis hotelu...",
+        "email": "kontakt@hotel.pl",
+        "phone": "+48 123 456 789",
+        "street": "np. Marszałkowska",
+        "buildingNumber": "12A",
+        "city": "Warszawa",
+        "postalCode": "00-001",
+        "country": "Polska"
+      }
+    }
+  },
+  "adminPanel": {
+    "title": "Panel Administratora",
+    "subtitle": "Konfiguracja główna systemu Luks",
+    "backToSite": "Wróć do serwisu",
+    "modules": {
+      "users": {
+        "title": "Zarządzanie Użytkownikami",
+        "description": "Zmieniaj role użytkowników (np. na Recepcjonistę)."
+      },
+      "rooms": {
+        "title": "Zarządzanie Pokojami",
+        "description": "Dodawaj nowe pokoje, edytuj zdjęcia, pojemność i opisy."
+      },
+      "hotels": {
+        "title": "Zarządzanie Hotelami",
+        "description": "Zarządzaj obiektami hotelowymi, nazwami i głównymi adresami."
+      }
+    }
+  },
+  "adminUserPanel": {
+    "title": "Zarządzanie Użytkownikami",
+    "subtitle": "Zarządzanie uprawnieniami personelu",
+    "backToAdminPanel": "Wróć do Panelu Admina",
+    "loading": "Ładowanie użytkowników...",
+    "yourAccount": "Twoje konto",
+    "table": {
+      "id": "ID",
+      "email": "Email",
+      "name": "Imię",
+      "currentRole": "Aktualna Rola",
+      "changeRoleTo": "Zmień rolę na:"
+    },
+    "errors": {
+      "changeRole": "Wystąpił błąd podczas zmiany roli."
+    }
+  },
+  "common": {
+    "back": "Powrót",
+    "currency": "zł",
+    "error": "Błąd",
+    "loading": "Przetwarzanie...",
+    "loadingData": "Ładowanie danych...",
+    "create": "Utwórz",
+    "cancel": "Anuluj",
+    "add": "Dodaj",
+    "understand": "Rozumiem"
+
+  },
+  "checkout": {
+    "title": "Rezerwacja",
+    "sessionExpired": "Sesja wygasła",
+    "noBookingDetails": "Nie znaleziono szczegółów rezerwacji",
+    "backToHome": "Wróć do strony głównej",
+    "alerts": {
+      "offlineSuccess": "Rezerwacja złożona! Prosimy o dokonanie przelewu.",
+      "errorSaving": "Wystąpił błąd podczas zapisu rezerwacji."
+    },
+    "room": {
+      "selected": "Wybrany apartament",
+      "maxGuests": "Max. {{count}} osób",
+      "beds_one": "{{count}} łóżko",
+      "beds_few": "{{count}} łóżka",
+      "beds_many": "{{count}} łóżek",
+      "beds_other": "{{count}} łóżek"
+    },
+    "form": {
+      "guestDetails": "Dane gościa",
+      "fullName": "Imię i Nazwisko",
+      "email": "Adres E-mail",
+      "phone": "Numer telefonu"
+    },
+    "payment": {
+      "title": "Metoda płatności",
+      "method": "Metoda płatności",
+      "onlineTitle": "Online",
+      "onlineDesc": "Natychmiastowe potwierdzenie rezerwacji (Karta / BLIK)",
+      "offlineTitle": "Przelew",
+      "offlineDesc": "Wymaga weryfikacji przez obsługę hotelu",
+      "transferDetails": "Dane do przelewu",
+      "transferTitle": "Tytuł: Rezerwacja {{roomName}} - {{fullName}}"
+    },
+    "summary": {
+      "title": "Podsumowanie",
+      "stay": "Pobyt",
+      "nights_one": "{{count}} noc",
+      "nights_few": "{{count}} noce",
+      "nights_many": "{{count}} nocy",
+      "nights_other": "{{count}} nocy",
+      "checkIn": "Zameldowanie",
+      "checkOut": "Wymeldowanie",
+      "total": "Suma brutto",
+      "confirmBtn": "Potwierdzam rezerwację",
+      "termsAcceptance": "Dokonując rezerwacji akceptujesz regulamin świadczenia usług Luks Search"
+    }
+  },
+  "admin": {
+    "rooms": {
+      "backToPanel": "Powrót do Panelu",
+      "title": "Zarządzanie Pokojami",
+      "subtitle": "Dodawaj, edytuj i usuwaj pokoje w systemie",
+      "newRoomBtn": "Nowy Pokój",
+      "table": {
+        "numberName": "Numer / Nazwa",
+        "places": "Miejsca",
+        "pricePerNight": "Cena / Noc",
+        "status": "Status",
+        "actions": "Akcje",
+        "empty": "Brak pokoi w systemie.",
+        "roomNumber": "Pokój {{number}}",
+        "noAmenities": "Brak udogodnień",
+        "amenitiesCount_one": "{{count}} udogodnienie",
+        "amenitiesCount_few": "{{count}} udogodnienia",
+        "amenitiesCount_many": "{{count}} udogodnień",
+        "amenitiesCount_other": "{{count}} udogodnień"
+      },
+      "status": {
+        "DOSTEPNY": "DOSTĘPNY",
+        "SERWIS": "SERWIS",
+        "NIEDOSTEPNY": "NIEDOSTĘPNY"
+      },
+      "alerts": {
+        "addPhotoError": "Błąd podczas dodawania zdjęcia",
+        "deletePhotoConfirm": "Usunąć to zdjęcie?",
+        "deletePhotoError": "Błąd podczas usuwania zdjęcia",
+        "amenityNameRequired": "Podaj nazwę udogodnienia",
+        "createAmenityError": "Błąd podczas tworzenia udogodnienia",
+        "deleteAmenityConfirm": "Czy na pewno chcesz usunąć udogodnienie \"{{amenityName}}\"?",
+        "deleteAmenityError": "Błąd podczas usuwania udogodnienia",
+        "saveRoomError": "Wystąpił błąd podczas zapisywania pokoju.",
+        "deleteRoomConfirm": "Czy na pewno chcesz usunąć ten pokój?",
+        "deleteRoomError": "Wystąpił błąd podczas usuwania pokoju."
+      },
+      "dialog": {
+        "editTitle": "Edytuj Pokój",
+        "addTitle": "Dodaj Nowy Pokój",
+        "roomNumber": "Numer pokoju",
+        "name": "Nazwa",
+        "description": "Opis",
+        "maxGuests": "Max. gości",
+        "bedCount": "Ilość łóżek",
+        "basePrice": "Cena za noc",
+        "status": "Status",
+        "hotel": "Hotel / Lokalizacja",
+        "saveRoom": "Zapisz Pokój"
+      },
+      "amenities": {
+        "title": "Udogodnienia",
+        "addNew": "Dodaj nowe",
+        "newAmenityTitle": "Nowe udogodnienie",
+        "namePlaceholder": "Nazwa (np. WiFi)",
+        "categoryPlaceholder": "Kategoria (np. Internet)",
+        "empty": "Brak udogodnień. Dodaj pierwsze!",
+        "deleteTooltip": "Usuń udogodnienie",
+        "categoryOther": "Inne",
+        "selectedCount_one": "Zaznaczono: 1 udogodnienie",
+        "selectedCount_few": "Zaznaczono: {{count}} udogodnienia",
+        "selectedCount_many": "Zaznaczono: {{count}} udogodnień",
+        "selectedCount_other": "Zaznaczono: {{count}} udogodnień"
+      },
+      "photos": {
+        "title": "Zdjęcia",
+        "urlLabel": "Adres URL Zdjęcia",
+        "urlPlaceholder": "https://...",
+        "primary": "Główne",
+        "primaryBadge": "Główne",
+        "empty": "Brak zdjęć dla tego pokoju."
+      },
+      "usageDialog": {
+        "title": "Nie można usunąć udogodnienia",
+        "description": "Udogodnienie \"{{amenityName}}\" jest używane w następujących pokojach:",
+        "hint": "Aby usunąć to udogodnienie, najpierw usuń je ze wszystkich pokoi, w których jest używane."
+      }
+    }
+  },
+  "home": {
+    "hero": {
+      "discover": "Odkryj",
+      "newDimension": "nowy wymiar",
+      "rest": "odpoczynku",
+      "subtitle": "Najlepsze hotele i apartamenty w całej Polsce. Od górskich szczytów, po bałtyckie plaże."
+    },
+    "results": {
+      "title": "Nasze Apartamenty",
+      "recommendedTitle": "Polecane w Luks Search",
+      "searchSubtitle_one": "Wyniki wyszukiwania dla {{count}} osoby",
+      "searchSubtitle_other": "Wyniki wyszukiwania dla {{count}} osób",
+      "recommendedSubtitle": "Wybierz lokalizację idealną na Twój kolejny wyjazd"
+    },
+    "states": {
+      "loadingRooms": "Szukanie idealnych pokoi...",
+      "error": "Błąd połączenia z serwerem: {{error}}",
+      "noRoomsTitle": "Brak apartamentów spełniających kryteria",
+      "noRoomsDesc": "Niestety nie posiadamy wolnych pokoi dla {{count}} osób w tym terminie. Zmień daty wyszukiwania.",
+      "loadingHotels": "Wczytywanie bazy najlepszych hoteli...",
+      "noHotelsTitle": "Brak hoteli do wyświetlenia",
+      "noHotelsDesc": "Upewnij się, że dodałeś dane do bazy Oracle."
+    },
+    "hotel": {
+      "defaultName": "Luksusowy Hotel Luks Search"
+    }
+  },
+  "notFound": {
+    "title": "Nie znaleziono strony",
+    "description": "Szukana strona nie istnieje lub została przeniesiona.",
+    "backBtn": "Wróć do strony głównej"
+  },
+  "reception": {
+    "back": "Wróć do serwisu",
+    "title": "Panel Recepcji",
+    "subtitle": "Obsługa gości i rezerwacji na żywo",
+    "stats": {
+      "pending": "Oczekujące płatności",
+      "active": "Goście w hotelu",
+      "total": "Suma rezerwacji",
+      "revenue": "Przychód"
+    },
+    "table": {
+      "id": "ID",
+      "guest": "Gość",
+      "room": "Pokój",
+      "dates": "Termin",
+      "amount": "Kwota",
+      "actions": "Akcje",
+      "action": "Akcja",
+      "status": "Status",
+      "noData": "Brak danych"
+    },
+    "pending": {
+      "title": "Oczekujące płatności",
+      "subtitle": "Wymagają weryfikacji manualnej",
+      "empty": "Brak oczekujących operacji",
+      "approve": "Zatwierdź wpłatę",
+      "reject": "Odrzuć rezerwację"
+    },
+    "active": {
+      "title": "Goście w hotelu",
+      "subtitle": "Płatność zweryfikowana — gotowi do wymeldowania",
+      "empty": "Brak gości przebywających obecnie w hotelu",
+      "checkout": "Wymelduj gościa"
+    },
+    "history": {
+      "title": "Historia rezerwacji"
+    },
+    "status": {
+      "POTWIERDZONA": "Potwierdzona",
+      "ZAKONCZONA": "Zakończona",
+      "ANULOWANA": "Anulowana",
+      "OCZEKUJACA": "Oczekuje"
+    }
+  },
+  "roomDetails": {
+    "errors": {
+      "loadDetails": "Nie można załadować szczegółów pokoju",
+      "loadOpinions": "Błąd ładowania opinii:"
+    },
+    "loadingRoom": "Ładowanie szczegółów pokoju...",
+    "notFound": {
+      "title": "Nie znaleziono pokoju"
+    },
+    "toast": {
+      "loginRequired": "Aby zarezerwować pokój, musisz się zalogować",
+      "datesRequired": "Wybierz daty przyjazdu i wyjazdu"
+    },
+    "backToList": "Wróć do listy pokoi",
+    "roomNumber": "Nr {{number}}",
+    "opinionsCount_one": "{{count}} opinia",
+    "opinionsCount_few": "{{count}} opinie",
+    "opinionsCount_many": "{{count}} opinii",
+    "opinionsCount_other": "{{count}} opinii",
+    "maxGuests": "Do {{count}} osób",
+    "beds_one": "{{count}} łóżko",
+    "beds_few": "{{count}} łóżka",
+    "beds_many": "{{count}} łóżek",
+    "beds_other": "{{count}} łóżek",
+    "amenities": {
+      "title": "Udogodnienia",
+      "empty": "Brak informacji o udogodnieniach"
+    },
+    "info": {
+      "title": "Ważne informacje",
+      "checkInOut": "• Zameldowanie: 15:00 | Wymeldowanie: 11:00",
+      "cancelPolicy": "• Polityka anulowania: Darmowe anulowanie do 48h przed przyjazdem",
+      "noPets": "• Zwierzęta nie są akceptowane",
+      "noSmoking": "• Zakaz palenia we wszystkich pokojach"
+    },
+    "opinions": {
+      "title": "Opinie gości ({{count}})",
+      "loading": "Ładowanie opinii...",
+      "guest": "Gość",
+      "showLess": "Pokaż mniej opinii",
+      "showAll": "Pokaż wszystkie opinie ({{count}})",
+      "emptyTitle": "Brak opinii",
+      "emptyDesc": "Ten pokój nie ma jeszcze żadnych opinii. Bądź pierwszy!"
+    },
+    "booking": {
+      "perNight": "za noc",
+      "checkIn": "Przyjazd:",
+      "checkOut": "Wyjazd:",
+      "guests": "Goście:",
+      "total": "Suma:",
+      "bookNowBtn": "Zarezerwuj teraz",
+      "selectDatesPrompt": "Wybierz daty na stronie głównej, aby zobaczyć cenę całkowitą"
+    }
+  },
+  "dashboard": {
+    "payment": {
+      "success": "Płatność PayPal zakończona pomyślnie!",
+      "canceled": "Płatność PayPal została anulowana.",
+      "error": "Wystąpił błąd podczas płatności PayPal."
+    },
+    "opinion": {
+      "success": "Dziękujemy za wystawienie opinii!"
+    },
+    "greeting": "Witaj, {{name}}",
+    "subtitle": "Twoja historia i planowane pobyty",
+    "stats": {
+      "totalBookings": "Wszystkie rezerwacje",
+      "upcomingStays": "Nadchodzące pobyty",
+      "yourOpinions": "Twoje opinie",
+      "totalSpent": "Suma wydatków"
+    },
+    "upcoming": {
+      "title": "Nadchodzące pobyty",
+      "empty": "Brak zaplanowanych pobytów"
+    },
+    "history": {
+      "title": "Historia pobytów",
+      "leaveOpinionBtn": "Wystaw opinię"
+    },
+    "table": {
+      "id": "ID",
+      "apartment": "Apartament",
+      "dates": "Termin",
+      "amount": "Kwota",
+      "status": "Status",
+      "opinion": "Opinia"
+    },
+    "empty": {
+      "title": "Nie masz jeszcze żadnych rezerwacji",
+      "browseBtn": "Przeglądaj Apartamenty"
+    },
+    "status": {
+      "OPLACONA": "Potwierdzone",
+      "POTWIERDZONA": "Potwierdzone",
+      "OCZEKUJACA": "Oczekuje",
+      "ANULOWANA": "Anulowane",
+      "ZAKONCZONA": "Zakończone"
+    }
+  }
+}

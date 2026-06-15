@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next'; 
 import { SearchBar } from '../components/SearchBar';
 import { RoomCard } from '../components/RoomCard';
 import { useApp } from '../context/AppContext';
@@ -14,6 +15,7 @@ const HOTEL_IMAGES: Record<number, string> = {
 const DEFAULT_HOTEL_IMAGE = "https://images.pexels.com/photos/164595/pexels-photo-164595.jpeg?auto=compress&cs=tinysrgb&w=1080";
 
 export const Homepage: React.FC = () => {
+  const { t } = useTranslation(); 
   const { searchParams, rooms, isLoading, error } = useApp();
   
   const [hotels, setHotels] = useState<HotelDTO[]>([]);
@@ -50,10 +52,10 @@ export const Homepage: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
               <h1 className="text-6xl md:text-7xl font-serif font-light leading-tight mb-6">
-                Odkryj <span className="italic text-accent">nowy wymiar</span> odpoczynku
+                {t('home.hero.discover')} <span className="italic text-accent">{t('home.hero.newDimension')}</span> {t('home.hero.rest')}
               </h1>
               <p className="text-xl text-gray-500 dark:text-gray-400 mb-10 max-w-md">
-                Najlepsze hotele i apartamenty w całej Polsce. Od górskich szczytów, po bałtyckie plaże.
+                {t('home.hero.subtitle')}
               </p>
               <SearchBar onSearch={scrollToRooms} />
             </div>
@@ -73,24 +75,24 @@ export const Homepage: React.FC = () => {
         
         <div className="mb-16">
           <h2 className="text-4xl font-serif mb-4 text-foreground">
-            {searchParams ? 'Nasze Apartamenty' : 'Polecane w Luks Search'}
+            {searchParams ? t('home.results.title') : t('home.results.recommendedTitle')}
           </h2>
           <p className="text-gray-500 dark:text-gray-400 text-lg">
             {searchParams 
-              ? `Wyniki wyszukiwania dla ${requiredGuests} ${requiredGuests === 1 ? 'osoby' : 'osób'}` 
-              : 'Wybierz lokalizację idealną na Twój kolejny wyjazd'}
+              ? t('home.results.searchSubtitle', { count: requiredGuests }) 
+              : t('home.results.recommendedSubtitle')}
           </p>
         </div>
 
         {isLoading && (
           <div className="text-center py-20">
-            <p className="text-xl text-gray-500 dark:text-gray-400 animate-pulse">Szukanie idealnych pokoi...</p>
+            <p className="text-xl text-gray-500 dark:text-gray-400 animate-pulse">{t('home.states.loadingRooms')}</p>
           </div>
         )}
 
         {error && (
           <div className="text-center py-20 bg-red-50 dark:bg-red-900/20 rounded-2xl transition-colors duration-300">
-            <p className="text-xl text-red-500 dark:text-red-400 font-medium">Błąd połączenia z serwerem: {error}</p>
+            <p className="text-xl text-red-500 dark:text-red-400 font-medium">{t('home.states.error', { error })}</p>
           </div>
         )}
 
@@ -106,8 +108,8 @@ export const Homepage: React.FC = () => {
         {/* Widok: Brak pokoi */}
         {!isLoading && !error && searchParams && rooms.length === 0 && (
           <div className="text-center py-24 bg-secondary rounded-2xl border border-border transition-colors duration-300">
-            <h3 className="font-serif text-3xl mb-3 text-foreground">Brak apartamentów spełniających kryteria</h3>
-            <p className="text-gray-500 dark:text-gray-400 text-lg">Niestety nie posiadamy wolnych pokoi dla {requiredGuests} osób w tym terminie. Zmień daty wyszukiwania.</p>
+            <h3 className="font-serif text-3xl mb-3 text-foreground">{t('home.states.noRoomsTitle')}</h3>
+            <p className="text-gray-500 dark:text-gray-400 text-lg">{t('home.states.noRoomsDesc', { count: requiredGuests })}</p>
           </div>
         )}
 
@@ -115,11 +117,11 @@ export const Homepage: React.FC = () => {
         {!isLoading && !error && !searchParams && (
           <div>
             {isHotelsLoading ? (
-               <div className="text-center py-20 text-gray-500 dark:text-gray-400 animate-pulse text-lg">Wczytywanie bazy najlepszych hoteli...</div>
+               <div className="text-center py-20 text-gray-500 dark:text-gray-400 animate-pulse text-lg">{t('home.states.loadingHotels')}</div>
             ) : hotels.length > 0 ? (
                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
                   {hotels.map((hotel) => {
-                    const hotelName = hotel.name || (hotel as any).name || 'Luksusowy Hotel Luks Search';
+                    const hotelName = hotel.name || (hotel as any).name || t('home.hotel.defaultName');
                     const hotelStars = hotel.stars || 4;
 
                     return (
@@ -158,8 +160,8 @@ export const Homepage: React.FC = () => {
                </div>
             ) : (
                <div className="text-center py-20 border border-border rounded-2xl transition-colors duration-300">
-                 <p className="font-serif text-2xl mb-2 text-gray-400 dark:text-gray-500">Brak hoteli do wyświetlenia</p>
-                 <p className="text-gray-500 dark:text-gray-400">Upewnij się, że dodałeś dane do bazy Oracle.</p>
+                 <p className="font-serif text-2xl mb-2 text-gray-400 dark:text-gray-500">{t('home.states.noHotelsTitle')}</p>
+                 <p className="text-gray-500 dark:text-gray-400">{t('home.states.noHotelsDesc')}</p>
                </div>
             )}
           </div>

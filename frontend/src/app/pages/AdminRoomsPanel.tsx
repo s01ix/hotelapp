@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { ArrowLeft, Plus, Edit, Trash, Bed, Users, Check, X, AlertTriangle } from 'lucide-react';
+import { useTranslation } from 'react-i18next'; 
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
@@ -30,6 +31,7 @@ import {
 } from '../components/service/api';
 
 export const AdminRoomsPanel: React.FC = () => {
+  const { t } = useTranslation(); 
   const navigate = useNavigate();
   const [roomsList, setRoomsList] = useState<RoomDTO[]>([]);
   const [hotelsList, setHotelsList] = useState<HotelDTO[]>([]);
@@ -42,12 +44,10 @@ export const AdminRoomsPanel: React.FC = () => {
   const [newPhotoUrl, setNewPhotoUrl] = useState('');
   const [isPhotoPrimary, setIsPhotoPrimary] = useState(false);
 
-  // Nowe udogodnienie
   const [isAddingAmenity, setIsAddingAmenity] = useState(false);
   const [newAmenityName, setNewAmenityName] = useState('');
   const [newAmenityCategory, setNewAmenityCategory] = useState('');
 
-  // Modal z komunikatem o użyciu udogodnienia
   const [isUsageDialogOpen, setIsUsageDialogOpen] = useState(false);
   const [usageDialogData, setUsageDialogData] = useState<{
     amenityName: string;
@@ -147,12 +147,12 @@ export const AdminRoomsPanel: React.FC = () => {
       }
       setRoomsList(updatedRooms);
     } catch(err) {
-      alert("Błąd podczas dodawania zdjęcia");
+      alert(t('admin.rooms.alerts.addPhotoError'));
     }
   };
 
   const handleDeletePhoto = async (photoId: number) => {
-    if(!window.confirm("Usunąć to zdjęcie?")) return;
+    if(!window.confirm(t('admin.rooms.alerts.deletePhotoConfirm'))) return;
     try {
       await deleteRoomPhoto(photoId);
       await loadRooms();
@@ -164,11 +164,10 @@ export const AdminRoomsPanel: React.FC = () => {
       }
       setRoomsList(updatedRooms);
     } catch(err) {
-      alert("Błąd podczas usuwania zdjęcia");
+      alert(t('admin.rooms.alerts.deletePhotoError'));
     }
   };
 
-  // Toggle wyboru udogodnienia
   const handleToggleAmenity = (amenityId: number) => {
     setFormData(prev => {
       const currentIds = prev.amenityIds || [];
@@ -179,17 +178,16 @@ export const AdminRoomsPanel: React.FC = () => {
     });
   };
 
-  // Dodaj nowe udogodnienie
   const handleCreateAmenity = async () => {
     if (!newAmenityName.trim()) {
-      alert('Podaj nazwę udogodnienia');
+      alert(t('admin.rooms.alerts.amenityNameRequired'));
       return;
     }
 
     try {
       const newAmenity = await createAmenity({
         name: newAmenityName,
-        category: newAmenityCategory || 'Inne',
+        category: newAmenityCategory || t('admin.rooms.amenities.categoryOther'),
         description: ''
       });
       
@@ -198,26 +196,22 @@ export const AdminRoomsPanel: React.FC = () => {
       setNewAmenityCategory('');
       setIsAddingAmenity(false);
       
-      // Automatycznie zaznacz nowo utworzone udogodnienie
       setFormData(prev => ({
         ...prev,
         amenityIds: [...(prev.amenityIds || []), newAmenity.id]
       }));
     } catch (err) {
-      alert('Błąd podczas tworzenia udogodnienia');
+      alert(t('admin.rooms.alerts.createAmenityError'));
       console.error(err);
     }
   };
 
-  // Usuń udogodnienie (z walidacją użycia)
   const handleDeleteAmenity = async (amenityId: number, amenityName: string) => {
-    // Sprawdź które pokoje używają tego udogodnienia
     const roomsUsingAmenity = roomsList.filter(room => 
       room.amenityIds && room.amenityIds.includes(amenityId)
     );
 
     if (roomsUsingAmenity.length > 0) {
-      // Jeśli jest używane - pokaż komunikat
       setUsageDialogData({
         amenityName,
         roomsUsing: roomsUsingAmenity.map(room => `${room.name} (Nr ${room.roomNumber})`)
@@ -226,8 +220,7 @@ export const AdminRoomsPanel: React.FC = () => {
       return;
     }
 
-    // Jeśli nie jest używane - usuń po potwierdzeniu
-    if (!window.confirm(`Czy na pewno chcesz usunąć udogodnienie "${amenityName}"?`)) {
+    if (!window.confirm(t('admin.rooms.alerts.deleteAmenityConfirm', { amenityName }))) {
       return;
     }
 
@@ -235,14 +228,13 @@ export const AdminRoomsPanel: React.FC = () => {
       await deleteAmenity(amenityId);
       setAmenitiesList(prev => prev.filter(a => a.id !== amenityId));
       
-      // Usuń z zaznaczonych w formularzu jeśli tam było
       setFormData(prev => ({
         ...prev,
         amenityIds: (prev.amenityIds || []).filter(id => id !== amenityId)
       }));
       
     } catch (err) {
-      alert('Błąd podczas usuwania udogodnienia');
+      alert(t('admin.rooms.alerts.deleteAmenityError'));
       console.error(err);
     }
   };
@@ -257,18 +249,18 @@ export const AdminRoomsPanel: React.FC = () => {
       handleCloseDialog();
       await loadRooms();
     } catch (err) {
-      alert("Wystąpił błąd podczas zapisywania pokoju.");
+      alert(t('admin.rooms.alerts.saveRoomError'));
       console.error(err);
     }
   };
 
   const handleDelete = async (id: number) => {
-    if (window.confirm("Czy na pewno chcesz usunąć ten pokój?")) {
+    if (window.confirm(t('admin.rooms.alerts.deleteRoomConfirm'))) {
       try {
         await deleteRoom(id);
         await loadRooms();
       } catch (err) {
-        alert("Wystąpił błąd podczas usuwania pokoju.");
+        alert(t('admin.rooms.alerts.deleteRoomError'));
         console.error(err);
       }
     }
@@ -283,7 +275,7 @@ export const AdminRoomsPanel: React.FC = () => {
   };
 
   const groupedAmenities = amenitiesList.reduce((acc, amenity) => {
-    const category = amenity.category || 'Inne';
+    const category = amenity.category || t('admin.rooms.amenities.categoryOther');
     if (!acc[category]) {
       acc[category] = [];
     }
@@ -299,16 +291,16 @@ export const AdminRoomsPanel: React.FC = () => {
           className="mb-6 -ml-4" 
           onClick={() => navigate('/admin')}
         >
-          <ArrowLeft className="mr-2 h-4 w-4" /> Powrót do Panelu
+          <ArrowLeft className="mr-2 h-4 w-4" /> {t('admin.rooms.backToPanel')}
         </Button>
 
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-serif text-primary">Zarządzanie Pokojami</h1>
-            <p className="text-gray-500 mt-2">Dodawaj, edytuj i usuwaj pokoje w systemie</p>
+            <h1 className="text-3xl font-serif text-primary">{t('admin.rooms.title')}</h1>
+            <p className="text-gray-500 mt-2">{t('admin.rooms.subtitle')}</p>
           </div>
           <Button onClick={() => handleOpenDialog()} className="bg-primary text-primary-foreground">
-            <Plus className="mr-2 h-4 w-4" /> Nowy Pokój
+            <Plus className="mr-2 h-4 w-4" /> {t('admin.rooms.newRoomBtn')}
           </Button>
         </div>
 
@@ -316,32 +308,32 @@ export const AdminRoomsPanel: React.FC = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Numer / Nazwa</TableHead>
-                <TableHead>Miejsca</TableHead>
-                <TableHead>Cena / Noc</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Akcje</TableHead>
+                <TableHead>{t('admin.rooms.table.numberName')}</TableHead>
+                <TableHead>{t('admin.rooms.table.places')}</TableHead>
+                <TableHead>{t('admin.rooms.table.pricePerNight')}</TableHead>
+                <TableHead>{t('admin.rooms.table.status')}</TableHead>
+                <TableHead className="text-right">{t('admin.rooms.table.actions')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center py-8">Ładowanie danych...</TableCell>
+                  <TableCell colSpan={5} className="text-center py-8">{t('common.loadingData')}</TableCell>
                 </TableRow>
               ) : roomsList.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center py-8">Brak pokoi w systemie.</TableCell>
+                  <TableCell colSpan={5} className="text-center py-8">{t('admin.rooms.table.empty')}</TableCell>
                 </TableRow>
               ) : (
                 roomsList.map((room) => (
                   <TableRow key={room.id}>
                     <TableCell>
                       <div className="font-medium">{room.name}</div>
-                      <div className="text-sm text-gray-500">Pokój {room.roomNumber}</div>
+                      <div className="text-sm text-gray-500">{t('admin.rooms.table.roomNumber', { number: room.roomNumber })}</div>
                       <div className="text-xs text-gray-400 mt-1">
                         {room.amenities && room.amenities.length > 0 
-                          ? `${room.amenities.length} udogodnień`
-                          : 'Brak udogodnień'}
+                          ? t('admin.rooms.table.amenitiesCount', { count: room.amenities.length })
+                          : t('admin.rooms.table.noAmenities')}
                       </div>
                     </TableCell>
                     <TableCell>
@@ -355,7 +347,7 @@ export const AdminRoomsPanel: React.FC = () => {
                     </TableCell>
                     <TableCell>
                       <span className={`px-2 py-1 text-xs rounded-full ${room.status === 'DOSTEPNY' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
-                        {room.status}
+                        {t(`admin.rooms.status.${room.status}`)}
                       </span>
                     </TableCell>
                     <TableCell className="text-right">
@@ -374,17 +366,16 @@ export const AdminRoomsPanel: React.FC = () => {
         </div>
       </div>
 
-      {/* DIALOG EDYCJI/DODAWANIA POKOJU */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{editingRoomId ? 'Edytuj Pokój' : 'Dodaj Nowy Pokój'}</DialogTitle>
+            <DialogTitle>{editingRoomId ? t('admin.rooms.dialog.editTitle') : t('admin.rooms.dialog.addTitle')}</DialogTitle>
           </DialogHeader>
           
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="roomNumber">Numer pokoju</Label>
+                <Label htmlFor="roomNumber">{t('admin.rooms.dialog.roomNumber')}</Label>
                 <Input 
                   id="roomNumber" 
                   name="roomNumber"
@@ -393,7 +384,7 @@ export const AdminRoomsPanel: React.FC = () => {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="name">Nazwa</Label>
+                <Label htmlFor="name">{t('admin.rooms.dialog.name')}</Label>
                 <Input 
                   id="name" 
                   name="name"
@@ -404,7 +395,7 @@ export const AdminRoomsPanel: React.FC = () => {
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="description">Opis</Label>
+              <Label htmlFor="description">{t('admin.rooms.dialog.description')}</Label>
               <Textarea 
                 id="description" 
                 name="description"
@@ -416,7 +407,7 @@ export const AdminRoomsPanel: React.FC = () => {
             
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="maxGuests">Max. gości</Label>
+                <Label htmlFor="maxGuests">{t('admin.rooms.dialog.maxGuests')}</Label>
                 <Input 
                   id="maxGuests" 
                   name="maxGuests"
@@ -427,7 +418,7 @@ export const AdminRoomsPanel: React.FC = () => {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="bedCount">Ilość łóżek</Label>
+                <Label htmlFor="bedCount">{t('admin.rooms.dialog.bedCount')}</Label>
                 <Input 
                   id="bedCount" 
                   name="bedCount"
@@ -441,7 +432,7 @@ export const AdminRoomsPanel: React.FC = () => {
             
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="basePrice">Cena za noc</Label>
+                <Label htmlFor="basePrice">{t('admin.rooms.dialog.basePrice')}</Label>
                 <Input 
                   id="basePrice" 
                   name="basePrice"
@@ -453,7 +444,7 @@ export const AdminRoomsPanel: React.FC = () => {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="status">Status</Label>
+                <Label htmlFor="status">{t('admin.rooms.dialog.status')}</Label>
                 <select 
                   id="status" 
                   name="status"
@@ -461,15 +452,15 @@ export const AdminRoomsPanel: React.FC = () => {
                   onChange={handleChange}
                   className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  <option value="DOSTEPNY">DOSTĘPNY</option>
-                  <option value="SERWIS">SERWIS</option>
-                  <option value="NIEDOSTEPNY">NIEDOSTĘPNY</option>
+                  <option value="DOSTEPNY">{t('admin.rooms.status.DOSTEPNY')}</option>
+                  <option value="SERWIS">{t('admin.rooms.status.SERWIS')}</option>
+                  <option value="NIEDOSTEPNY">{t('admin.rooms.status.NIEDOSTEPNY')}</option>
                 </select>
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="hotelId">Hotel / Lokalizacja</Label>
+              <Label htmlFor="hotelId">{t('admin.rooms.dialog.hotel')}</Label>
               <select 
                 id="hotelId" 
                 name="hotelId"
@@ -485,10 +476,9 @@ export const AdminRoomsPanel: React.FC = () => {
               </select>
             </div>
 
-            {/* SEKCJA UDOGODNIEŃ - CHECKLIST */}
             <div className="space-y-3 pt-4 border-t border-gray-200">
               <div className="flex items-center justify-between">
-                <Label className="text-base font-semibold">Udogodnienia</Label>
+                <Label className="text-base font-semibold">{t('admin.rooms.amenities.title')}</Label>
                 <Button 
                   type="button" 
                   variant="outline" 
@@ -496,29 +486,28 @@ export const AdminRoomsPanel: React.FC = () => {
                   onClick={() => setIsAddingAmenity(!isAddingAmenity)}
                 >
                   <Plus className="h-4 w-4 mr-1" />
-                  Dodaj nowe
+                  {t('admin.rooms.amenities.addNew')}
                 </Button>
               </div>
 
-              {/* Formularz dodawania nowego udogodnienia */}
               {isAddingAmenity && (
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-3">
-                  <h4 className="font-medium text-sm">Nowe udogodnienie</h4>
+                  <h4 className="font-medium text-sm">{t('admin.rooms.amenities.newAmenityTitle')}</h4>
                   <div className="grid grid-cols-2 gap-3">
                     <Input 
-                      placeholder="Nazwa (np. WiFi)" 
+                      placeholder={t('admin.rooms.amenities.namePlaceholder')}
                       value={newAmenityName}
                       onChange={e => setNewAmenityName(e.target.value)}
                     />
                     <Input 
-                      placeholder="Kategoria (np. Internet)" 
+                      placeholder={t('admin.rooms.amenities.categoryPlaceholder')}
                       value={newAmenityCategory}
                       onChange={e => setNewAmenityCategory(e.target.value)}
                     />
                   </div>
                   <div className="flex gap-2">
                     <Button type="button" size="sm" onClick={handleCreateAmenity}>
-                      Utwórz
+                      {t('common.create')}
                     </Button>
                     <Button 
                       type="button" 
@@ -526,17 +515,16 @@ export const AdminRoomsPanel: React.FC = () => {
                       variant="outline"
                       onClick={() => setIsAddingAmenity(false)}
                     >
-                      Anuluj
+                      {t('common.cancel')}
                     </Button>
                   </div>
                 </div>
               )}
 
-              {/* Checklist udogodnień - JEDNO POD DRUGIM */}
               <div className="max-h-64 overflow-y-auto border border-gray-200 rounded-lg p-3 space-y-4">
                 {Object.keys(groupedAmenities).length === 0 ? (
                   <p className="text-sm text-gray-500 italic text-center py-4">
-                    Brak udogodnień. Dodaj pierwsze!
+                    {t('admin.rooms.amenities.empty')}
                   </p>
                 ) : (
                   Object.entries(groupedAmenities).map(([category, amenities]) => (
@@ -572,7 +560,6 @@ export const AdminRoomsPanel: React.FC = () => {
                                 </span>
                               </label>
                               
-                              {/* Przycisk usuń */}
                               <button
                                 type="button"
                                 onClick={(e) => {
@@ -580,7 +567,7 @@ export const AdminRoomsPanel: React.FC = () => {
                                   handleDeleteAmenity(amenity.id, amenity.name);
                                 }}
                                 className="p-1 hover:bg-red-100 rounded transition-colors group"
-                                title="Usuń udogodnienie"
+                                title={t('admin.rooms.amenities.deleteTooltip')}
                               >
                                 <Trash className="h-4 w-4 text-gray-400 group-hover:text-red-600" />
                               </button>
@@ -594,20 +581,19 @@ export const AdminRoomsPanel: React.FC = () => {
               </div>
 
               <p className="text-xs text-gray-500">
-                Zaznaczono: <strong>{formData.amenityIds?.length || 0}</strong> udogodnień
+                {t('admin.rooms.amenities.selectedCount', { count: formData.amenityIds?.length || 0 })}
               </p>
             </div>
 
-            {/* SEKCJA ZDJĘĆ */}
             {editingRoomId && (
               <div className="space-y-4 pt-4 border-t border-gray-100">
-                <h3 className="font-semibold">Zdjęcia</h3>
+                <h3 className="font-semibold">{t('admin.rooms.photos.title')}</h3>
                 
                 <div className="flex gap-2 items-end">
                   <div className="flex-1 space-y-1">
-                    <Label className="text-xs">Adres URL Zdjęcia</Label>
+                    <Label className="text-xs">{t('admin.rooms.photos.urlLabel')}</Label>
                     <Input 
-                      placeholder="https://..." 
+                      placeholder={t('admin.rooms.photos.urlPlaceholder')}
                       value={newPhotoUrl} 
                       onChange={e => setNewPhotoUrl(e.target.value)} 
                     />
@@ -619,10 +605,10 @@ export const AdminRoomsPanel: React.FC = () => {
                       checked={isPhotoPrimary} 
                       onChange={e => setIsPhotoPrimary(e.target.checked)} 
                     />
-                    <Label htmlFor="isPrimary" className="text-sm">Główne</Label>
+                    <Label htmlFor="isPrimary" className="text-sm">{t('admin.rooms.photos.primary')}</Label>
                   </div>
                   <Button type="button" onClick={handleAddPhoto} className="bg-primary text-primary-foreground">
-                    Dodaj
+                    {t('common.add')}
                   </Button>
                 </div>
 
@@ -633,7 +619,7 @@ export const AdminRoomsPanel: React.FC = () => {
                         <img src={photo.url} alt="Room" className="w-full h-24 object-cover" />
                         {photo.isPrimary && (
                           <div className="absolute top-1 left-1 bg-primary text-white text-xs px-1 rounded-sm">
-                            Główne
+                            {t('admin.rooms.photos.primaryBadge')}
                           </div>
                         )}
                         <button 
@@ -647,7 +633,7 @@ export const AdminRoomsPanel: React.FC = () => {
                     ))
                   ) : (
                     <div className="col-span-3 text-sm text-gray-500 text-center py-2">
-                      Brak zdjęć dla tego pokoju.
+                      {t('admin.rooms.photos.empty')}
                     </div>
                   )}
                 </div>
@@ -656,27 +642,26 @@ export const AdminRoomsPanel: React.FC = () => {
           </div>
           
           <DialogFooter>
-            <Button variant="outline" onClick={handleCloseDialog}>Anuluj</Button>
+            <Button variant="outline" onClick={handleCloseDialog}>{t('common.cancel')}</Button>
             <Button onClick={handleSave} className="bg-primary text-primary-foreground">
-              Zapisz Pokój
+              {t('admin.rooms.dialog.saveRoom')}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* KOMUNIKAT O TYM ŻE NIE MOŻNA USUNĄĆ UDOGODNIENIA */}
       <Dialog open={isUsageDialogOpen} onOpenChange={setIsUsageDialogOpen}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-red-600">
               <AlertTriangle className="h-5 w-5" />
-              Nie można usunąć udogodnienia
+              {t('admin.rooms.usageDialog.title')}
             </DialogTitle>
           </DialogHeader>
           
           <div className="py-4">
             <p className="text-sm text-gray-700 mb-4">
-              Udogodnienie <strong>"{usageDialogData?.amenityName}"</strong> jest używane w następujących pokojach:
+              {t('admin.rooms.usageDialog.description', { amenityName: usageDialogData?.amenityName })}
             </p>
             
             <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 max-h-48 overflow-y-auto">
@@ -691,13 +676,13 @@ export const AdminRoomsPanel: React.FC = () => {
             </div>
             
             <p className="text-xs text-gray-500 mt-4">
-              Aby usunąć to udogodnienie, najpierw usuń je ze wszystkich pokoi, w których jest używane.
+              {t('admin.rooms.usageDialog.hint')}
             </p>
           </div>
           
           <DialogFooter>
             <Button onClick={() => setIsUsageDialogOpen(false)} className="bg-primary text-primary-foreground">
-              Rozumiem
+              {t('common.understand')}
             </Button>
           </DialogFooter>
         </DialogContent>

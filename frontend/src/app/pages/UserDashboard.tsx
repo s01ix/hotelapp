@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
 import { ArrowLeft, Star, MessageSquare } from 'lucide-react';
+import { useTranslation } from 'react-i18next'; 
 import { Button } from '../components/ui/button';
 import {
   Table,
@@ -21,7 +22,8 @@ import {
 } from '../components/service/api';
 
 export const UserDashboard: React.FC = () => {
-  const { user, bookings, loginWithGoogle} = useApp();
+  const { t } = useTranslation();
+  const { user, bookings, loginWithGoogle } = useApp();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   
@@ -40,20 +42,18 @@ export const UserDashboard: React.FC = () => {
   const [bookingsCanReview, setBookingsCanReview] = useState<Set<number>>(new Set());
   const [isLoading, setIsLoading] = useState(false);
 
-  // Obsługa komunikatów z PayPal
   useEffect(() => {
     const status = searchParams.get('status');
     const error = searchParams.get('error');
     if (status === 'success') {
-      setPaymentMessage({ type: 'success', text: 'Płatność PayPal zakończona pomyślnie!' });
+      setPaymentMessage({ type: 'success', text: t('dashboard.payment.success') });
     } else if (status === 'canceled') {
-      setPaymentMessage({ type: 'warning', text: 'Płatność PayPal została anulowana.' });
+      setPaymentMessage({ type: 'warning', text: t('dashboard.payment.canceled') });
     } else if (status === 'error' || error) {
-      setPaymentMessage({ type: 'error', text: 'Wystąpił błąd podczas płatności PayPal.' });
+      setPaymentMessage({ type: 'error', text: t('dashboard.payment.error') });
     }
-  }, [searchParams]);
+  }, [searchParams, t]);
 
-  // Funkcja ładowania opinii użytkownika
   const loadUserOpinions = useCallback(async () => {
     if (!user?.id) return;
     try {
@@ -67,14 +67,11 @@ export const UserDashboard: React.FC = () => {
     }
   }, [user?.id]);
 
-  // Funkcja sprawdzania możliwości wystawienia opinii
   const checkBookingsCanReview = useCallback(async () => {
     if (!user?.id || bookings.length === 0) return;
     
     try {
       const canReviewSet = new Set<number>();
-      
-      // Sprawdzaj tylko zakończone rezerwacje
       const today = new Date().toISOString().split('T')[0];
       const pastBookings = bookings.filter((b) => b.checkOutDate < today);
       
@@ -95,14 +92,12 @@ export const UserDashboard: React.FC = () => {
     }
   }, [user?.id, bookings]);
 
-  // Pobieranie opinii użytkownika przy załadowaniu
   useEffect(() => {
     if (user?.id) {
       loadUserOpinions();
     }
   }, [user?.id, loadUserOpinions]);
 
-  // Sprawdzanie  możliwości wystawienia opinii
   useEffect(() => {
     if (user?.id && bookings.length > 0) {
       checkBookingsCanReview();
@@ -126,7 +121,7 @@ export const UserDashboard: React.FC = () => {
       
       setPaymentMessage({
         type: 'success',
-        text: 'Dziękujemy za wystawienie opinii!',
+        text: t('dashboard.opinion.success'),
       });
       
       setTimeout(() => setPaymentMessage(null), 5000);
@@ -152,19 +147,7 @@ export const UserDashboard: React.FC = () => {
   };
 
   const getStatusName = (status: string) => {
-    switch (status) {
-      case 'OPLACONA':
-      case 'POTWIERDZONA':
-        return 'Potwierdzone';
-      case 'OCZEKUJACA':
-        return 'Oczekuje';
-      case 'ANULOWANA':
-        return 'Anulowane';
-      case 'ZAKONCZONA':
-        return 'Zakończone';
-      default:
-        return status;
-    }
+    return t(`dashboard.status.${status}`, { defaultValue: status });
   };
   
   const today = new Date().toISOString().split('T')[0];
@@ -181,11 +164,11 @@ export const UserDashboard: React.FC = () => {
             className="mb-6 hover:text-accent p-0"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            <span className="text-xs uppercase tracking-widest">Wróć do strony głównej</span>
+            <span className="text-xs uppercase tracking-widest">{t('common.backToHome')}</span>
           </Button>
-          <h1 className="text-5xl font-serif mb-2">Witaj, {user?.name}</h1>
+          <h1 className="text-5xl font-serif mb-2">{t('dashboard.greeting', { name: user?.name })}</h1>
           <p className="text-gray-400 uppercase tracking-[0.2em] text-[10px]">
-            Twoja historia i planowane pobyty
+            {t('dashboard.subtitle')}
           </p>
         </div>
 
@@ -207,24 +190,24 @@ export const UserDashboard: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-24">
           <div className="border-l border-gray-200 pl-6 py-2">
             <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-2">
-              Wszystkie rezerwacje
+              {t('dashboard.stats.totalBookings')}
             </p>
             <p className="text-3xl font-serif text-primary">{bookings.length}</p>
           </div>
           <div className="border-l border-gray-200 pl-6 py-2">
             <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-2">
-              Nadchodzące pobyty
+              {t('dashboard.stats.upcomingStays')}
             </p>
             <p className="text-3xl font-serif text-accent">{upcomingBookings.length}</p>
           </div>
           <div className="border-l border-gray-200 pl-6 py-2">
-            <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-2">Twoje opinie</p>
+            <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-2">{t('dashboard.stats.yourOpinions')}</p>
             <p className="text-3xl font-serif text-primary">{userOpinions.length}</p>
           </div>
           <div className="border-l border-gray-200 pl-6 py-2">
-            <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-2">Suma wydatków</p>
+            <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-2">{t('dashboard.stats.totalSpent')}</p>
             <p className="text-3xl font-serif text-primary">
-              {bookings.reduce((sum, b) => sum + b.totalAmount, 0)} zł
+              {bookings.reduce((sum, b) => sum + b.totalAmount, 0)} {t('common.currency')}
             </p>
           </div>
         </div>
@@ -232,7 +215,7 @@ export const UserDashboard: React.FC = () => {
         {/* Nadchodzące pobyty */}
         <div className="mb-24">
           <h2 className="text-2xl font-serif mb-8 border-b border-gray-100 pb-4">
-            Nadchodzące pobyty
+            {t('dashboard.upcoming.title')}
           </h2>
           {upcomingBookings.length > 0 ? (
             <div className="overflow-x-auto">
@@ -240,19 +223,19 @@ export const UserDashboard: React.FC = () => {
                 <TableHeader>
                   <TableRow className="hover:bg-transparent border-b border-gray-100">
                     <TableHead className="text-[10px] uppercase tracking-widest font-bold text-gray-400">
-                      ID
+                      {t('dashboard.table.id')}
                     </TableHead>
                     <TableHead className="text-[10px] uppercase tracking-widest font-bold text-gray-400">
-                      Apartament
+                      {t('dashboard.table.apartment')}
                     </TableHead>
                     <TableHead className="text-[10px] uppercase tracking-widest font-bold text-gray-400">
-                      Termin
+                      {t('dashboard.table.dates')}
                     </TableHead>
                     <TableHead className="text-[10px] uppercase tracking-widest font-bold text-gray-400">
-                      Kwota
+                      {t('dashboard.table.amount')}
                     </TableHead>
                     <TableHead className="text-[10px] uppercase tracking-widest font-bold text-gray-400 text-right">
-                      Status
+                      {t('dashboard.table.status')}
                     </TableHead>
                   </TableRow>
                 </TableHeader>
@@ -267,7 +250,7 @@ export const UserDashboard: React.FC = () => {
                         {booking.checkInDate} — {booking.checkOutDate}
                       </TableCell>
                       <TableCell className="font-serif font-bold text-primary">
-                        {booking.totalAmount} zł
+                        {booking.totalAmount} {t('common.currency')}
                       </TableCell>
                       <TableCell className="text-right">
                         <span
@@ -285,7 +268,7 @@ export const UserDashboard: React.FC = () => {
             </div>
           ) : (
             <div className="py-12 border border-dashed border-gray-200 text-center">
-              <p className="font-serif italic text-gray-400">Brak zaplanowanych pobytów</p>
+              <p className="font-serif italic text-gray-400">{t('dashboard.upcoming.empty')}</p>
             </div>
           )}
         </div>
@@ -294,26 +277,26 @@ export const UserDashboard: React.FC = () => {
         {pastBookings.length > 0 && (
           <div className="mb-24">
             <h2 className="text-2xl font-serif mb-8 border-b border-gray-100 pb-4 text-gray-400">
-              Historia pobytów
+              {t('dashboard.history.title')}
             </h2>
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow className="hover:bg-transparent border-b border-gray-100">
                     <TableHead className="text-[10px] uppercase tracking-widest font-bold text-gray-400">
-                      Apartament
+                      {t('dashboard.table.apartment')}
                     </TableHead>
                     <TableHead className="text-[10px] uppercase tracking-widest font-bold text-gray-400">
-                      Termin
+                      {t('dashboard.table.dates')}
                     </TableHead>
                     <TableHead className="text-[10px] uppercase tracking-widest font-bold text-gray-400">
-                      Kwota
+                      {t('dashboard.table.amount')}
                     </TableHead>
                     <TableHead className="text-[10px] uppercase tracking-widest font-bold text-gray-400">
-                      Status
+                      {t('dashboard.table.status')}
                     </TableHead>
                     <TableHead className="text-[10px] uppercase tracking-widest font-bold text-gray-400 text-right">
-                      Opinia
+                      {t('dashboard.table.opinion')}
                     </TableHead>
                   </TableRow>
                 </TableHeader>
@@ -321,7 +304,7 @@ export const UserDashboard: React.FC = () => {
                   {pastBookings.map((booking) => {
                     const opinion = userOpinions.find((op) => op.bookingId === booking.id);
                     const canReview = bookingsCanReview.has(booking.id);
-                    const roomId = (booking as any).roomId; // Fallback jeśli roomId nie jest w typie
+                    const roomId = (booking as any).roomId;
 
                     return (
                       <TableRow key={booking.id} className="border-b border-gray-50">
@@ -330,11 +313,11 @@ export const UserDashboard: React.FC = () => {
                           {booking.checkInDate} — {booking.checkOutDate}
                         </TableCell>
                         <TableCell className="text-gray-500 font-serif">
-                          {booking.totalAmount} zł
+                          {booking.totalAmount} {t('common.currency')}
                         </TableCell>
                         <TableCell>
                           <span className="text-[10px] uppercase tracking-widest font-bold text-gray-400">
-                            Zakończono
+                            {t('dashboard.status.ZAKONCZONA')}
                           </span>
                         </TableCell>
                         <TableCell className="text-right">
@@ -369,7 +352,7 @@ export const UserDashboard: React.FC = () => {
                               size="sm"
                               className="text-xs uppercase tracking-widest"
                             >
-                              Wystaw opinię
+                              {t('dashboard.history.leaveOpinionBtn')}
                             </Button>
                           ) : (
                             <span className="text-xs text-gray-400 italic">-</span>
@@ -387,12 +370,12 @@ export const UserDashboard: React.FC = () => {
         {/* No Bookings Case */}
         {bookings.length === 0 && (
           <div className="py-32 text-center">
-            <h3 className="text-3xl font-serif mb-6">Nie masz jeszcze żadnych rezerwacji</h3>
+            <h3 className="text-3xl font-serif mb-6">{t('dashboard.empty.title')}</h3>
             <Button
               onClick={() => navigate('/')}
               className="bg-primary text-primary-foreground rounded-none px-10 py-6 text-sm uppercase tracking-widest hover:bg-accent"
             >
-              Przeglądaj Apartamenty
+              {t('dashboard.empty.browseBtn')}
             </Button>
           </div>
         )}

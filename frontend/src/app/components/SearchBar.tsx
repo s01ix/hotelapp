@@ -4,7 +4,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { useApp } from '../context/AppContext';
 import { toast } from 'sonner';
-
+import { useTranslation } from 'react-i18next'; 
 
 interface SearchBarProps {
   onSearch?: () => void;
@@ -12,6 +12,8 @@ interface SearchBarProps {
 
 export const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
   const { searchRooms, isLoading } = useApp();
+  const { t } = useTranslation(); 
+  
   const [checkIn, setCheckIn] = useState('');
   const [checkOut, setCheckOut] = useState('');
   const [guests, setGuests] = useState(1);
@@ -20,17 +22,17 @@ export const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
 
   const handleSearch = async () => {
     if (!checkIn || !checkOut) {
-      toast.error('Proszę wybrać daty przyjazdu i wyjazdu.');
+      toast.error(t('searchBar.errors.datesRequired'));
       return;
     }
 
     if (checkIn < today) {
-      toast.error('Data przyjazdu nie może być wcześniejsza niż dzisiaj.');
+      toast.error(t('searchBar.errors.checkInPast'));
       return;
     }
 
     if(checkOut <= checkIn) {
-      toast.error('Data wyjazdu musi być późniejsza niż data przyjazdu.');
+      toast.error(t('searchBar.errors.checkOutBeforeCheckIn'));
       return;
     }
 
@@ -43,11 +45,10 @@ export const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
   return (
     <div className="bg-card border border-border p-6 w-full shadow-sm">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-4">
-        {/* Check-in Date */}
         <div className="space-y-2 flex flex-col">
           <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
             <Calendar className="h-4 w-4 text-primary" />
-            Data przyjazdu
+            {t('searchBar.checkIn')}
           </label>
           <Input
             type="date"
@@ -58,11 +59,10 @@ export const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
           />
         </div>
 
-        {}
         <div className="space-y-2 flex flex-col">
           <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
             <Calendar className="h-4 w-4 text-primary" />
-            Data wyjazdu
+            {t('searchBar.checkOut')}
           </label>
           <Input
             type="date"
@@ -73,11 +73,10 @@ export const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
           />
         </div>
 
-        {/* Number of Guests */}
         <div className="space-y-2 flex flex-col">
           <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
             <Users className="h-4 w-4 text-primary" />
-            Liczba gości
+            {t('searchBar.guests')}
           </label>
           <Input
             type="number"
@@ -97,11 +96,11 @@ export const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
             className="w-full bg-primary hover:bg-accent text-primary-foreground h-10 font-medium rounded-none transition-colors"
           >
             {isLoading ? (
-              'Szukam...'
+              t('searchBar.searching')
             ) : (
               <>
                 <Search className="h-4 w-4 mr-2" />
-                Szukaj
+                {t('searchBar.search')}
               </>
             )}
           </Button>

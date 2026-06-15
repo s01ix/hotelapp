@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import { ArrowLeft, Users, BedDouble, Check, Star, MessageSquare } from 'lucide-react';
+import { useTranslation } from 'react-i18next'; 
 import { Button } from '../components/ui/button';
 import { useApp } from '../context/AppContext';
 import { RoomDTO, fetchRoomById, fetchRoomOpinions, Opinion } from '../components/service/api';
 import { toast } from 'sonner';
 
 export const RoomDetails: React.FC = () => {
+  const { t, i18n } = useTranslation(); 
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { searchParams, isLoggedIn } = useApp();
@@ -32,13 +34,13 @@ export const RoomDetails: React.FC = () => {
         const data = await fetchRoomById(parseInt(id));
         setRoom(data);
       } catch (error) {
-        setError('Nie można załadować szczegółów pokoju');
+        setError(t('roomDetails.errors.loadDetails'));
       } finally {
         setLoading(false);
       }
     };
     loadRoom();
-  }, [id]);
+  }, [id, t]);
 
   useEffect(() => {
     const loadOpinions = async () => {
@@ -52,13 +54,13 @@ export const RoomDetails: React.FC = () => {
         
         setDisplayedOpinions(sorted.slice(0, 3));
       } catch (error) {
-        console.error('Błąd ładowania opinii:', error);
+        console.error(t('roomDetails.errors.loadOpinions'), error);
       } finally {
         setOpinionsLoading(false);
       }
     };
     loadOpinions();
-  }, [id]);
+  }, [id, t]);
 
   const toggleShowAllOpinions = () => {
     if (showAllOpinions) {
@@ -76,7 +78,7 @@ export const RoomDetails: React.FC = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background text-foreground">
-        <p className="text-xl text-muted-foreground animate-pulse">Ładowanie szczegółów pokoju...</p>
+        <p className="text-xl text-muted-foreground animate-pulse">{t('roomDetails.loadingRoom')}</p>
       </div>
     );
   }
@@ -85,25 +87,23 @@ export const RoomDetails: React.FC = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background text-foreground">
         <div className="text-center bg-card p-8 rounded-3xl shadow-sm">
-          <h2 className="text-2xl font-bold text-foreground mb-4">Nie znaleziono pokoju</h2>
+          <h2 className="text-2xl font-bold text-foreground mb-4">{t('roomDetails.notFound.title')}</h2>
           <p className="text-red-500 mb-6">{error}</p>
-          <Button onClick={() => navigate('/')}>Wróć do strony głównej</Button>
+          <Button onClick={() => navigate('/')}>{t('common.backToHome')}</Button>
         </div>
       </div>
     );
   }
 
-const handleBookNow = () => {
+  const handleBookNow = () => {
     if (!isLoggedIn) {
-      toast.error('Aby zarezerwować pokój, musisz się zalogować');
-
+      toast.error(t('roomDetails.toast.loginRequired'));
       navigate('/dashboard');
-
       return;
     }
 
     if (!searchParams) {
-      toast.error('Wybierz daty przyjazdu i wyjazdu');
+      toast.error(t('roomDetails.toast.datesRequired'));
       navigate('/');
       return;
     }
@@ -123,17 +123,15 @@ const handleBookNow = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Back Button */}
         <Button
           onClick={() => navigate('/')}
           variant="ghost"
           className="mb-6 hover:bg-muted"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Wróć do listy pokoi
+          {t('roomDetails.backToList')}
         </Button>
 
-        {/* Room Image */}
         <div className="relative h-96 rounded-xl overflow-hidden mb-8">
           <img
             src={currentImage}
@@ -141,7 +139,6 @@ const handleBookNow = () => {
             className="w-full h-full object-cover"
           />
           
-          {/* Średnia ocena na zdjęciu */}
           {averageRating && (
             <div className="absolute top-4 right-4 bg-card/95 backdrop-blur-sm px-4 py-2 rounded-lg shadow-lg flex items-center gap-2">
               <Star className="h-5 w-5 fill-amber-400 text-amber-400" />
@@ -152,14 +149,14 @@ const handleBookNow = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Room Details */}
           <div className="lg:col-span-2 space-y-6">
             <div>
               <h1 className="text-4xl font-bold text-gray-900 mb-2">{room.name}</h1>
               <div className="flex items-center gap-4">
-                <span className="text-lg text-gray-500 font-medium">Nr {room.roomNumber}</span>
+                <span className="text-lg text-gray-500 font-medium">
+                  {t('roomDetails.roomNumber', { number: room.roomNumber })}
+                </span>
                 
-                {/* Gwiazdki z oceną */}
                 {averageRating && (
                   <div className="flex items-center gap-2">
                     <div className="flex">
@@ -175,7 +172,7 @@ const handleBookNow = () => {
                       ))}
                     </div>
                     <span className="text-sm text-gray-600 font-medium">
-                      {averageRating} ({opinions.length} {opinions.length === 1 ? 'opinia' : 'opinii'})
+                      {averageRating} ({t('roomDetails.opinionsCount', { count: opinions.length })})
                     </span>
                   </div>
                 )}
@@ -186,21 +183,19 @@ const handleBookNow = () => {
               <p className="text-lg text-gray-600">{room.description}</p>
             </div>
 
-            {/* Room Info */}
             <div className="flex items-center gap-6 text-gray-700">
               <div className="flex items-center gap-2">
                 <Users className="h-5 w-5 text-[#1e3a8a]" />
-                <span>Do {room.maxGuests} osób</span>
+                <span>{t('roomDetails.maxGuests', { count: room.maxGuests })}</span>
               </div>
               <div className="flex items-center gap-2">
                 <BedDouble className="h-5 w-5 text-[#1e3a8a]" />
-                <span>{room.bedCount} łóżka</span>
+                <span>{t('roomDetails.beds', { count: room.bedCount })}</span>
               </div>
             </div>
 
-            {/* Amenities */}
             <div>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">Udogodnienia</h2>
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">{t('roomDetails.amenities.title')}</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {room.amenities && room.amenities.length > 0 ? (
                   room.amenities.map((amenityName, index) => (
@@ -212,32 +207,30 @@ const handleBookNow = () => {
                     </div>
                   ))
                 ) : (
-                  <p className="text-gray-500 italic">Brak informacji o udogodnieniach</p>
+                  <p className="text-gray-500 italic">{t('roomDetails.amenities.empty')}</p>
                 )}
               </div>
             </div>
 
-            {/* Additional Info */}
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-              <h3 className="font-semibold text-[#1e3a8a] mb-2">Ważne informacje</h3>
+              <h3 className="font-semibold text-[#1e3a8a] mb-2">{t('roomDetails.info.title')}</h3>
               <ul className="space-y-2 text-sm text-gray-700">
-                <li>• Zameldowanie: 15:00 | Wymeldowanie: 11:00</li>
-                <li>• Polityka anulowania: Darmowe anulowanie do 48h przed przyjazdem</li>
-                <li>• Zwierzęta nie są akceptowane</li>
-                <li>• Zakaz palenia we wszystkich pokojach</li>
+                <li>{t('roomDetails.info.checkInOut')}</li>
+                <li>{t('roomDetails.info.cancelPolicy')}</li>
+                <li>{t('roomDetails.info.noPets')}</li>
+                <li>{t('roomDetails.info.noSmoking')}</li>
               </ul>
             </div>
 
-            {/* SEKCJA OPINII */}
             {opinions.length > 0 && (
               <div className="border-t border-gray-200 pt-8 mt-8">
                 <h2 className="text-2xl font-semibold text-gray-900 mb-6 flex items-center gap-3">
                   <MessageSquare className="h-6 w-6 text-[#1e3a8a]" />
-                  Opinie gości ({opinions.length})
+                  {t('roomDetails.opinions.title', { count: opinions.length })}
                 </h2>
 
                 {opinionsLoading ? (
-                  <p className="text-gray-500 italic">Ładowanie opinii...</p>
+                  <p className="text-gray-500 italic">{t('roomDetails.opinions.loading')}</p>
                 ) : (
                   <div className="space-y-6">
                     {displayedOpinions.map((opinion) => (
@@ -245,26 +238,27 @@ const handleBookNow = () => {
                         key={opinion.id}
                         className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow"
                       >
-                        {/* Nagłówek opinii */}
                         <div className="flex items-start justify-between mb-3">
                           <div>
                             <div className="flex items-center gap-2 mb-1">
                               <span className="font-semibold text-gray-900">
-                                {opinion.userName || 'Gość'}
+                                {opinion.userName || t('roomDetails.opinions.guest')}
                               </span>
                               <span className="text-xs text-gray-400">•</span>
                               <span className="text-sm text-gray-500">
                                 {opinion.createdAt
-                                  ? new Date(opinion.createdAt).toLocaleDateString('pl-PL', {
-                                      year: 'numeric',
-                                      month: 'long',
-                                      day: 'numeric',
-                                    })
+                                  ? new Date(opinion.createdAt).toLocaleDateString(
+                                      i18n.language === 'pl' ? 'pl-PL' : 'en-US', 
+                                      {
+                                        year: 'numeric',
+                                        month: 'long',
+                                        day: 'numeric',
+                                      }
+                                    )
                                   : ''}
                               </span>
                             </div>
                             
-                            {/* Gwiazdki */}
                             <div className="flex gap-1">
                               {[1, 2, 3, 4, 5].map((star) => (
                                 <Star
@@ -280,7 +274,6 @@ const handleBookNow = () => {
                           </div>
                         </div>
 
-                        {/* Komentarz */}
                         {opinion.comment && (
                           <p className="text-gray-700 leading-relaxed mt-3">
                             "{opinion.comment}"
@@ -289,7 +282,6 @@ const handleBookNow = () => {
                       </div>
                     ))}
 
-                    {/* Przycisk "Pokaż więcej" / "Pokaż mniej" */}
                     {opinions.length > 5 && (
                       <div className="text-center pt-4">
                         <Button
@@ -298,8 +290,8 @@ const handleBookNow = () => {
                           className="px-8"
                         >
                           {showAllOpinions
-                            ? 'Pokaż mniej opinii'
-                            : `Pokaż wszystkie opinie (${opinions.length})`}
+                            ? t('roomDetails.opinions.showLess')
+                            : t('roomDetails.opinions.showAll', { count: opinions.length })}
                         </Button>
                       </div>
                     )}
@@ -308,51 +300,49 @@ const handleBookNow = () => {
               </div>
             )}
 
-            {/* Brak opinii */}
             {opinions.length === 0 && !opinionsLoading && (
               <div className="border-t border-gray-200 pt-8 mt-8">
                 <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 text-center">
                   <MessageSquare className="h-12 w-12 text-gray-300 mx-auto mb-3" />
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    Brak opinii
+                    {t('roomDetails.opinions.emptyTitle')}
                   </h3>
                   <p className="text-gray-500">
-                    Ten pokój nie ma jeszcze żadnych opinii. Bądź pierwszy!
+                    {t('roomDetails.opinions.emptyDesc')}
                   </p>
                 </div>
               </div>
             )}
           </div>
 
-          {/* Booking Card */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-lg p-6 sticky top-20">
               <div className="text-center mb-6">
                 <div className="text-4xl font-bold text-[#1e3a8a] mb-1">
-                  {room.basePrice} zł
+                  {room.basePrice} {t('common.currency')}
                 </div>
-                <div className="text-gray-600">za noc</div>
+                <div className="text-gray-600">{t('roomDetails.booking.perNight')}</div>
               </div>
 
               {searchParams && (
                 <div className="bg-gray-50 rounded-lg p-4 mb-6 space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Przyjazd:</span>
+                    <span className="text-gray-600">{t('roomDetails.booking.checkIn')}</span>
                     <span className="font-medium">{searchParams.checkIn}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Wyjazd:</span>
+                    <span className="text-gray-600">{t('roomDetails.booking.checkOut')}</span>
                     <span className="font-medium">{searchParams.checkOut}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Goście:</span>
+                    <span className="text-gray-600">{t('roomDetails.booking.guests')}</span>
                     <span className="font-medium">{searchParams.guests}</span>
                   </div>
                   <div className="border-t border-gray-200 pt-2 mt-2">
                     <div className="flex justify-between">
-                      <span className="font-semibold">Suma:</span>
+                      <span className="font-semibold">{t('roomDetails.booking.total')}</span>
                       <span className="font-bold text-[#1e3a8a]">
-                        {room.basePrice * nights} zł
+                        {room.basePrice * nights} {t('common.currency')}
                       </span>
                     </div>
                   </div>
@@ -363,12 +353,12 @@ const handleBookNow = () => {
                 onClick={handleBookNow}
                 className="w-full bg-amber-500 hover:bg-amber-600 text-white text-lg py-6"
               >
-                Zarezerwuj teraz
+                {t('roomDetails.booking.bookNowBtn')}
               </Button>
 
               {!searchParams && (
                 <p className="text-sm text-gray-500 text-center mt-4">
-                  Wybierz daty na stronie głównej, aby zobaczyć cenę całkowitą
+                  {t('roomDetails.booking.selectDatesPrompt')}
                 </p>
               )}
             </div>

@@ -3,16 +3,20 @@ import { Link, useNavigate } from 'react-router';
 import { User, LogOut, LayoutDashboard, ShieldCheck } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { Button } from './ui/button';
-import {Dialog,DialogContent,DialogDescription,DialogHeader,DialogTitle,} from './ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './ui/dialog';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { ThemeToggle } from './ThemeToggle';
+import { LanguageSwitcher } from './LanguageSwitcher'; 
+import { useTranslation } from 'react-i18next'; 
 
 
 export const Navbar: React.FC = () => {
-const { user, isLoggedIn, loginWithGoogle, loginWithEmail, registerWithEmail, logout } = useApp();
+  const { user, isLoggedIn, loginWithGoogle, loginWithEmail, registerWithEmail, logout } = useApp();
   const navigate = useNavigate();
-
+  
+  const { t } = useTranslation(); 
+  
   const [showLoginDialog, setShowLoginDialog] = useState(false);
   const [isLoginMode, setIsLoginMode] = useState(true);
 
@@ -76,6 +80,7 @@ const { user, isLoggedIn, loginWithGoogle, loginWithEmail, registerWithEmail, lo
             </Link>
 
             <div className="flex items-center gap-6">
+              <LanguageSwitcher />
               <ThemeToggle />
               {isLoggedIn ? (
                 <>
@@ -87,30 +92,29 @@ const { user, isLoggedIn, loginWithGoogle, loginWithEmail, registerWithEmail, lo
                   {user?.role === 'admin' || user?.role === 'ADMIN' ? (
                   <Button onClick={() => navigate('/admin')} variant="ghost" className="hover:text-accent">
                       <ShieldCheck className="h-4 w-4 mr-2" />
-                      Panel Admina
+                      {t('navbar.adminPanel')}
                   </Button>
                   ) : user?.role === 'receptionist' || user?.role === 'RECEPTIONIST' ? (
                   <Button onClick={() => navigate('/receptionist')} variant="ghost" className="hover:text-accent">
                       <ShieldCheck className="h-4 w-4 mr-2" />
-                      Panel Recepcjonisty
+                      {t('navbar.receptionPanel')}
                   </Button>
                     ) : (
                   <Button onClick={() => navigate('/dashboard')} variant="ghost" className="hover:text-accent">
                       <LayoutDashboard className="h-4 w-4 mr-2" />
-                      Rezerwacje
+                      {t('navbar.reservations')}
                   </Button>
                   )}
                   
                   <Button onClick={handleLogout} variant="outline" size="sm" className="rounded-none border-gray-300">
                     <LogOut className="h-4 w-4 mr-2" />
-                    Wyloguj
+                    {t('navbar.logout')}
                   </Button>
                 </>
               ) : (
                 <>
-                  {/* Kliknięcie teraz po prostu otwiera modal (okienko) */}
                   <Button onClick={() => setShowLoginDialog(true)} variant="ghost" className="text-sm hover:text-accent">
-                    Logowanie
+                    {t('navbar.login')}
                   </Button>
                   
                   <Button 
@@ -118,7 +122,7 @@ const { user, isLoggedIn, loginWithGoogle, loginWithEmail, registerWithEmail, lo
                     variant="ghost" 
                     className="text-sm hover:text-accent"
                   >
-                    Rejestracja
+                    {t('navbar.register')}
                   </Button>
                 </>
               )}
@@ -127,17 +131,16 @@ const { user, isLoggedIn, loginWithGoogle, loginWithEmail, registerWithEmail, lo
         </div>
       </nav>
 
-      {/* NASZE OKIENKO (MODAL) LOGOWANIA */}
       <Dialog open={showLoginDialog} onOpenChange={setShowLoginDialog}>
         <DialogContent className="sm:max-w-md rounded-none border-gray-200">
           <DialogHeader>
             <DialogTitle className="font-serif text-2xl">
-              {isLoginMode ? 'Zaloguj się' : 'Zarejestruj się'}
+              {isLoginMode ? t('auth.loginTitle') : t('auth.registerTitle')}
             </DialogTitle>
             <DialogDescription className="text-gray-500">
               {isLoginMode 
-                ? 'Użyj e-maila i hasła lub zaloguj się przez konto Google.' 
-                : 'Utwórz nowe konto, podając poniższe dane.'}
+                ? t('auth.loginDesc') 
+                : t('auth.registerDesc')}
             </DialogDescription>
           </DialogHeader>
 
@@ -151,17 +154,17 @@ const { user, isLoggedIn, loginWithGoogle, loginWithEmail, registerWithEmail, lo
               <>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="firstName" className="text-xs uppercase tracking-widest text-gray-500">Imię</Label>
+                    <Label htmlFor="firstName" className="text-xs uppercase tracking-widest text-gray-500">{t('auth.firstName')}</Label>
                     <Input
-                      id="firstName" type="text" placeholder="Jan"
+                      id="firstName" type="text" placeholder={t('auth.firstNamePlaceholder')}
                       value={name} onChange={(e) => setName(e.target.value)}
                       className="rounded-none border-gray-300 focus-visible:ring-accent" required={!isLoginMode}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="lastName" className="text-xs uppercase tracking-widest text-gray-500">Nazwisko</Label>
+                    <Label htmlFor="lastName" className="text-xs uppercase tracking-widest text-gray-500">{t('auth.lastName')}</Label>
                     <Input
-                      id="lastName" type="text" placeholder="Kowalski"
+                      id="lastName" type="text" placeholder={t('auth.lastNamePlaceholder')}
                       value={lastName} onChange={(e) => setLastName(e.target.value)}
                       className="rounded-none border-gray-300 focus-visible:ring-accent" required={!isLoginMode}
                     />
@@ -169,7 +172,7 @@ const { user, isLoggedIn, loginWithGoogle, loginWithEmail, registerWithEmail, lo
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="phone" className="text-xs uppercase tracking-widest text-gray-500">Telefon</Label>
+                  <Label htmlFor="phone" className="text-xs uppercase tracking-widest text-gray-500">{t('auth.phone')}</Label>
                   <Input
                     id="phone" type="tel" placeholder="123 456 789"
                     value={phone} onChange={(e) => setPhone(e.target.value)}
@@ -180,7 +183,7 @@ const { user, isLoggedIn, loginWithGoogle, loginWithEmail, registerWithEmail, lo
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-xs uppercase tracking-widest text-gray-500">Adres Email</Label>
+              <Label htmlFor="email" className="text-xs uppercase tracking-widest text-gray-500">{t('auth.email')}</Label>
               <Input
                 id="email" type="email" placeholder="jan@kowalski.pl"
                 value={email} onChange={(e) => setEmail(e.target.value)}
@@ -189,7 +192,7 @@ const { user, isLoggedIn, loginWithGoogle, loginWithEmail, registerWithEmail, lo
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-xs uppercase tracking-widest text-gray-500">Hasło</Label>
+              <Label htmlFor="password" className="text-xs uppercase tracking-widest text-gray-500">{t('auth.password')}</Label>
               <Input
                 id="password" type="password" placeholder="••••••••"
                 value={password} onChange={(e) => setPassword(e.target.value)}
@@ -198,7 +201,7 @@ const { user, isLoggedIn, loginWithGoogle, loginWithEmail, registerWithEmail, lo
             </div>
             
             <Button type="submit" className="w-full bg-primary hover:bg-accent text-primary-foreground rounded-none h-12 transition-colors">
-              {isLoginMode ? 'Zaloguj się' : 'Utwórz konto'}
+              {isLoginMode ? t('auth.loginBtn') : t('auth.registerBtn')}
             </Button>
           </form>
           
@@ -208,19 +211,17 @@ const { user, isLoggedIn, loginWithGoogle, loginWithEmail, registerWithEmail, lo
               onClick={() => { setIsLoginMode(!isLoginMode); setLoginError(null); }}
               className="text-sm text-gray-500 hover:text-accent underline underline-offset-4 transition-colors"
             >
-              {isLoginMode ? 'Nie masz konta? Zarejestruj się' : 'Masz już konto? Zaloguj się'}
+              {isLoginMode ? t('auth.noAccount') : t('auth.hasAccount')}
             </button>
           </div>
 
-          {/* ODDZIELNIK */}
           <div className="relative my-4">
             <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-gray-200" /></div>
             <div className="relative flex justify-center text-xs uppercase tracking-widest">
-              <span className="bg-white px-2 text-gray-500">LUB</span>
+              <span className="bg-white px-2 text-gray-500">{t('auth.or')}</span>
             </div>
           </div>
 
-          {/* LOGOWANIE GOOGLE */}
           <Button 
             type="button" 
             variant="outline" 
@@ -233,7 +234,7 @@ const { user, isLoggedIn, loginWithGoogle, loginWithEmail, registerWithEmail, lo
               <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
               <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
             </svg>
-            Kontynuuj z Google
+            {t('auth.continueWithGoogle')}
           </Button>
 
         </DialogContent>

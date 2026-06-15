@@ -2,27 +2,28 @@ import React from 'react';
 import { useNavigate } from 'react-router';
 import { ArrowLeft, Users, Building, Hotel } from 'lucide-react';
 import { Button } from '../components/ui/button';
+import { useTranslation } from 'react-i18next';
 
 export const AdminPanel: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const adminModules = [
     {
-      title: 'Zarządzanie Użytkownikami',
-      description: 'Zmieniaj role użytkowników (np. na Recepcjonistę).',
+      title: t('adminPanel.modules.users.title'),
+      description: t('adminPanel.modules.users.description'),
       icon: <Users className="h-8 w-8 text-primary mb-4" />,
       path: '/admin/users' 
     },
     {
-      title: 'Zarządzanie Pokojami',
-      description: 'Dodawaj nowe pokoje, edytuj zdjęcia, pojemność i opisy.',
+      title: t('adminPanel.modules.rooms.title'),
+      description: t('adminPanel.modules.rooms.description'),
       icon: <Building className="h-8 w-8 text-primary mb-4" />,
       path: '/admin/rooms'
     },
-
     {
-  title: 'Zarządzanie Hotelami',
-      description: 'Zarządzaj obiektami hotelowymi, nazwami i głównymi adresami.',
+      title: t('adminPanel.modules.hotels.title'),
+      description: t('adminPanel.modules.hotels.description'),
       icon: <Hotel className="h-8 w-8 text-primary mb-4" />, 
       path: '/admin/locations' 
     }
@@ -40,11 +41,11 @@ export const AdminPanel: React.FC = () => {
             className="mb-6 hover:text-accent p-0"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            <span className="text-xs uppercase tracking-widest">Wróć do serwisu</span>
+            <span className="text-xs uppercase tracking-widest">{t('adminPanel.backToSite')}</span>
           </Button>
-          <h1 className="text-5xl font-serif mb-2">Panel Administratora</h1>
+          <h1 className="text-5xl font-serif mb-2">{t('adminPanel.title')}</h1>
           <p className="text-gray-400 uppercase tracking-[0.2em] text-[10px]">
-            Konfiguracja główna systemu Luks
+            {t('adminPanel.subtitle')}
           </p>
         </div>
 

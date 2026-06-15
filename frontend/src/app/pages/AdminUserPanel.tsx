@@ -5,13 +5,14 @@ import { Button } from '../components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
 import { useApp } from '../context/AppContext';
 import { User, fetchAllUsers, updateUserRole } from '../components/service/api';
+import { useTranslation } from 'react-i18next';
 
 export const AdminUserPanel: React.FC = () => {
-  const { user} = useApp();
+  const { user } = useApp();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [usersList, setUsersList] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-
 
   const loadUsers = async () => {
     try {
@@ -33,7 +34,7 @@ export const AdminUserPanel: React.FC = () => {
       await updateUserRole(userId, newRole);
       await loadUsers();
     } catch (err) {
-      alert("Wystąpił błąd podczas zmiany roli.");
+      alert(t('adminUserPanel.errors.changeRole'));
     }
   };
 
@@ -52,29 +53,28 @@ export const AdminUserPanel: React.FC = () => {
         <div className="mb-12">
           <Button onClick={() => navigate('/admin')} variant="ghost" className="mb-6 hover:text-accent p-0">
             <ArrowLeft className="h-4 w-4 mr-2" />
-            <span className="text-xs uppercase tracking-widest">Wróć do Panelu Admina</span>
+            <span className="text-xs uppercase tracking-widest">{t('adminUserPanel.backToAdminPanel')}</span>
           </Button>
-          <h1 className="text-4xl font-serif mb-2">Zarządzanie Użytkownikami</h1>
-          <p className="text-gray-400 uppercase tracking-[0.2em] text-[10px]">Zarządzanie uprawnieniami personelu</p>
+          <h1 className="text-4xl font-serif mb-2">{t('adminUserPanel.title')}</h1>
+          <p className="text-gray-400 uppercase tracking-[0.2em] text-[10px]">{t('adminUserPanel.subtitle')}</p>
         </div>
 
         {isLoading ? (
-          <p className="text-center py-10 text-gray-500">Ładowanie użytkowników...</p>
+          <p className="text-center py-10 text-gray-500">{t('adminUserPanel.loading')}</p>
         ) : (
           <div className="bg-white border border-gray-100">
             <Table>
               <TableHeader>
                 <TableRow className="hover:bg-transparent border-b border-gray-100">
-                  <TableHead className="text-[10px] uppercase tracking-widest font-bold text-gray-400">ID</TableHead>
-                  <TableHead className="text-[10px] uppercase tracking-widest font-bold text-gray-400">Email</TableHead>
-                  <TableHead className="text-[10px] uppercase tracking-widest font-bold text-gray-400">Imię</TableHead>
-                  <TableHead className="text-[10px] uppercase tracking-widest font-bold text-gray-400">Aktualna Rola</TableHead>
-                  <TableHead className="text-[10px] uppercase tracking-widest font-bold text-gray-400 text-right">Zmień rolę na:</TableHead>
+                  <TableHead className="text-[10px] uppercase tracking-widest font-bold text-gray-400">{t('adminUserPanel.table.id')}</TableHead>
+                  <TableHead className="text-[10px] uppercase tracking-widest font-bold text-gray-400">{t('adminUserPanel.table.email')}</TableHead>
+                  <TableHead className="text-[10px] uppercase tracking-widest font-bold text-gray-400">{t('adminUserPanel.table.name')}</TableHead>
+                  <TableHead className="text-[10px] uppercase tracking-widest font-bold text-gray-400">{t('adminUserPanel.table.currentRole')}</TableHead>
+                  <TableHead className="text-[10px] uppercase tracking-widest font-bold text-gray-400 text-right">{t('adminUserPanel.table.changeRoleTo')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {usersList.map((u) => {
-                  // Sprawdzamy, czy ten wiersz to konto obecnie zalogowanego admina
                   const isMe = u.id === user?.id;
 
                   return (
@@ -90,12 +90,10 @@ export const AdminUserPanel: React.FC = () => {
                       </TableCell>
                       <TableCell className="text-right space-x-2">
                         {isMe ? (
-                          // Zabezpieczenie: jeśli to moje własne konto, wyświetlam tylko tekst, bez przycisków!
                           <span className="text-[10px] uppercase tracking-widest font-bold text-gray-300 italic pr-4">
-                            Twoje konto
+                            {t('adminUserPanel.yourAccount')}
                           </span>
                         ) : (
-                          // Jeśli to jakikolwiek inny użytkownik, pokazujemy przyciski USER / RECEPCJA
                           <>
                             <Button 
                               onClick={() => handleRoleChange(u.id, 'USER')} 
