@@ -24,7 +24,12 @@
     "noAccount": "Nie masz konta? Zarejestruj się",
     "hasAccount": "Masz już konto? Zaloguj się",
     "or": "LUB",
-    "continueWithGoogle": "Kontynuuj z Google"
+    "continueWithGoogle": "Kontynuuj z Google",
+    "errors": {
+      "fieldRequired": "Pole jest wymagane",
+      "emailRequired": "Email jest wymagany",
+      "passwordRequired": "Hasło jest wymagane"
+    }
   },
   "opinionForm": {
     "title": "Oceń swój pobyt",
@@ -122,6 +127,14 @@
         "country": "Polska"
       }
     }
+    ,
+    "form": {
+      "errors": {
+        "fieldRequired": "Pole jest wymagane",
+        "emailRequired": "Email jest wymagany",
+        "phoneRequired": "Telefon jest wymagany"
+      }
+    }
   },
   "adminPanel": {
     "title": "Panel Administratora",
@@ -192,7 +205,12 @@
       "guestDetails": "Dane gościa",
       "fullName": "Imię i Nazwisko",
       "email": "Adres E-mail",
-      "phone": "Numer telefonu"
+      "phone": "Numer telefonu",
+      "errors": {
+        "fullNameRequired": "Imię i nazwisko jest wymagane",
+        "emailInvalid": "Podaj poprawny adres email",
+        "phoneInvalid": "Podaj prawidłowy numer telefonu"
+      }
     },
     "payment": {
       "title": "Metoda płatności",
@@ -268,6 +286,13 @@
         "hotel": "Hotel / Lokalizacja",
         "saveRoom": "Zapisz Pokój"
       },
+        "form": {
+          "errors": {
+            "required": "Wymagane",
+            "minOne": "Wymagane (min. 1)",
+            "minZero": "Wymagane (min. 0)"
+          }
+        },
       "amenities": {
         "title": "Udogodnienia",
         "addNew": "Dodaj nowe",

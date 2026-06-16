@@ -27,6 +27,20 @@ import {
   deleteLocation
 } from '../components/service/api';
 import { useTranslation } from 'react-i18next';
+import { useForm} from 'react-hook-form';
+
+interface AdminFormValues {
+  name: string;
+  description: string;
+  email: string;
+  phone: string;
+  stars: number;
+  street: string;
+  buildingNumber: string;
+  city: string;
+  postalCode: string;
+  country: string;
+}
 
 export const AdminLocationsPanel: React.FC = () => {
   const { user } = useApp();
@@ -40,14 +54,12 @@ export const AdminLocationsPanel: React.FC = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingHotelId, setEditingHotelId] = useState<number | null>(null);
   const [editingLocationId, setEditingLocationId] = useState<number | null>(null);
-
-  const [hotelFormData, setHotelFormData] = useState<Partial<HotelDTO>>({
-    name: '', description: '', stars: 3, email: '', phone: ''
-  });
-
-  const [locationFormData, setLocationFormData] = useState<Partial<LocationDTO>>({
-    street: '', buildingNumber: '', city: '', postalCode: '', country: 'Polska'
-  });
+  const { 
+    register, 
+    handleSubmit, 
+    reset, 
+    formState: { errors } 
+  } = useForm<AdminFormValues>();
 
   const loadData = async () => {
     setIsLoading(true);
@@ -72,39 +84,61 @@ export const AdminLocationsPanel: React.FC = () => {
   const handleOpenDialog = (hotel?: HotelDTO) => {
     if (hotel) {
       setEditingHotelId(hotel.id);
-      setHotelFormData({ ...hotel });
-      
       const location = locationsList.find(l => l.id === hotel.locationId);
-      if (location) {
-        setEditingLocationId(location.id);
-        setLocationFormData({ ...location });
-      }
+      setEditingLocationId(location ? location.id : null);
+      
+      reset({
+        name: hotel.name || '',
+        description: hotel.description || '',
+        email: hotel.email || '',
+        phone: hotel.phone || '',
+        stars: hotel.stars || 3,
+        street: location?.street || '',
+        buildingNumber: location?.buildingNumber || '',
+        city: location?.city || '',
+        postalCode: location?.postalCode || '',
+        country: location?.country || 'Polska',
+      });
     } else {
       setEditingHotelId(null);
       setEditingLocationId(null);
-      setHotelFormData({
-        name: '', description: '', stars: 3, email: '', phone: ''
-      });
-      setLocationFormData({
+
+      reset({
+        name: '', description: '', email: '', phone: '', stars: 3,
         street: '', buildingNumber: '', city: '', postalCode: '', country: 'Polska'
       });
     }
     setIsDialogOpen(true);
   };
 
-  const handleSave = async () => {
+const onSubmit = async (data: AdminFormValues) => {
     try {
       let locationId: number;
 
+      const locationData: Partial<LocationDTO> = {
+        street: data.street,
+        buildingNumber: data.buildingNumber,
+        city: data.city,
+        postalCode: data.postalCode,
+        country: data.country
+      };
+
       if (editingLocationId) {
-        await updateLocation(editingLocationId, locationFormData as LocationDTO);
+        await updateLocation(editingLocationId, locationData as LocationDTO);
         locationId = editingLocationId;
       } else {
-        const newLocation = await createLocation(locationFormData as LocationDTO);
+        const newLocation = await createLocation(locationData as LocationDTO);
         locationId = newLocation.id;
       }
 
-      const hotelData = { ...hotelFormData, locationId };
+      const hotelData: Partial<HotelDTO> = {
+        name: data.name,
+        description: data.description,
+        email: data.email,
+        phone: data.phone,
+        stars: Number(data.stars), 
+        locationId: locationId
+      };
       
       if (editingHotelId) {
         await updateHotel(editingHotelId, hotelData as HotelDTO);
@@ -146,24 +180,13 @@ export const AdminLocationsPanel: React.FC = () => {
     }
   };
 
-  const handleHotelChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value, type } = e.target;
-    const isNumber = type === 'number';
-    setHotelFormData(prev => ({ ...prev, [name]: isNumber ? Number(value) : value }));
-  };
-
-  const handleLocationChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setLocationFormData(prev => ({ ...prev, [name]: value }));
-  };
-
   const getLocationString = (locationId?: number) => {
     const loc = locationsList.find(l => l.id === locationId);
     if (!loc) return t('adminLocations.noAddress');
     return `${loc.city}, ul. ${loc.street} ${loc.buildingNumber}`;
   };
 
-  return (
+    return (
     <div className="min-h-screen bg-background text-foreground py-12">
       <div className="container mx-auto px-4 max-w-6xl">
         <Button variant="ghost" className="mb-6 -ml-4" onClick={() => navigate('/admin')}>
@@ -235,78 +258,122 @@ export const AdminLocationsPanel: React.FC = () => {
           <DialogHeader>
             <DialogTitle>{editingHotelId ? t('adminLocations.dialog.editTitle') : t('adminLocations.dialog.addTitle')}</DialogTitle>
           </DialogHeader>
-          <div className="grid gap-6 py-4">
-            <div className="space-y-4">
-              <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 border-b pb-2">
-                <Building className="h-4 w-4" />
-                <span>{t('adminLocations.dialog.hotelData')}</span>
-              </div>
-              
-              <div className="space-y-2">
-                <Label>{t('adminLocations.dialog.hotelName')}</Label>
-                <Input name="name" value={hotelFormData.name} onChange={handleHotelChange} placeholder={t('adminLocations.dialog.placeholders.name')} />
-              </div>
-              
-              <div className="space-y-2">
-                <Label>{t('adminLocations.dialog.description')}</Label>
-                <Textarea name="description" value={hotelFormData.description} onChange={handleHotelChange} rows={3} placeholder={t('adminLocations.dialog.placeholders.description')} />
-              </div>
-              
-              <div className="grid grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <Label>{t('adminLocations.dialog.email')}</Label>
-                  <Input name="email" type="email" value={hotelFormData.email} onChange={handleHotelChange} placeholder={t('adminLocations.dialog.placeholders.email')} />
+          <form onSubmit={handleSubmit(onSubmit)} className="grid gap-6 py-4">
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 border-b pb-2">
+                  <Building className="h-4 w-4" />
+                  <span>{t('adminLocations.dialog.hotelData')}</span>
                 </div>
+                
                 <div className="space-y-2">
-                  <Label>{t('adminLocations.dialog.phone')}</Label>
-                  <Input name="phone" value={hotelFormData.phone} onChange={handleHotelChange} placeholder={t('adminLocations.dialog.placeholders.phone')} />
+                  <Label>{t('adminLocations.dialog.hotelName')} *</Label>
+                  <Input 
+                    {...register('name', { required: true, minLength: 3 })} 
+                    placeholder={t('adminLocations.dialog.placeholders.name')} 
+                  />
+                  {errors.name && <span className="text-red-500 dark:text-red-400 text-xs">{t('adminLocations.form.errors.fieldRequired')}</span>}
                 </div>
+                
                 <div className="space-y-2">
-                  <Label>{t('adminLocations.dialog.stars')}</Label>
-                  <Input name="stars" type="number" min="1" max="5" value={hotelFormData.stars} onChange={handleHotelChange} />
+                  <Label>{t('adminLocations.dialog.description')} *</Label>
+                  <Textarea 
+                    {...register('description', { required: true })} 
+                    rows={1} 
+                    placeholder={t('adminLocations.dialog.placeholders.description')} 
+                  />
+                  {errors.description && <span className="text-red-500 dark:text-red-400 text-xs">{t('adminLocations.form.errors.fieldRequired')}</span>}
+                </div>
+                
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <Label>{t('adminLocations.dialog.email')} *</Label>
+                    <Input 
+                      type="email" 
+                      {...register('email', { required: true })} 
+                      placeholder={t('adminLocations.dialog.placeholders.email')} 
+                    />
+                    {errors.email && <span className="text-red-500 dark:text-red-400 text-xs">{t('adminLocations.form.errors.emailRequired')}</span>}
+                  </div>
+                  <div className="space-y-2">
+                    <Label>{t('adminLocations.dialog.phone')} *</Label>
+                    <Input 
+                      {...register('phone', { required: true })} 
+                      placeholder={t('adminLocations.dialog.placeholders.phone')} 
+                    />
+                    {errors.phone && <span className="text-red-500 dark:text-red-400 text-xs">{t('adminLocations.form.errors.phoneRequired')}</span>}
+                  </div>
+                  <div className="space-y-2">
+                    <Label>{t('adminLocations.dialog.stars')} *</Label>
+                    <Input 
+                      type="number" 
+                      {...register('stars', { required: true, min: 1, max: 5 })} 
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className="space-y-4">
-              <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 border-b pb-2">
-                <MapPin className="h-4 w-4" />
-                <span>{t('adminLocations.dialog.locationData')}</span>
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 border-b pb-2">
+                  <MapPin className="h-4 w-4" />
+                  <span>{t('adminLocations.dialog.locationData')}</span>
+                </div>
+                
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="space-y-2 col-span-2">
+                    <Label>{t('adminLocations.dialog.street')} *</Label>
+                    <Input 
+                      {...register('street', { required: true })} 
+                      placeholder={t('adminLocations.dialog.placeholders.street')} 
+                    />
+                    {errors.street && <span className="text-red-500 dark:text-red-400 text-xs">{t('adminLocations.form.errors.fieldRequired')}</span>}
+                  </div>
+                  <div className="space-y-2">
+                    <Label>{t('adminLocations.dialog.buildingNumber')} *</Label>
+                    <Input 
+                      {...register('buildingNumber', { required: true })} 
+                      placeholder={t('adminLocations.dialog.placeholders.buildingNumber')} 
+                    />
+                    {errors.buildingNumber && <span className="text-red-500 dark:text-red-400 text-xs">{t('adminLocations.form.errors.fieldRequired')}</span>}
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>{t('adminLocations.dialog.city')} *</Label>
+                    <Input 
+                      {...register('city', { required: true })} 
+                      placeholder={t('adminLocations.dialog.placeholders.city')} 
+                    />
+                    {errors.city && <span className="text-red-500 dark:text-red-400 text-xs">{t('adminLocations.form.errors.fieldRequired')}</span>}
+                  </div>
+                  <div className="space-y-2">
+                    <Label>{t('adminLocations.dialog.postalCode')} *</Label>
+                    <Input 
+                      {...register('postalCode', { required: true })} 
+                      placeholder={t('adminLocations.dialog.placeholders.postalCode')} 
+                    />
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>{t('adminLocations.dialog.country')} *</Label>
+                  <Input 
+                    {...register('country', { required: true })} 
+                    placeholder={t('adminLocations.dialog.placeholders.country')} 
+                  />
+                </div>
               </div>
               
-              <div className="grid grid-cols-3 gap-4">
-                <div className="space-y-2 col-span-2">
-                  <Label>{t('adminLocations.dialog.street')}</Label>
-                  <Input name="street" value={locationFormData.street} onChange={handleLocationChange} placeholder={t('adminLocations.dialog.placeholders.street')} />
-                </div>
-                <div className="space-y-2">
-                  <Label>{t('adminLocations.dialog.buildingNumber')}</Label>
-                  <Input name="buildingNumber" value={locationFormData.buildingNumber} onChange={handleLocationChange} placeholder={t('adminLocations.dialog.placeholders.buildingNumber')} />
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>{t('adminLocations.dialog.city')}</Label>
-                  <Input name="city" value={locationFormData.city} onChange={handleLocationChange} placeholder={t('adminLocations.dialog.placeholders.city')} />
-                </div>
-                <div className="space-y-2">
-                  <Label>{t('adminLocations.dialog.postalCode')}</Label>
-                  <Input name="postalCode" value={locationFormData.postalCode} onChange={handleLocationChange} placeholder={t('adminLocations.dialog.placeholders.postalCode')} />
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <Label>{t('adminLocations.dialog.country')}</Label>
-                <Input name="country" value={locationFormData.country} onChange={handleLocationChange} placeholder={t('adminLocations.dialog.placeholders.country')} />
-              </div>
-            </div>
-          </div>
-          
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>{t('adminLocations.dialog.cancel')}</Button>
-            <Button onClick={handleSave} className="bg-primary text-primary-foreground">{t('adminLocations.dialog.save')}</Button>
-          </DialogFooter>
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+                  {t('adminLocations.dialog.cancel')}
+                </Button>
+                <Button type="submit" className="bg-primary text-primary-foreground">
+                  {t('adminLocations.dialog.save')}
+                </Button>
+              </DialogFooter>
+
+            </form>
         </DialogContent>
       </Dialog>
     </div>

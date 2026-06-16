@@ -8,6 +8,14 @@ import { Label } from '../components/ui/label';
 import { RadioGroup, RadioGroupItem } from '../components/ui/radio-group';
 import { useApp } from '../context/AppContext';
 import { BookingDTO, createBooking, createPayment, RoomDTO } from '../components/service/api';
+import { useForm} from 'react-hook-form';
+
+interface CheckoutFormValues {
+  fullName: string;
+  email: string;
+  phone: string;
+  paymentMethod: 'online' | 'offline';
+}
 
 export const Checkout: React.FC = () => {
   const { t } = useTranslation(); 
@@ -19,11 +27,23 @@ export const Checkout: React.FC = () => {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const [paymentMethod, setPaymentMethod] = useState<'online' | 'offline'>('online');
-  const [fullName, setFullName] = useState(user?.name || '');
-  const [email, setEmail] = useState(user?.email || '');
-  const [phone, setPhone] = useState('');
+  
+  const { 
+    register, 
+    handleSubmit, 
+    watch, 
+    setValue, 
+    formState: { errors } 
+  } = useForm<CheckoutFormValues>({
+    defaultValues: {
+      fullName: user?.name || '',
+      email: user?.email || '',
+      phone: '',
+      paymentMethod: 'online' 
+    }
+  });
+  
+  const currentPaymentMethod = watch('paymentMethod');
 
   if (!room || !searchParams) {
     return (
@@ -48,9 +68,7 @@ export const Checkout: React.FC = () => {
 
   const placeholderImage = "https://images.unsplash.com/photo-1611892440504-42a792e24d32?q=80&w=1080";
 
-  const handleConfirmBooking = async (e: React.FormEvent) => {
-    e.preventDefault();
-
+  const onSubmit = async (data: CheckoutFormValues) => {
     try {
       setLoading(true);
       setError(null);
@@ -62,12 +80,12 @@ export const Checkout: React.FC = () => {
         checkOutDate: searchParams.checkOut,
         adults: searchParams.guests,
         children: 0,
-        notes: `${t('checkout.form.phone')}: ${phone}. ${t('checkout.payment.method')}: ${paymentMethod}`,
+        notes: `${t('checkout.form.phone')}: ${data.phone}. ${t('checkout.payment.method')}: ${data.paymentMethod}`,
       };
 
       const createdBooking = await createBooking(bookingData);
 
-      if (paymentMethod === 'online') {
+      if (data.paymentMethod === 'online') {
         const paymentData = {
           bookingId: createdBooking.id,
           amount: createdBooking.totalAmount || totalPrice,
@@ -104,7 +122,7 @@ export const Checkout: React.FC = () => {
         
         <h1 className="text-5xl font-serif mb-12">{t('checkout.title')}</h1>
 
-        <form onSubmit={handleConfirmBooking}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             <div className="lg:col-span-2 space-y-12">
               
@@ -130,53 +148,54 @@ export const Checkout: React.FC = () => {
               <section>
                 <h2 className="text-xl font-serif mb-6 border-b border-gray-100 pb-2">{t('checkout.form.guestDetails')}</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+ 
                   <div className="space-y-2">
                     <Label className="text-xs uppercase tracking-widest text-gray-500">{t('checkout.form.fullName')}</Label>
                     <Input
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
+                      {...register('fullName', { required: true, minLength: 3 })}
                       className="rounded-none border-gray-300 focus-visible:ring-accent"
-                      required
                     />
+                    {errors.fullName && <span className="text-red-500 dark:text-red-400 text-xs mt-1 block">{t('checkout.form.errors.fullNameRequired')}</span>}
                   </div>
+
                   <div className="space-y-2">
                     <Label className="text-xs uppercase tracking-widest text-gray-500">{t('checkout.form.email')}</Label>
                     <Input
                       type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      {...register('email', { required: true, pattern: /^\S+@\S+$/i })}
                       className="rounded-none border-gray-300 focus-visible:ring-accent"
-                      required
                     />
+                    {errors.email && <span className="text-red-500 dark:text-red-400 text-xs mt-1 block">{t('checkout.form.errors.emailInvalid')}</span>}
                   </div>
                 </div>
+
                 <div className="mt-6 space-y-2">
                   <Label className="text-xs uppercase tracking-widest text-gray-500">{t('checkout.form.phone')}</Label>
                   <Input
                     type="tel"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
                     placeholder="+48 000 000 000"
+                    {...register('phone', { required: true, minLength: 9 })}
                     className="rounded-none border-gray-300 focus-visible:ring-accent"
-                    required
                   />
+                  {errors.phone && <span className="text-red-500 dark:text-red-400 text-xs mt-1 block">{t('checkout.form.errors.phoneInvalid')}</span>}
                 </div>
               </section>
 
               <section>
                 <h2 className="text-xl font-serif mb-6 border-b border-gray-100 pb-2">{t('checkout.payment.title')}</h2>
+ 
                 <RadioGroup
-                  value={paymentMethod}
-                  onValueChange={(value) => setPaymentMethod(value as 'online' | 'offline')}
+                  value={currentPaymentMethod}
+                  onValueChange={(value) => setValue('paymentMethod', value as 'online' | 'offline')}
                   className="grid grid-cols-1 md:grid-cols-2 gap-4"
                 >
                   <div
                     className={`p-6 border cursor-pointer transition-all ${
-                      paymentMethod === 'online'
+                      currentPaymentMethod === 'online'
                         ? 'border-primary bg-secondary'
                         : 'border-border hover:border-border bg-card'
                     }`}
-                    onClick={() => setPaymentMethod('online')}
+                    onClick={() => setValue('paymentMethod', 'online')}
                   >
                     <div className="flex items-center gap-3 mb-4">
                       <RadioGroupItem value="online" id="online" />
@@ -190,11 +209,11 @@ export const Checkout: React.FC = () => {
 
                   <div
                     className={`p-6 border cursor-pointer transition-all ${
-                      paymentMethod === 'offline'
-                        ? 'border-primary bg-gray-50'
-                        : 'border-gray-100 hover:border-gray-200 bg-white'
+                      currentPaymentMethod === 'offline'
+                        ? 'border-primary bg-gray-50 dark:bg-gray-800'
+                        : 'border-gray-100 hover:border-gray-200 bg-white dark:bg-gray-900'
                     }`}
-                    onClick={() => setPaymentMethod('offline')}
+                    onClick={() => setValue('paymentMethod', 'offline')}
                   >
                     <div className="flex items-center gap-3 mb-4">
                       <RadioGroupItem value="offline" id="offline" />
@@ -207,13 +226,13 @@ export const Checkout: React.FC = () => {
                   </div>
                 </RadioGroup>
 
-                {paymentMethod === 'offline' && (
+                {currentPaymentMethod === 'offline' && (
                   <div className="mt-6 p-6 border border-border bg-card">
                     <p className="text-[10px] uppercase tracking-widest text-accent mb-4 font-bold">{t('checkout.payment.transferDetails')}</p>
                     <div className="space-y-1 text-sm text-gray-600 font-mono">
                       <p>Nr: 88 1020 4444 0000 1234 5678 9000</p>
                       <p>Luks Search</p>
-                      <p>{t('checkout.payment.transferTitle', { roomName: room.name.slice(0, 10), fullName })}</p>
+                      <p>{t('checkout.payment.transferTitle', { roomName: room.name.slice(0, 10), fullName: watch('fullName') })}</p>
                     </div>
                   </div>
                 )}
@@ -250,7 +269,7 @@ export const Checkout: React.FC = () => {
                   </div>
 
                   {error && (
-                    <div className="bg-red-50 text-red-600 p-3 rounded-md mb-4 border border-red-200 text-sm">
+                    <div className="bg-red-50 dark:bg-red-900/10 text-red-600 dark:text-red-400 p-3 rounded-md mb-4 border border-red-200 dark:border-red-800/50 text-sm">
                       <strong>{t('common.error')}: </strong> {error}
                     </div>
                   )}

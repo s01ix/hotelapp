@@ -24,7 +24,12 @@
     "noAccount": "Don't have an account? Sign up",
     "hasAccount": "Already have an account? Log in",
     "or": "OR",
-    "continueWithGoogle": "Continue with Google"
+    "continueWithGoogle": "Continue with Google",
+    "errors": {
+      "fieldRequired": "This field is required",
+      "emailRequired": "Email is required",
+      "passwordRequired": "Password is required"
+    }
   },
   "opinionForm": {
     "title": "Rate your stay",
@@ -122,6 +127,14 @@
         "country": "USA"
       }
     }
+      ,
+      "form": {
+        "errors": {
+          "fieldRequired": "This field is required",
+          "emailRequired": "Email is required",
+          "phoneRequired": "Phone is required"
+        }
+      }
   },
   "adminPanel": {
     "title": "Administrator Panel",
@@ -190,7 +203,12 @@
       "guestDetails": "Guest details",
       "fullName": "Full Name",
       "email": "Email Address",
-      "phone": "Phone number"
+      "phone": "Phone number",
+      "errors": {
+        "fullNameRequired": "Full name is required",
+        "emailInvalid": "Please enter a valid email address",
+        "phoneInvalid": "Please enter a valid phone number"
+      }
     },
     "payment": {
       "title": "Payment method",
@@ -262,6 +280,13 @@
         "hotel": "Hotel / Location",
         "saveRoom": "Save Room"
       },
+        "form": {
+          "errors": {
+            "required": "Required",
+            "minOne": "Required (min. 1)",
+            "minZero": "Required (min. 0)"
+          }
+        },
       "amenities": {
         "title": "Amenities",
         "addNew": "Add new",

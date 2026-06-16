@@ -212,7 +212,7 @@ export const RoomDetails: React.FC = () => {
               </div>
             </div>
 
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+            <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
               <h3 className="font-semibold text-[#1e3a8a] mb-2">{t('roomDetails.info.title')}</h3>
               <ul className="space-y-2 text-sm text-gray-700">
                 <li>{t('roomDetails.info.checkInOut')}</li>

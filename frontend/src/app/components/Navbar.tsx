@@ -9,6 +9,15 @@ import { Label } from './ui/label';
 import { ThemeToggle } from './ThemeToggle';
 import { LanguageSwitcher } from './LanguageSwitcher'; 
 import { useTranslation } from 'react-i18next'; 
+import { useForm } from 'react-hook-form';
+
+interface AuthFormValues {
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+  email: string;
+  password: string;
+}
 
 
 export const Navbar: React.FC = () => {
@@ -19,46 +28,39 @@ export const Navbar: React.FC = () => {
   
   const [showLoginDialog, setShowLoginDialog] = useState(false);
   const [isLoginMode, setIsLoginMode] = useState(true);
-
-  const [name, setName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState<string | null>(null);
+
+  const { 
+    register, 
+    handleSubmit, 
+    reset, 
+    formState: { errors } 
+  } = useForm<AuthFormValues>();
 
   const handleOpenChange = (open: boolean) => {
     setShowLoginDialog(open);
     if (!open) {
       setIsLoginMode(true);
       setLoginError(null);
-      setName(''); setLastName(''); setPhone(''); setEmail(''); setPassword('');
+      reset();
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+const onSubmit = async (data: AuthFormValues) => {
     setLoginError(null);
     try {
       if (isLoginMode) {
-        await loginWithEmail(email, password);
+        await loginWithEmail(data.email, data.password);
       } else {
-        await registerWithEmail(name, lastName, email, password, phone);
+        await registerWithEmail(
+          data.firstName || '', 
+          data.lastName || '', 
+          data.email, 
+          data.password, 
+          data.phone || ''
+        );
       }
       handleOpenChange(false);
-    } catch (err: any) {
-      setLoginError(err.message);
-    }
-  };
-
-  const handleEmailLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoginError(null);
-    try {
-      await loginWithEmail(email, password);
-      setShowLoginDialog(false);
-      setEmail('');
-      setPassword('');
     } catch (err: any) {
       setLoginError(err.message);
     }
@@ -144,9 +146,9 @@ export const Navbar: React.FC = () => {
             </DialogDescription>
           </DialogHeader>
 
-          <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-4">
             {loginError && (
-              <div className="text-red-500 text-sm font-medium p-2 bg-red-50 border border-red-200 text-center">
+              <div className="text-red-500 dark:text-red-400 text-sm font-medium p-2 bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800/50 text-center">
                 {loginError}
               </div>
             )}
@@ -157,17 +159,19 @@ export const Navbar: React.FC = () => {
                     <Label htmlFor="firstName" className="text-xs uppercase tracking-widest text-gray-500">{t('auth.firstName')}</Label>
                     <Input
                       id="firstName" type="text" placeholder={t('auth.firstNamePlaceholder')}
-                      value={name} onChange={(e) => setName(e.target.value)}
-                      className="rounded-none border-gray-300 focus-visible:ring-accent" required={!isLoginMode}
+                      {...register('firstName', { required: !isLoginMode })}
+                      className="rounded-none border-gray-300 focus-visible:ring-accent"
                     />
+                    {errors.firstName && <span className="text-red-500 dark:text-red-400 text-xs">{t('auth.errors.fieldRequired')}</span>}
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="lastName" className="text-xs uppercase tracking-widest text-gray-500">{t('auth.lastName')}</Label>
                     <Input
                       id="lastName" type="text" placeholder={t('auth.lastNamePlaceholder')}
-                      value={lastName} onChange={(e) => setLastName(e.target.value)}
-                      className="rounded-none border-gray-300 focus-visible:ring-accent" required={!isLoginMode}
+                      {...register('lastName', { required: !isLoginMode })}
+                      className="rounded-none border-gray-300 focus-visible:ring-accent"
                     />
+                    {errors.lastName && <span className="text-red-500 dark:text-red-400 text-xs">{t('auth.errors.fieldRequired')}</span>}
                   </div>
                 </div>
                 
@@ -175,9 +179,10 @@ export const Navbar: React.FC = () => {
                   <Label htmlFor="phone" className="text-xs uppercase tracking-widest text-gray-500">{t('auth.phone')}</Label>
                   <Input
                     id="phone" type="tel" placeholder="123 456 789"
-                    value={phone} onChange={(e) => setPhone(e.target.value)}
-                    className="rounded-none border-gray-300 focus-visible:ring-accent" required={!isLoginMode}
+                    {...register('phone', { required: !isLoginMode })}
+                    className="rounded-none border-gray-300 focus-visible:ring-accent"
                   />
+                  {errors.phone && <span className="text-red-500 dark:text-red-400 text-xs">{t('auth.errors.fieldRequired')}</span>}
                 </div>
               </>
             )}
@@ -186,18 +191,20 @@ export const Navbar: React.FC = () => {
               <Label htmlFor="email" className="text-xs uppercase tracking-widest text-gray-500">{t('auth.email')}</Label>
               <Input
                 id="email" type="email" placeholder="jan@kowalski.pl"
-                value={email} onChange={(e) => setEmail(e.target.value)}
-                className="rounded-none border-gray-300 focus-visible:ring-accent" required
+                {...register('email', { required: true })}
+                className="rounded-none border-gray-300 focus-visible:ring-accent"
               />
+              {errors.email && <span className="text-red-500 dark:text-red-400 text-xs">{t('auth.errors.emailRequired')}</span>}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="password" className="text-xs uppercase tracking-widest text-gray-500">{t('auth.password')}</Label>
               <Input
                 id="password" type="password" placeholder="••••••••"
-                value={password} onChange={(e) => setPassword(e.target.value)}
-                className="rounded-none border-gray-300 focus-visible:ring-accent" required
+                {...register('password', { required: true })}
+                className="rounded-none border-gray-300 focus-visible:ring-accent"
               />
+              {errors.password && <span className="text-red-500 dark:text-red-400 text-xs">{t('auth.errors.passwordRequired')}</span>}
             </div>
             
             <Button type="submit" className="w-full bg-primary hover:bg-accent text-primary-foreground rounded-none h-12 transition-colors">
@@ -208,7 +215,7 @@ export const Navbar: React.FC = () => {
           <div className="text-center mt-2">
             <button 
               type="button" 
-              onClick={() => { setIsLoginMode(!isLoginMode); setLoginError(null); }}
+              onClick={() => { setIsLoginMode(!isLoginMode); setLoginError(null); reset(); }}
               className="text-sm text-gray-500 hover:text-accent underline underline-offset-4 transition-colors"
             >
               {isLoginMode ? t('auth.noAccount') : t('auth.hasAccount')}

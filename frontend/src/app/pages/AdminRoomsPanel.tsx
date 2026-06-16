@@ -29,6 +29,21 @@ import {
   createAmenity,
   deleteAmenity
 } from '../components/service/api';
+import { useForm } from 'react-hook-form';
+
+interface RoomFormValues {
+  roomNumber: string;
+  name: string;
+  description: string;
+  bedCount: number;
+  maxGuests: number;
+  basePrice: number;
+  currency: string;
+  status: string;
+  hotelId: number;
+  amenityIds: number[];
+  photos?: any[]; 
+}
 
 export const AdminRoomsPanel: React.FC = () => {
   const { t } = useTranslation(); 
@@ -53,19 +68,25 @@ export const AdminRoomsPanel: React.FC = () => {
     amenityName: string;
     roomsUsing: string[];
   } | null>(null);
-
-  const [formData, setFormData] = useState<Partial<RoomDTO>>({
-    roomNumber: '',
-    name: '',
-    description: '',
-    bedCount: 1,
-    maxGuests: 1,
-    basePrice: 0,
-    currency: 'PLN',
-    status: 'DOSTEPNY',
-    hotelId: 1,
-    amenityIds: []
+  
+  const { 
+    register, 
+    handleSubmit, 
+    reset, 
+    setValue,
+    watch,
+    getValues,
+    formState: { errors } 
+  } = useForm<RoomFormValues>({
+    defaultValues: {
+      roomNumber: '', name: '', description: '', bedCount: 1, 
+      maxGuests: 1, basePrice: 0, currency: 'PLN', status: 'DOSTEPNY', 
+      hotelId: 1, amenityIds: [], photos: []
+    }
   });
+
+  const currentAmenities = watch('amenityIds') || [];
+  const currentPhotos = watch('photos') || [];
 
   const loadRooms = async () => {
     setIsLoading(true);
@@ -79,9 +100,6 @@ export const AdminRoomsPanel: React.FC = () => {
       setHotelsList(hotelsData);
       setAmenitiesList(amenitiesData);
       
-      if (hotelsData.length > 0 && formData.hotelId === 1) {
-        setFormData(prev => ({...prev, hotelId: hotelsData[0].id}));
-      }
     } catch (err) {
       console.error(err);
     } finally {
@@ -96,29 +114,32 @@ export const AdminRoomsPanel: React.FC = () => {
   const handleOpenDialog = (room?: RoomDTO) => {
     if (room) {
       setEditingRoomId(room.id);
-      setFormData({
-        ...room,
-        amenityIds: room.amenityIds || []
+      reset({
+        roomNumber: room.roomNumber,
+        name: room.name,
+        description: room.description,
+        bedCount: room.bedCount,
+        maxGuests: room.maxGuests,
+        basePrice: room.basePrice,
+        currency: room.currency,
+        status: room.status,
+        hotelId: room.hotelId,
+        amenityIds: room.amenityIds || [],
+        photos: room.photos || []
       });
     } else {
       setEditingRoomId(null);
-      setFormData({
-        roomNumber: '',
-        name: '',
-        description: '',
-        bedCount: 1,
-        maxGuests: 1,
-        basePrice: 0,
-        currency: 'PLN',
-        status: 'DOSTEPNY',
-        hotelId: hotelsList.length > 0 ? hotelsList[0].id : 1,
-        amenityIds: []
+      reset({
+        roomNumber: '', name: '', description: '', bedCount: 1, 
+        maxGuests: 1, basePrice: 0, currency: 'PLN', status: 'DOSTEPNY', 
+        hotelId: hotelsList.length > 0 ? hotelsList[0].id : 1, 
+        amenityIds: [], photos: []
       });
     }
     setIsDialogOpen(true);
   };
 
-  const handleCloseDialog = () => {
+    const handleCloseDialog = () => {
     setIsDialogOpen(false);
     setEditingRoomId(null);
     setNewPhotoUrl('');
@@ -143,7 +164,7 @@ export const AdminRoomsPanel: React.FC = () => {
       const updatedRooms = await fetchAllRooms();
       const updatedRoom = updatedRooms.find(r => r.id === editingRoomId);
       if(updatedRoom) {
-        setFormData(prev => ({...prev, photos: updatedRoom.photos}));
+        setValue('photos', updatedRoom.photos);
       }
       setRoomsList(updatedRooms);
     } catch(err) {
@@ -160,7 +181,7 @@ export const AdminRoomsPanel: React.FC = () => {
       const updatedRooms = await fetchAllRooms();
       const updatedRoom = updatedRooms.find(r => r.id === editingRoomId);
       if(updatedRoom) {
-        setFormData(prev => ({...prev, photos: updatedRoom.photos}));
+        setValue('photos', updatedRoom.photos);
       }
       setRoomsList(updatedRooms);
     } catch(err) {
@@ -169,13 +190,12 @@ export const AdminRoomsPanel: React.FC = () => {
   };
 
   const handleToggleAmenity = (amenityId: number) => {
-    setFormData(prev => {
-      const currentIds = prev.amenityIds || [];
-      const newIds = currentIds.includes(amenityId)
-        ? currentIds.filter(id => id !== amenityId)
-        : [...currentIds, amenityId];
-      return { ...prev, amenityIds: newIds };
-    });
+    const currentIds = getValues('amenityIds') || [];
+    const newIds = currentIds.includes(amenityId)
+      ? currentIds.filter(id => id !== amenityId)
+      : [...currentIds, amenityId];
+    
+    setValue('amenityIds', newIds);
   };
 
   const handleCreateAmenity = async () => {
@@ -196,11 +216,9 @@ export const AdminRoomsPanel: React.FC = () => {
       setNewAmenityCategory('');
       setIsAddingAmenity(false);
       
-      setFormData(prev => ({
-        ...prev,
-        amenityIds: [...(prev.amenityIds || []), newAmenity.id]
-      }));
-    } catch (err) {
+      const currentIds = getValues('amenityIds') || [];
+      setValue('amenityIds', [...currentIds, newAmenity.id]);
+      } catch (err) {
       alert(t('admin.rooms.alerts.createAmenityError'));
       console.error(err);
     }
@@ -228,10 +246,8 @@ export const AdminRoomsPanel: React.FC = () => {
       await deleteAmenity(amenityId);
       setAmenitiesList(prev => prev.filter(a => a.id !== amenityId));
       
-      setFormData(prev => ({
-        ...prev,
-        amenityIds: (prev.amenityIds || []).filter(id => id !== amenityId)
-      }));
+      const currentIds = getValues('amenityIds') || [];
+      setValue('amenityIds', currentIds.filter(id => id !== amenityId));
       
     } catch (err) {
       alert(t('admin.rooms.alerts.deleteAmenityError'));
@@ -239,12 +255,17 @@ export const AdminRoomsPanel: React.FC = () => {
     }
   };
 
-  const handleSave = async () => {
+  const onSubmit = async (data: RoomFormValues) => {
     try {
+      const payload: Partial<RoomDTO> = {
+        ...data,
+        hotelId: Number(data.hotelId),
+      };
+
       if (editingRoomId) {
-        await updateRoom(editingRoomId, formData as RoomDTO);
+        await updateRoom(editingRoomId, payload as RoomDTO);
       } else {
-        await createRoom(formData as RoomDTO);
+        await createRoom(payload as RoomDTO);
       }
       handleCloseDialog();
       await loadRooms();
@@ -264,14 +285,6 @@ export const AdminRoomsPanel: React.FC = () => {
         console.error(err);
       }
     }
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value, type } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'number' ? Number(value) : value
-    }));
   };
 
   const groupedAmenities = amenitiesList.reduce((acc, amenity) => {
@@ -372,281 +385,269 @@ export const AdminRoomsPanel: React.FC = () => {
             <DialogTitle>{editingRoomId ? t('admin.rooms.dialog.editTitle') : t('admin.rooms.dialog.addTitle')}</DialogTitle>
           </DialogHeader>
           
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="roomNumber">{t('admin.rooms.dialog.roomNumber')}</Label>
-                <Input 
-                  id="roomNumber" 
-                  name="roomNumber"
-                  value={formData.roomNumber} 
-                  onChange={handleChange} 
-                />
+          <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 py-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="roomNumber">{t('admin.rooms.dialog.roomNumber')} *</Label>
+                  <Input 
+                    id="roomNumber" 
+                    {...register('roomNumber', { required: true })}
+                  />
+                  {errors.roomNumber && <span className="text-red-500 dark:text-red-400 text-xs">{t('admin.rooms.form.errors.required')}</span>}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="name">{t('admin.rooms.dialog.name')} *</Label>
+                  <Input 
+                    id="name" 
+                    {...register('name', { required: true })}
+                  />
+                  {errors.name && <span className="text-red-500 dark:text-red-400 text-xs">{t('admin.rooms.form.errors.required')}</span>}
+                </div>
               </div>
+              
               <div className="space-y-2">
-                <Label htmlFor="name">{t('admin.rooms.dialog.name')}</Label>
-                <Input 
-                  id="name" 
-                  name="name"
-                  value={formData.name} 
-                  onChange={handleChange} 
+                <Label htmlFor="description">{t('admin.rooms.dialog.description')} *</Label>
+                <Textarea 
+                  id="description" 
+                  {...register('description', { required: true })}
+                  rows={3}
                 />
+                {errors.description && <span className="text-red-500 dark:text-red-400 text-xs">{t('admin.rooms.form.errors.required')}</span>}
               </div>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="description">{t('admin.rooms.dialog.description')}</Label>
-              <Textarea 
-                id="description" 
-                name="description"
-                value={formData.description} 
-                onChange={handleChange} 
-                rows={3}
-              />
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="maxGuests">{t('admin.rooms.dialog.maxGuests')}</Label>
-                <Input 
-                  id="maxGuests" 
-                  name="maxGuests"
-                  type="number"
-                  min="1"
-                  value={formData.maxGuests} 
-                  onChange={handleChange} 
-                />
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="maxGuests">{t('admin.rooms.dialog.maxGuests')} *</Label>
+                  <Input 
+                    id="maxGuests" 
+                    type="number"
+                    {...register('maxGuests', { required: true, min: 1, valueAsNumber: true })}
+                  />
+                  {errors.maxGuests && <span className="text-red-500 dark:text-red-400 text-xs">{t('admin.rooms.form.errors.minOne')}</span>}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="bedCount">{t('admin.rooms.dialog.bedCount')} *</Label>
+                  <Input 
+                    id="bedCount" 
+                    type="number"
+                    {...register('bedCount', { required: true, min: 1, valueAsNumber: true })}
+                  />
+                  {errors.bedCount && <span className="text-red-500 dark:text-red-400 text-xs">{t('admin.rooms.form.errors.minOne')}</span>}
+                </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="bedCount">{t('admin.rooms.dialog.bedCount')}</Label>
-                <Input 
-                  id="bedCount" 
-                  name="bedCount"
-                  type="number"
-                  min="1"
-                  value={formData.bedCount} 
-                  onChange={handleChange} 
-                />
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="basePrice">{t('admin.rooms.dialog.basePrice')} *</Label>
+                  <Input 
+                    id="basePrice" 
+                    type="number"
+                    step="0.01"
+                    {...register('basePrice', { required: true, min: 0, valueAsNumber: true })}
+                  />
+                  {errors.basePrice && <span className="text-red-500 dark:text-red-400 text-xs">{t('admin.rooms.form.errors.minZero')}</span>}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="status">{t('admin.rooms.dialog.status')}</Label>
+                  <select 
+                    id="status" 
+                    {...register('status', { required: true })}
+                    className="h-9 w-full rounded-md border border-gray-100 bg-white dark:bg-card px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    <option value="DOSTEPNY">{t('admin.rooms.status.DOSTEPNY')}</option>
+                    <option value="SERWIS">{t('admin.rooms.status.SERWIS')}</option>
+                    <option value="NIEDOSTEPNY">{t('admin.rooms.status.NIEDOSTEPNY')}</option>
+                  </select>
+                </div>
               </div>
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
+
               <div className="space-y-2">
-                <Label htmlFor="basePrice">{t('admin.rooms.dialog.basePrice')}</Label>
-                <Input 
-                  id="basePrice" 
-                  name="basePrice"
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={formData.basePrice} 
-                  onChange={handleChange} 
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="status">{t('admin.rooms.dialog.status')}</Label>
+                <Label htmlFor="hotelId">{t('admin.rooms.dialog.hotel')}</Label>
                 <select 
-                  id="status" 
-                  name="status"
-                  value={formData.status}
-                  onChange={handleChange}
-                  className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                  id="hotelId" 
+                  {...register('hotelId', { required: true, valueAsNumber: true })}
+                  className="h-9 w-full rounded-md border border-gray-100 bg-white dark:bg-card px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  <option value="DOSTEPNY">{t('admin.rooms.status.DOSTEPNY')}</option>
-                  <option value="SERWIS">{t('admin.rooms.status.SERWIS')}</option>
-                  <option value="NIEDOSTEPNY">{t('admin.rooms.status.NIEDOSTEPNY')}</option>
+                  {hotelsList.map(hotel => (
+                    <option key={hotel.id} value={hotel.id}>
+                      {hotel.name} ({hotel.stars}★)
+                    </option>
+                  ))}
                 </select>
               </div>
-            </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="hotelId">{t('admin.rooms.dialog.hotel')}</Label>
-              <select 
-                id="hotelId" 
-                name="hotelId"
-                value={formData.hotelId}
-                onChange={handleChange}
-                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {hotelsList.map(hotel => (
-                  <option key={hotel.id} value={hotel.id}>
-                    {hotel.name} ({hotel.stars}★)
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="space-y-3 pt-4 border-t border-gray-200">
-              <div className="flex items-center justify-between">
-                <Label className="text-base font-semibold">{t('admin.rooms.amenities.title')}</Label>
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => setIsAddingAmenity(!isAddingAmenity)}
-                >
-                  <Plus className="h-4 w-4 mr-1" />
-                  {t('admin.rooms.amenities.addNew')}
-                </Button>
-              </div>
-
-              {isAddingAmenity && (
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-3">
-                  <h4 className="font-medium text-sm">{t('admin.rooms.amenities.newAmenityTitle')}</h4>
-                  <div className="grid grid-cols-2 gap-3">
-                    <Input 
-                      placeholder={t('admin.rooms.amenities.namePlaceholder')}
-                      value={newAmenityName}
-                      onChange={e => setNewAmenityName(e.target.value)}
-                    />
-                    <Input 
-                      placeholder={t('admin.rooms.amenities.categoryPlaceholder')}
-                      value={newAmenityCategory}
-                      onChange={e => setNewAmenityCategory(e.target.value)}
-                    />
-                  </div>
-                  <div className="flex gap-2">
-                    <Button type="button" size="sm" onClick={handleCreateAmenity}>
-                      {t('common.create')}
-                    </Button>
-                    <Button 
-                      type="button" 
-                      size="sm" 
-                      variant="outline"
-                      onClick={() => setIsAddingAmenity(false)}
-                    >
-                      {t('common.cancel')}
-                    </Button>
-                  </div>
-                </div>
-              )}
-
-              <div className="max-h-64 overflow-y-auto border border-gray-200 rounded-lg p-3 space-y-4">
-                {Object.keys(groupedAmenities).length === 0 ? (
-                  <p className="text-sm text-gray-500 italic text-center py-4">
-                    {t('admin.rooms.amenities.empty')}
-                  </p>
-                ) : (
-                  Object.entries(groupedAmenities).map(([category, amenities]) => (
-                    <div key={category}>
-                      <h5 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-                        {category}
-                      </h5>
-                      <div className="space-y-2">
-                        {amenities.map((amenity) => {
-                          const isSelected = (formData.amenityIds || []).includes(amenity.id);
-                          
-                          return (
-                            <div
-                              key={amenity.id}
-                              className={`flex items-center justify-between p-2 rounded border transition-all ${
-                                isSelected
-                                  ? 'bg-primary/10 border-primary'
-                                  : 'bg-white border-gray-200 hover:bg-gray-50'
-                              }`}
-                            >
-                              <label
-                                className="flex items-center gap-2 flex-1 cursor-pointer"
-                              >
-                                <input
-                                  type="checkbox"
-                                  checked={isSelected}
-                                  onChange={() => handleToggleAmenity(amenity.id)}
-                                  className="rounded border-gray-300 text-primary focus:ring-primary"
-                                />
-                                <span className={`text-sm flex items-center gap-1 ${isSelected ? 'text-primary font-medium' : ''}`}>
-                                  {isSelected && <Check className="h-3 w-3" />}
-                                  {amenity.name}
-                                </span>
-                              </label>
-                              
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleDeleteAmenity(amenity.id, amenity.name);
-                                }}
-                                className="p-1 hover:bg-red-100 rounded transition-colors group"
-                                title={t('admin.rooms.amenities.deleteTooltip')}
-                              >
-                                <Trash className="h-4 w-4 text-gray-400 group-hover:text-red-600" />
-                              </button>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-
-              <p className="text-xs text-gray-500">
-                {t('admin.rooms.amenities.selectedCount', { count: formData.amenityIds?.length || 0 })}
-              </p>
-            </div>
-
-            {editingRoomId && (
-              <div className="space-y-4 pt-4 border-t border-gray-100">
-                <h3 className="font-semibold">{t('admin.rooms.photos.title')}</h3>
-                
-                <div className="flex gap-2 items-end">
-                  <div className="flex-1 space-y-1">
-                    <Label className="text-xs">{t('admin.rooms.photos.urlLabel')}</Label>
-                    <Input 
-                      placeholder={t('admin.rooms.photos.urlPlaceholder')}
-                      value={newPhotoUrl} 
-                      onChange={e => setNewPhotoUrl(e.target.value)} 
-                    />
-                  </div>
-                  <div className="flex items-center gap-2 pb-2">
-                    <input 
-                      type="checkbox" 
-                      id="isPrimary" 
-                      checked={isPhotoPrimary} 
-                      onChange={e => setIsPhotoPrimary(e.target.checked)} 
-                    />
-                    <Label htmlFor="isPrimary" className="text-sm">{t('admin.rooms.photos.primary')}</Label>
-                  </div>
-                  <Button type="button" onClick={handleAddPhoto} className="bg-primary text-primary-foreground">
-                    {t('common.add')}
+              <div className="space-y-3 pt-4 border-t border-gray-200">
+                <div className="flex items-center justify-between">
+                  <Label className="text-base font-semibold">{t('admin.rooms.amenities.title')}</Label>
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setIsAddingAmenity(!isAddingAmenity)}
+                  >
+                    <Plus className="h-4 w-4 mr-1" />
+                    {t('admin.rooms.amenities.addNew')}
                   </Button>
                 </div>
 
-                <div className="grid grid-cols-3 gap-2 mt-4">
-                  {formData.photos && formData.photos.length > 0 ? (
-                    formData.photos.map(photo => (
-                      <div key={photo.id} className="relative group rounded overflow-hidden border">
-                        <img src={photo.url} alt="Room" className="w-full h-24 object-cover" />
-                        {photo.isPrimary && (
-                          <div className="absolute top-1 left-1 bg-primary text-white text-xs px-1 rounded-sm">
-                            {t('admin.rooms.photos.primaryBadge')}
-                          </div>
-                        )}
-                        <button 
-                          type="button"
-                          onClick={() => handleDeletePhoto(photo.id)}
-                          className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white transition-opacity"
-                        >
-                          <Trash className="h-5 w-5 text-red-400" />
-                        </button>
+                {isAddingAmenity && (
+                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 space-y-3">
+                    <h4 className="font-medium text-sm">{t('admin.rooms.amenities.newAmenityTitle')}</h4>
+                    <div className="grid grid-cols-2 gap-3">
+                      <Input 
+                        placeholder={t('admin.rooms.amenities.namePlaceholder')}
+                        value={newAmenityName}
+                        onChange={e => setNewAmenityName(e.target.value)}
+                      />
+                      <Input 
+                        placeholder={t('admin.rooms.amenities.categoryPlaceholder')}
+                        value={newAmenityCategory}
+                        onChange={e => setNewAmenityCategory(e.target.value)}
+                      />
+                    </div>
+                    <div className="flex gap-2">
+                      <Button type="button" size="sm" onClick={handleCreateAmenity}>
+                        {t('common.create')}
+                      </Button>
+                      <Button 
+                        type="button" 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => setIsAddingAmenity(false)}
+                      >
+                        {t('common.cancel')}
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                <div className="max-h-64 overflow-y-auto border border-gray-200 rounded-lg p-3 space-y-4">
+                  {Object.keys(groupedAmenities).length === 0 ? (
+                    <p className="text-sm text-gray-500 italic text-center py-4">
+                      {t('admin.rooms.amenities.empty')}
+                    </p>
+                  ) : (
+                    Object.entries(groupedAmenities).map(([category, amenities]) => (
+                      <div key={category}>
+                        <h5 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                          {category}
+                        </h5>
+                        <div className="space-y-2">
+                          {amenities.map((amenity) => {
+  
+                            const isSelected = currentAmenities.includes(amenity.id);
+                            
+                            return (
+                              <div
+                                key={amenity.id}
+                                className={`flex items-center justify-between p-2 rounded border transition-all ${
+                                  isSelected
+                                    ? 'bg-primary/10 border-primary'
+                                    : 'bg-white border-gray-200 hover:bg-gray-50'
+                                }`}
+                              >
+                                <label
+                                  className="flex items-center gap-2 flex-1 cursor-pointer"
+                                >
+                                  <input
+                                    type="checkbox"
+                                    checked={isSelected}
+                                    onChange={() => handleToggleAmenity(amenity.id)}
+                                    className="rounded border-gray-300 text-primary focus:ring-primary"
+                                  />
+                                  <span className={`text-sm flex items-center gap-1 ${isSelected ? 'text-primary font-medium' : ''}`}>
+                                    {isSelected && <Check className="h-3 w-3" />}
+                                    {amenity.name}
+                                  </span>
+                                </label>
+                                
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDeleteAmenity(amenity.id, amenity.name);
+                                  }}
+                                  className="p-1 hover:bg-red-100 rounded transition-colors group"
+                                  title={t('admin.rooms.amenities.deleteTooltip')}
+                                >
+                                  <Trash className="h-4 w-4 text-gray-400 group-hover:text-red-600" />
+                                </button>
+                              </div>
+                            );
+                          })}
+                        </div>
                       </div>
                     ))
-                  ) : (
-                    <div className="col-span-3 text-sm text-gray-500 text-center py-2">
-                      {t('admin.rooms.photos.empty')}
-                    </div>
                   )}
                 </div>
+
+                <p className="text-xs text-gray-500">
+                  {t('admin.rooms.amenities.selectedCount', { count: currentAmenities.length })}
+                </p>
               </div>
-            )}
-          </div>
-          
-          <DialogFooter>
-            <Button variant="outline" onClick={handleCloseDialog}>{t('common.cancel')}</Button>
-            <Button onClick={handleSave} className="bg-primary text-primary-foreground">
-              {t('admin.rooms.dialog.saveRoom')}
-            </Button>
-          </DialogFooter>
+
+              {editingRoomId && (
+                <div className="space-y-4 pt-4 border-t border-gray-100">
+                  <h3 className="font-semibold">{t('admin.rooms.photos.title')}</h3>
+                  
+                  <div className="flex gap-2 items-end">
+                    <div className="flex-1 space-y-1">
+                      <Label className="text-xs">{t('admin.rooms.photos.urlLabel')}</Label>
+                      <Input 
+                        placeholder={t('admin.rooms.photos.urlPlaceholder')}
+                        value={newPhotoUrl} 
+                        onChange={e => setNewPhotoUrl(e.target.value)} 
+                      />
+                    </div>
+                    <div className="flex items-center gap-2 pb-2">
+                      <input 
+                        type="checkbox" 
+                        id="isPrimary" 
+                        checked={isPhotoPrimary} 
+                        onChange={e => setIsPhotoPrimary(e.target.checked)} 
+                      />
+                      <Label htmlFor="isPrimary" className="text-sm">{t('admin.rooms.photos.primary')}</Label>
+                    </div>
+                    <Button type="button" onClick={handleAddPhoto} className="bg-primary text-primary-foreground">
+                      {t('common.add')}
+                    </Button>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2 mt-4">
+                    {currentPhotos.length > 0 ? (
+                      currentPhotos.map(photo => (
+                        <div key={photo.id} className="relative group rounded overflow-hidden border">
+                          <img src={photo.url} alt="Room" className="w-full h-24 object-cover" />
+                          {photo.isPrimary && (
+                            <div className="absolute top-1 left-1 bg-primary text-white text-xs px-1 rounded-sm">
+                              {t('admin.rooms.photos.primaryBadge')}
+                            </div>
+                          )}
+                          <button 
+                            type="button"
+                            onClick={() => handleDeletePhoto(photo.id)}
+                            className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white transition-opacity"
+                          >
+                            <Trash className="h-5 w-5 text-red-400" />
+                          </button>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="col-span-3 text-sm text-gray-500 text-center py-2">
+                        {t('admin.rooms.photos.empty')}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+              
+              <DialogFooter className="mt-4 border-t pt-4">
+                <Button type="button" variant="outline" onClick={handleCloseDialog}>{t('common.cancel')}</Button>
+                <Button type="submit" className="bg-primary text-primary-foreground">
+                  {t('admin.rooms.dialog.saveRoom')}
+                </Button>
+              </DialogFooter>
+            </form>
         </DialogContent>
       </Dialog>
 
