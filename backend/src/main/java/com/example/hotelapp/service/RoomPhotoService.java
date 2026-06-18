@@ -25,7 +25,7 @@ public class RoomPhotoService {
     private final RoomPhotoRepository roomPhotoRepository;
     private final RoomRepository roomRepository;
     
-    private final String UPLOAD_DIR = "uploads/";
+    private final String UPLOAD_DIR = "C:/Users/HARDPC/Desktop/Frontendowe/backend/uploads/";
 
     public List<RoomPhotoDTO> getAll() {
         List<RoomPhoto> photosFromDatabase = roomPhotoRepository.findAll();
@@ -36,7 +36,6 @@ public class RoomPhotoService {
         return dtoList;
     }
 
-    
     public RoomPhotoDTO createWithFile(MultipartFile file, Long roomId, Boolean isPrimary) {
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nie znaleziono pokoju o ID"));
@@ -47,11 +46,9 @@ public class RoomPhotoService {
                 Files.createDirectories(uploadPath);
             }
 
-            
             String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
             Path filePath = uploadPath.resolve(fileName);
 
-            
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
             RoomPhoto photo = new RoomPhoto();

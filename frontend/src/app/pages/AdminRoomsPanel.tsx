@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { ArrowLeft, Plus, Edit, Trash, Bed, Users, Check, X, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Plus, Edit, Trash, Bed, Users, Check, X, AlertTriangle, Upload } from 'lucide-react';
 import { useTranslation } from 'react-i18next'; 
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -23,7 +23,6 @@ import {
   updateRoom, 
   deleteRoom, 
   fetchAllHotels, 
-  createRoomPhoto, 
   deleteRoomPhoto,
   fetchAllAmenities,
   createAmenity,
@@ -56,7 +55,8 @@ export const AdminRoomsPanel: React.FC = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingRoomId, setEditingRoomId] = useState<number | null>(null);
   
-  const [newPhotoUrl, setNewPhotoUrl] = useState('');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
   const [isPhotoPrimary, setIsPhotoPrimary] = useState(false);
 
   const [isAddingAmenity, setIsAddingAmenity] = useState(false);
@@ -139,10 +139,10 @@ export const AdminRoomsPanel: React.FC = () => {
     setIsDialogOpen(true);
   };
 
-    const handleCloseDialog = () => {
+  const handleCloseDialog = () => {
     setIsDialogOpen(false);
     setEditingRoomId(null);
-    setNewPhotoUrl('');
+    setSelectedFile(null);
     setIsPhotoPrimary(false);
     setIsAddingAmenity(false);
     setNewAmenityName('');
@@ -150,25 +150,47 @@ export const AdminRoomsPanel: React.FC = () => {
   };
 
   const handleAddPhoto = async () => {
-    if(!editingRoomId || !newPhotoUrl.trim()) return;
+    if (!editingRoomId || !selectedFile) return;
+
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+    formData.append('roomId', editingRoomId.toString());
+    formData.append('isPrimary', isPhotoPrimary ? 'true' : 'false');
+
     try {
-      await createRoomPhoto({
-        roomId: editingRoomId,
-        url: newPhotoUrl,
-        isPrimary: isPhotoPrimary
-      });
-      setNewPhotoUrl('');
-      setIsPhotoPrimary(false);
-      await loadRooms();
+      setIsUploadingPhoto(true);
       
+      const response = await fetch(`http://localhost:8080/api/room_photos`, {
+        method: 'POST',
+        body: formData,
+        credentials: 'include', 
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        alert(`BŁĄD SERWERA (Status ${response.status}):\n${errorText}`);
+        setIsUploadingPhoto(false);
+        return;
+      }
+
+      setSelectedFile(null);
+      setIsPhotoPrimary(false);
+      const fileInput = document.getElementById('photo-upload-input') as HTMLInputElement;
+      if (fileInput) fileInput.value = '';
+
+      await loadRooms();
       const updatedRooms = await fetchAllRooms();
       const updatedRoom = updatedRooms.find(r => r.id === editingRoomId);
-      if(updatedRoom) {
+      if (updatedRoom) {
         setValue('photos', updatedRoom.photos);
       }
       setRoomsList(updatedRooms);
-    } catch(err) {
-      alert(t('admin.rooms.alerts.addPhotoError'));
+      
+    } catch (err: any) {
+      console.error(err);
+      alert(`BŁĄD SIECI:\n${err.message}`);
+    } finally {
+      setIsUploadingPhoto(false);
     }
   };
 
@@ -586,38 +608,53 @@ export const AdminRoomsPanel: React.FC = () => {
                 </p>
               </div>
 
+              {/* zdj z dysku */}
               {editingRoomId && (
                 <div className="space-y-4 pt-4 border-t border-gray-100">
                   <h3 className="font-semibold">{t('admin.rooms.photos.title')}</h3>
                   
-                  <div className="flex gap-2 items-end">
-                    <div className="flex-1 space-y-1">
-                      <Label className="text-xs">{t('admin.rooms.photos.urlLabel')}</Label>
-                      <Input 
-                        placeholder={t('admin.rooms.photos.urlPlaceholder')}
-                        value={newPhotoUrl} 
-                        onChange={e => setNewPhotoUrl(e.target.value)} 
-                      />
+                  <div className="flex flex-col gap-2">
+                    <Label className="text-xs">Wybierz plik z komputera</Label>
+                    <div className="flex gap-2 items-end">
+                      <div className="flex-1 border border-gray-200 rounded overflow-hidden">
+                        <input 
+                          id="photo-upload-input"
+                          type="file" 
+                          accept="image/*"
+                          onChange={e => setSelectedFile(e.target.files?.[0] || null)} 
+                          className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:border-0 file:text-xs file:font-semibold file:bg-gray-50 file:text-gray-700 hover:file:bg-gray-100 cursor-pointer"
+                        />
+                      </div>
+                      
+                      <Button 
+                        type="button" 
+                        onClick={handleAddPhoto} 
+                        disabled={!selectedFile || isUploadingPhoto}
+                        className="bg-primary text-primary-foreground min-w-[100px]"
+                      >
+                        {isUploadingPhoto ? '...' : (
+                          <>
+                            <Upload className="w-4 h-4 mr-2" />
+                            {t('common.add')}
+                          </>
+                        )}
+                      </Button>
                     </div>
-                    <div className="flex items-center gap-2 pb-2">
-                      <input 
-                        type="checkbox" 
-                        id="isPrimary" 
-                        checked={isPhotoPrimary} 
-                        onChange={e => setIsPhotoPrimary(e.target.checked)} 
-                      />
-                      <Label htmlFor="isPrimary" className="text-sm">{t('admin.rooms.photos.primary')}</Label>
-                    </div>
-                    <Button type="button" onClick={handleAddPhoto} className="bg-primary text-primary-foreground">
-                      {t('common.add')}
-                    </Button>
                   </div>
 
                   <div className="grid grid-cols-3 gap-2 mt-4">
                     {currentPhotos.length > 0 ? (
                       currentPhotos.map(photo => (
-                        <div key={photo.id} className="relative group rounded overflow-hidden border">
-                          <img src={photo.url} alt="Room" className="w-full h-24 object-cover" />
+                        <div key={photo.id} className="relative group rounded overflow-hidden border bg-gray-100">
+                          {}
+                          <img 
+                            src={photo.url || 'https://placehold.co/400x300?text=Brak+obrazka'} 
+                            alt="Room" 
+                            className="w-full h-24 object-cover" 
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = 'https://placehold.co/400x300?text=Brak+obrazka';
+                            }}
+                          />
                           {photo.isPrimary && (
                             <div className="absolute top-1 left-1 bg-primary text-white text-xs px-1 rounded-sm">
                               {t('admin.rooms.photos.primaryBadge')}
@@ -633,7 +670,7 @@ export const AdminRoomsPanel: React.FC = () => {
                         </div>
                       ))
                     ) : (
-                      <div className="col-span-3 text-sm text-gray-500 text-center py-2">
+                      <div className="col-span-3 text-sm text-gray-500 text-center py-4 bg-gray-50 rounded border border-dashed">
                         {t('admin.rooms.photos.empty')}
                       </div>
                     )}

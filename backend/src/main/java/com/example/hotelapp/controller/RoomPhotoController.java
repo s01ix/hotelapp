@@ -10,9 +10,11 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/room_photos")
+@RequestMapping("/api/room_photos") 
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true") 
 public class RoomPhotoController {
+    
     private final RoomPhotoService roomPhotoService;
 
     @GetMapping
@@ -20,7 +22,6 @@ public class RoomPhotoController {
         return roomPhotoService.getAll();
     }
 
-    // Endpoint zmieniony pod przyjmowanie pliku zamiast JSON-a
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public RoomPhotoDTO create(
             @RequestParam("file") MultipartFile file,
