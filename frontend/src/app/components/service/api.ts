@@ -160,14 +160,19 @@ export const fetchAvailableRooms = async (checkIn: string, checkOut: string, max
 
     return response.json();
 }
-
+// Funkcja do pobierania WSZYSTKICH pokoi z bazy (na stronę główną)
 export const fetchAllRooms = async (): Promise<RoomDTO[]> => {
-    const response = await fetch(`${API_BASE_URL}/rooms`);
-    if(!response.ok) {
-        throw new Error("Błąd podczas pobierania pokoi");
+    const response = await fetch(`${API_BASE_URL}/rooms`, {
+        method: 'GET',
+    });
+
+    if (!response.ok) {
+        throw new Error("Błąd podczas pobierania wszystkich pokoi");
     }
+
     return response.json();
-}
+};
+
 
 export const fetchAllHotels = async (): Promise<HotelDTO[]> => {
     const response = await fetch(`${API_BASE_URL}/hotels`, {

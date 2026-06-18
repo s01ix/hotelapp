@@ -8,37 +8,66 @@ import com.example.hotelapp.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class RoomPhotoService {
     private final RoomPhotoRepository roomPhotoRepository;
     private final RoomRepository roomRepository;
+    
+    private final String UPLOAD_DIR = "uploads/";
 
     public List<RoomPhotoDTO> getAll() {
         List<RoomPhoto> photosFromDatabase = roomPhotoRepository.findAll();
         List<RoomPhotoDTO> dtoList = new ArrayList<>();
-
         for (RoomPhoto photo : photosFromDatabase) {
             dtoList.add(mapToDto(photo));
         }
         return dtoList;
     }
 
-    public RoomPhotoDTO create(RoomPhotoDTO dto) {
-        Room room = roomRepository.findById(dto.getRoomId())
+    
+    public RoomPhotoDTO createWithFile(MultipartFile file, Long roomId, Boolean isPrimary) {
+        Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nie znaleziono pokoju o ID"));
 
-        RoomPhoto photoToSave = mapToEntity(dto);
-        photoToSave.setRoom(room);
+        try {
+            Path uploadPath = Paths.get(UPLOAD_DIR);
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
 
-        RoomPhoto savedPhoto = roomPhotoRepository.save(photoToSave);
-        return mapToDto(savedPhoto);
+            
+            String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+            Path filePath = uploadPath.resolve(fileName);
+
+            
+            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+            RoomPhoto photo = new RoomPhoto();
+            photo.setRoom(room);
+            
+            photo.setUrl("http://localhost:8080/uploads/" + fileName); 
+            photo.setIsPrimary(isPrimary != null ? isPrimary : false);
+
+            RoomPhoto savedPhoto = roomPhotoRepository.save(photo);
+            return mapToDto(savedPhoto);
+
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Nie udało się zapisać pliku", e);
+        }
     }
+
     public RoomPhotoDTO update(Long id, RoomPhotoDTO dto) {
         RoomPhoto existingPhoto = roomPhotoRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nie znaleziono zdjęcia o ID"));
@@ -67,17 +96,7 @@ public class RoomPhotoService {
         dto.setId(entity.getId());
         dto.setUrl(entity.getUrl());
         dto.setIsPrimary(entity.getIsPrimary());
-
-        if (entity.getRoom() != null) {
-            dto.setRoomId(entity.getRoom().getId());
-        }
+        if (entity.getRoom() != null) dto.setRoomId(entity.getRoom().getId());
         return dto;
-    }
-
-    private RoomPhoto mapToEntity(RoomPhotoDTO dto) {
-        RoomPhoto entity = new RoomPhoto();
-        entity.setUrl(dto.getUrl());
-        entity.setIsPrimary(dto.getIsPrimary() != null ? dto.getIsPrimary() : false);
-        return entity;
     }
 }

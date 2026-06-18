@@ -30,6 +30,7 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
     }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -43,9 +44,12 @@ public class SecurityConfig {
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/api/users/me").permitAll()
                         .requestMatchers("/paypal/**", "/paypal.html").permitAll()
+                        // Odblokowany folder ze zdjęciami
+                        .requestMatchers("/uploads/**").permitAll() 
 
                         .anyRequest().authenticated()
                 )
+                // Przywrócone logowanie OAuth2 (Google)
                 .oauth2Login(oauth2 -> oauth2
                         .defaultSuccessUrl("http://localhost:5173/", true)
                 )
