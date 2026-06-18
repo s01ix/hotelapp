@@ -1,11 +1,13 @@
 package com.example.hotelapp.service;
 
+import com.example.hotelapp.config.WebConfig;
 import com.example.hotelapp.dto.RoomPhotoDTO;
 import com.example.hotelapp.model.Room;
 import com.example.hotelapp.model.RoomPhoto;
 import com.example.hotelapp.repository.RoomPhotoRepository;
 import com.example.hotelapp.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,10 +24,10 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class RoomPhotoService {
+    @Value("${app.upload-dir}")
+    private String uploadDir;
     private final RoomPhotoRepository roomPhotoRepository;
     private final RoomRepository roomRepository;
-    
-    private final String UPLOAD_DIR = "C:/Users/HARDPC/Desktop/Frontendowe/backend/uploads/";
 
     public List<RoomPhotoDTO> getAll() {
         List<RoomPhoto> photosFromDatabase = roomPhotoRepository.findAll();
@@ -41,7 +43,7 @@ public class RoomPhotoService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nie znaleziono pokoju o ID"));
 
         try {
-            Path uploadPath = Paths.get(UPLOAD_DIR);
+            Path uploadPath = Paths.get(uploadDir);
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);
             }
