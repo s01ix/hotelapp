@@ -67,7 +67,8 @@
     "errors": {
       "datesRequired": "Proszę wybrać daty przyjazdu i wyjazdu.",
       "checkInPast": "Data przyjazdu nie może być wcześniejsza niż dzisiaj.",
-      "checkOutBeforeCheckIn": "Data wyjazdu musi być późniejsza niż data przyjazdu."
+      "checkOutBeforeCheckIn": "Data wyjazdu musi być późniejsza niż data przyjazdu.",
+      "invalidGuests": "Proszę wpisać poprawną liczbę gości (1-10)."
     },
     "checkIn": "Data przyjazdu",
     "checkOut": "Data wyjazdu",

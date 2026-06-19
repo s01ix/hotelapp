@@ -70,7 +70,7 @@ export const RoomDetails: React.FC = () => {
 
   const imageUrl = room.photos && room.photos.length > 0
     ? (room.photos.find(p => p.isPrimary)?.url || room.photos[0].url)
-    : "http://localhost:8080/uploads/placeholder.jfif";
+    : "http://localhost:8080/uploads/Noimage.jpg";
 
   return (
     <div className="min-h-screen bg-gray-50">

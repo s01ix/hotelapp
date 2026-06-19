@@ -67,7 +67,8 @@
     "errors": {
       "datesRequired": "Please select check-in and check-out dates.",
       "checkInPast": "Check-in date cannot be in the past.",
-      "checkOutBeforeCheckIn": "Check-out date must be after check-in date."
+      "checkOutBeforeCheckIn": "Check-out date must be after check-in date.",
+      "invalidGuests": "Please enter a valid number of guests (1-10)."
     },
     "checkIn": "Check-in Date",
     "checkOut": "Check-out Date",
