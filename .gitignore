@@ -1,0 +1,7 @@
+.vscode/
+.idea/
+*.iml
+frontend/coverage/
+node_modules/
+backend/target/
+.env

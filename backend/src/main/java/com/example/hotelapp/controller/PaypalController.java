@@ -4,61 +4,76 @@ import com.example.hotelapp.dto.PaymentDTO;
 import com.example.hotelapp.model.PaymentStatus;
 import com.example.hotelapp.service.PaymentService;
 import com.example.hotelapp.service.PaypalService;
+import com.paypal.api.payments.Amount;
 import com.paypal.api.payments.Links;
 import com.paypal.api.payments.Payment;
 import com.paypal.base.rest.PayPalRESTException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
+
+@Slf4j
 @Controller
 @RequestMapping("/paypal")
 @RequiredArgsConstructor
 public class PaypalController {
+
+    private static final String FRONTEND_DASHBOARD = "redirect:http://localhost:5173/dashboard";
 
     private final PaypalService paypalService;
     private final PaymentService paymentService;
 
     @GetMapping("/pay")
     public String pay(@RequestParam("paymentId") Long internalPaymentId) {
+        PaymentDTO pDto;
         try {
-            // Fetch internal payment to get amount and info.
-            // Simplified for demonstration: getting by id, assuming it exists.
-            PaymentDTO pDto = paymentService.getAll().stream()
-                    .filter(p -> p.getId().equals(internalPaymentId))
-                    .findFirst()
-                    .orElse(null);
+            pDto = paymentService.getById(internalPaymentId);
+        } catch (ResponseStatusException e) {
+            return FRONTEND_DASHBOARD + "?error=payment_not_found";
+        }
 
-            if (pDto == null) return "redirect:http://localhost:5173/dashboard?error=payment_not_found";
+        if (pDto.getStatus() == PaymentStatus.OPLACONA) {
+            return FRONTEND_DASHBOARD + "?error=already_paid";
+        }
 
-            String cancelUrl = "http://localhost:8080/paypal/cancel";
-            String successUrl = "http://localhost:8080/paypal/success?internalPaymentId=" + internalPaymentId;
+        String currency = pDto.getCurrency() != null ? pDto.getCurrency() : "PLN";
+        String cancelUrl = "http://localhost:8080/paypal/cancel";
+        String successUrl = "http://localhost:8080/paypal/success?internalPaymentId=" + internalPaymentId;
 
+        try {
             Payment payment = paypalService.createPayment(
                     pDto.getAmount().doubleValue(),
-                    "PLN",
+                    currency,
                     "paypal",
                     "sale",
                     "Opłata za rezerwację " + pDto.getBookingId(),
                     cancelUrl,
                     successUrl);
 
-            for(Links links : payment.getLinks()) {
-                if(links.getRel().equals("approval_url")) {
-                    return "redirect:" + links.getHref();
+            // Zapamiętujemy identyfikator płatności PayPal, żeby przy powrocie
+            // potwierdzić, że opłacono właśnie tę płatność wewnętrzną.
+            paymentService.attachExternalPayment(internalPaymentId, payment.getId());
+
+            for (Links link : payment.getLinks()) {
+                if ("approval_url".equals(link.getRel())) {
+                    return "redirect:" + link.getHref();
                 }
             }
-        } catch (PayPalRESTException e) {
-            e.printStackTrace();
+        } catch (PayPalRESTException | ResponseStatusException e) {
+            log.warn("Nie udało się rozpocząć płatności PayPal dla płatności {}", internalPaymentId, e);
         }
-        return "redirect:http://localhost:5173/dashboard?error=paypal_init_failed";
+        return FRONTEND_DASHBOARD + "?error=paypal_init_failed";
     }
 
     @GetMapping("/cancel")
     public String cancelPay() {
-        return "redirect:http://localhost:5173/dashboard?status=canceled";
+        return FRONTEND_DASHBOARD + "?status=canceled";
     }
 
     @GetMapping("/success")
@@ -67,24 +82,26 @@ public class PaypalController {
                              @RequestParam("internalPaymentId") Long internalPaymentId) {
         try {
             Payment payment = paypalService.executePayment(paymentId, payerId);
-            if(payment.getState().equals("approved")) {
 
-                PaymentDTO pDto = paymentService.getAll().stream()
-                    .filter(p -> p.getId().equals(internalPaymentId))
-                    .findFirst()
-                    .orElse(null);
+            if ("approved".equals(payment.getState())
+                    && payment.getTransactions() != null
+                    && !payment.getTransactions().isEmpty()) {
 
-                if(pDto != null) {
-                    pDto.setStatus(PaymentStatus.OPLACONA);
-                    pDto.setTransactionNumber(paymentId);
-                    paymentService.update(internalPaymentId, pDto);
-                }
+                Amount paid = payment.getTransactions().get(0).getAmount();
 
-                return "redirect:http://localhost:5173/dashboard?status=success";
+                // Weryfikacja: identyfikator transakcji, kwota i waluta muszą się zgadzać
+                // z płatnością wewnętrzną, zanim oznaczymy ją jako opłaconą.
+                paymentService.markAsPaid(
+                        internalPaymentId,
+                        paymentId,
+                        new BigDecimal(paid.getTotal()),
+                        paid.getCurrency());
+
+                return FRONTEND_DASHBOARD + "?status=success";
             }
-        } catch (PayPalRESTException e) {
-            e.printStackTrace();
+        } catch (PayPalRESTException | ResponseStatusException | NumberFormatException e) {
+            log.warn("Weryfikacja płatności PayPal {} nie powiodła się", paymentId, e);
         }
-        return "redirect:http://localhost:5173/dashboard?status=error";
+        return FRONTEND_DASHBOARD + "?status=error";
     }
 }

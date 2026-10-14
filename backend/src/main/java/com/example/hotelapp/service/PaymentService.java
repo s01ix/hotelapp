@@ -9,8 +9,10 @@ import com.example.hotelapp.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +31,56 @@ public class PaymentService {
             dtoList.add(mapToDto(payment));
         }
         return dtoList;
+    }
+
+    public PaymentDTO getById(Long id) {
+        return mapToDto(findPayment(id));
+    }
+
+    /**
+     * Wiąże płatność wewnętrzną z płatnością utworzoną w PayPal.
+     * Dzięki temu przy powrocie z PayPal można sprawdzić, że opłacono właśnie tę płatność.
+     */
+    @Transactional
+    public void attachExternalPayment(Long id, String externalPaymentId) {
+        Payment payment = findPayment(id);
+        if (payment.getStatus() == PaymentStatus.OPLACONA) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Płatność została już opłacona");
+        }
+        payment.setTransactionNumber(externalPaymentId);
+        paymentRepository.save(payment);
+    }
+
+    /**
+     * Oznacza płatność jako opłaconą po weryfikacji danych zwróconych przez PayPal:
+     * identyfikator transakcji, kwota i waluta muszą zgadzać się z płatnością wewnętrzną.
+     */
+    @Transactional
+    public PaymentDTO markAsPaid(Long id, String externalPaymentId, BigDecimal paidAmount, String paidCurrency) {
+        Payment payment = findPayment(id);
+
+        if (payment.getStatus() == PaymentStatus.OPLACONA) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Płatność została już opłacona");
+        }
+        if (externalPaymentId == null || !externalPaymentId.equals(payment.getTransactionNumber())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Transakcja PayPal nie dotyczy tej płatności");
+        }
+        if (paidAmount == null || payment.getAmount() == null || paidAmount.compareTo(payment.getAmount()) != 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Opłacona kwota nie zgadza się z kwotą płatności");
+        }
+        String expectedCurrency = payment.getCurrency() != null ? payment.getCurrency() : "PLN";
+        if (!expectedCurrency.equalsIgnoreCase(paidCurrency)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Waluta transakcji nie zgadza się z walutą płatności");
+        }
+
+        payment.setStatus(PaymentStatus.OPLACONA);
+        payment.setPaidAt(LocalDateTime.now());
+        return mapToDto(paymentRepository.save(payment));
+    }
+
+    private Payment findPayment(Long id) {
+        return paymentRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nie znaleziono płatności o ID: " + id));
     }
 
     public PaymentDTO create(PaymentDTO paymentDTO) {
